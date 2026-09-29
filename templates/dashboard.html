@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>MRCC</title>  <meta name="description" content="Gérez votre compte et vos préférences">
+  <meta name="keywords" content="investissement, finance, dashboard">
+
+  <!-- Favicons -->
+  <link href="{{ url_for('static', filename='img/favicon.png') }}" rel="icon">
+  <link href="{{ url_for('static', filename='img/apple-touch-icon.png') }}" rel="apple-touch-icon">
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Vendor CSS Files -->
+  <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet">
+  <link href="{{ url_for('static', filename='vendor/bootstrap-icons/bootstrap-icons.css') }}" rel="stylesheet">
+  <link href="{{ url_for('static', filename='vendor/aos/aos.css') }}" rel="stylesheet">
+  <link href="{{ url_for('static', filename='css/main.css') }}" rel="stylesheet">
+
+  <!-- Dashboard Specific CSS -->
+  <style>
+    :root {
+      --primary-color: #4361ee;
+      --secondary-color: #3f37c9;
+      --accent-color: #4cc9f0;
+      --light-color: #f8f9fa;
+      --dark-color: #212529;
+      --success-color: #4bb543;
+      --warning-color: #f0ad4e;
+      --danger-color: #d9534f;
+    }
+    
+    body.dashboard {
+      background-color: #f5f7fb;
+      font-family: 'Inter', sans-serif;
+      color: var(--dark-color);
+      padding-top: 70px;
+    }
+    
+    /* Header Styles */
+    .header {
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      box-shadow: 0 2px 20px rgba(67, 97, 238, 0.2);
+      height: 70px;
+    }
+    
+    .header .logo h1 {
+      color: white;
+      font-weight: 700;
+      font-size: 1.8rem;
+    }
+    
+    .header .navmenu ul li a {
+      color: rgba(255, 255, 255, 0.8);
+      font-weight: 500;
+      transition: all 0.3s;
+    }
+    
+    .header .navmenu ul li a:hover,
+    .header .navmenu ul li a.active {
+      color: white;
+    }
+    
+    .user-menu {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+    
+    .username {
+      color: white;
+      font-weight: 500;
+      margin-right: 10px;
+    }
+    
+    .dashboard-header {
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      color: white;
+      padding: 2rem 0;
+      margin-bottom: 2rem;
+      border-radius: 0;
+      box-shadow: 0 4px 20px rgba(67, 97, 238, 0.15);
+      margin-top: -1px;
+    }
+    
+    .dashboard-card {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+      padding: 2rem;
+      margin-bottom: 2rem;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      border: none;
+    }
+    
+    .dashboard-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    }
+    
+    .dashboard-card h2 {
+      color: var(--primary-color);
+      font-weight: 600;
+      margin-bottom: 1.5rem;
+      font-family: 'Manrope', sans-serif;
+      position: relative;
+      padding-bottom: 0.5rem;
+    }
+    
+    .dashboard-card h2::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 50px;
+      height: 3px;
+      background: var(--accent-color);
+    }
+    
+    .form-control-dashboard {
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 12px 15px;
+      font-size: 15px;
+      transition: all 0.3s;
+      margin-bottom: 1.5rem;
+    }
+    
+    .form-control-dashboard:focus {
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+    }
+    
+    .btn-dashboard {
+      background: var(--primary-color);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 12px 25px;
+      font-weight: 500;
+      letter-spacing: 0.5px;
+      transition: all 0.3s;
+      text-transform: uppercase;
+      font-size: 14px;
+    }
+    
+    .btn-dashboard:hover {
+      background: var(--secondary-color);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(67, 97, 238, 0.3);
+    }
+    
+    .user-avatar {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 3px solid white;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      margin-bottom: 1rem;
+    }
+    
+    .user-welcome {
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      color: white;
+    }
+    
+    .user-email {
+      color: rgba(255, 255, 255, 0.8);
+      font-size: 0.9rem;
+    }
+    
+    .form-label {
+      font-weight: 500;
+      margin-bottom: 0.5rem;
+      color: #495057;
+    }
+    
+    .password-toggle {
+      position: absolute;
+      right: 15px;
+      top: 42px;
+      cursor: pointer;
+      color: #6c757d;
+    }
+    
+    .password-toggle:hover {
+      color: var(--primary-color);
+    }
+    
+    .input-group-password {
+      position: relative;
+    }
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .container, .container1 {
+        padding: 1.5rem;
+        margin: 1rem auto;
+    }
+    
+    h2 {
+        font-size: 1.5rem;
+    }
+}
+
+/* Notification Styles */
+.notification-icon {
+    position: relative;
+    cursor: pointer;
+    color: white;
+    font-size: 1.2rem;
+    margin-left: 15px;
+}
+
+.notification-count {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background: #ff4757;
+    color: white;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.7rem;
+    font-weight: bold;
+}
+
+.notification-list {
+    position: absolute;
+    top: 50px;
+    right: 0;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    width: 300px;
+    z-index: 1000;
+    padding: 10px;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.notification-item {
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+    font-size: 0.9rem;
+}
+
+.notification-item:last-child {
+    border-bottom: none;
+}
+
+.notification-item.unread {
+    background-color: #f8f9fa;
+    font-weight: 500;
+}
+  </style>
+</head>
+
+<body class="dashboard">
+  <header id="header" class="header d-flex align-items-center fixed-top">
+    <div class="container-fluid container-xl position-relative d-flex align-items-center">
+      <a href="{{ url_for('index') }}" class="logo d-flex align-items-center me-auto">
+        <h1 data-aos="fade-up"> MRCC</h1>
+      </a>
+
+      <nav id="navmenu" class="navmenu">
+        <ul>
+          <li><a href="{{ url_for('index') }}">Accueil</a></li>
+          <li><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
+          <li><a href="http://geoai-solutions.ddns.net:8888/MRCC/">Géoportail</a></li>
+          <li><a href="{{ url_for('marine') }}">Flotte maritime</a></li>
+          <li><a href="{{ url_for('moyens') }}">Moyens de secours</a></li>
+          <li><a href="{{ url_for('alerte') }}">Alertes</a></li>
+          <li><a href="{{ url_for('api') }}">API</a></li>
+        </ul>
+      </nav>
+
+      <div class="user-menu d-flex align-items-center ms-auto">
+        {% if current_user.is_authenticated %}
+          <span class="username me-2">{{ current_user.username }}</span>
+          <a href="{{ url_for('logout') }}" class="btn btn-sm btn-outline-light">Déconnexion</a>
+        {% else %}
+          <a href="{{ url_for('login') }}" class="btn btn-sm btn-outline-light me-2">Connexion</a>
+          <a href="{{ url_for('register') }}" class="btn btn-sm btn-primary">Inscription</a>
+        {% endif %}
+            <!-- Icône de notification -->
+            <span id="notification-icon" class="notification-icon" onclick="toggleNotifications()">
+              <i class="fa fa-bell"></i>
+              <span id="notification-count" class="notification-count">0</span>
+          </span>
+      </div>
+
+      <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
+            <!-- Liste des notifications -->
+            <div id="notification-list" class="notification-list" style="display: none;">
+              <!-- Notifications affichées via JavaScript -->
+          </div>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="dashboard-header">
+      <div class="container">
+        <div class="row align-items-center">
+          <div class="col-md-2 text-center text-md-start">
+            <img src="{{ url_for('static', filename='img/default-avatar.png') }}" alt="Avatar" class="user-avatar">
+          </div>
+          <div class="col-md-10">
+            <h1 class="user-welcome">Bonjour, {{ user[1] }} {{ user[2] }}</h1>
+       
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="container">
+      <div class="row">
+        <div class="col-lg-8 mx-auto">
+          <!-- Section Informations personnelles -->
+          <div class="dashboard-card" data-aos="fade-up">
+            <h2><i class="bi bi-person-circle me-2"></i>Informations personnelles</h2>
+            <form method="POST">
+              <input type="hidden" name="update_info">
+              
+              <div class="mb-3">
+                <label for="email" class="form-label">Adresse e-mail</label>
+                <input type="email" class="form-control form-control-dashboard" id="email" name="email" value="{{ user[0] }}" required>
+              </div>
+              
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="mb-3">
+                    <label for="first_name" class="form-label">Prénom</label>
+                    <input type="text" class="form-control form-control-dashboard" id="first_name" name="first_name" value="{{ user[1] }}" required>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="mb-3">
+                    <label for="last_name" class="form-label">Nom</label>
+                    <input type="text" class="form-control form-control-dashboard" id="last_name" name="last_name" value="{{ user[2] }}" required>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="mb-3">
+                    <label for="first_name" class="form-label">telephone</label>
+                    <input type="tel" class="form-control form-control-dashboard"  id="telephone" name="telephone" value="{{ user[3] }}" required placeholder="Téléphone">
+                  </div>
+                </div>
+                
+                <div class="col-md-6">
+                  <div class="mb-3">
+                    <label for="first_name" class="form-label">fonction</label>
+                    <input type="text" class="form-control form-control-dashboard"  id="fonction" name="fonction" value="{{ user[4] }}" required placeholder="Fonction">
+                  </div>
+                </div>
+              </div>
+                
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="mb-3">
+                    <label for="first_name" class="form-label">organisme</label>
+                    <input type="text" class="form-control form-control-dashboard" id="organisme" name="organisme" value="{{ user[5] }}" required placeholder="Organisme">
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="first_name" class="form-label">type_organisme</label>
+                    <input type="text" class="form-control form-control-dashboard" id="type_organisme" name="type_organisme" value="{{ user[6] }}" required placeholder="Type d'organisme">
+                </div>
+              </div>
+            </div>
+              
+              <div class="text-end">
+                <button type="submit" class="btn btn-dashboard">
+                  <i class="bi bi-save-fill me-2"></i>Mettre à jour
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Section Mot de passe -->
+          <div class="dashboard-card" data-aos="fade-up" data-aos-delay="100">
+            <h2><i class="bi bi-shield-lock me-2"></i>Sécurité du compte</h2>
+            <form method="POST">
+              <input type="hidden" name="change_password">
+              
+              <div class="mb-3 input-group-password">
+                <label for="old_password" class="form-label">Mot de passe actuel</label>
+                <input type="password" class="form-control form-control-dashboard" id="old_password" name="old_password" required>
+                <i class="bi bi-eye-fill password-toggle" onclick="togglePassword('old_password')"></i>
+              </div>
+              
+              <div class="mb-3 input-group-password">
+                <label for="new_password" class="form-label">Nouveau mot de passe</label>
+                <input type="password" class="form-control form-control-dashboard" id="new_password" name="new_password" required>
+                <i class="bi bi-eye-fill password-toggle" onclick="togglePassword('new_password')"></i>
+                <div class="form-text">Minimum 8 caractères avec des chiffres et symboles</div>
+              </div>
+              
+              <div class="mb-4 input-group-password">
+                <label for="confirm_password" class="form-label">Confirmer le nouveau mot de passe</label>
+                <input type="password" class="form-control form-control-dashboard" id="confirm_password" name="confirm_password" required>
+                <i class="bi bi-eye-fill password-toggle" onclick="togglePassword('confirm_password')"></i>
+              </div>
+              
+              <div class="text-end">
+                <button type="submit" class="btn btn-dashboard">
+                  <i class="bi bi-key-fill me-2"></i>Changer le mot de passe
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+
+
+    <div class="container copyright text-center mt-4">
+      <p>© <span>Copyright</span> <strong class="px-1">MRCC</strong><span>Tous droits réservés</span></p>
+    </div>
+  </footer>
+
+  <!-- Scroll Top -->
+  <a href="#" id="scroll-top" class="scroll-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+
+  <!-- Vendor JS Files -->
+  <script src="{{ url_for('static', filename='vendor/aos/aos.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+
+  <!-- Dashboard Specific JS -->
+  <script>
+    // Activer les animations AOS
+    AOS.init({
+      duration: 800,
+      easing: 'ease-in-out',
+      once: true
+    });
+
+    // Fonction pour basculer la visibilité du mot de passe
+    function togglePassword(id) {
+      const input = document.getElementById(id);
+      const icon = event.currentTarget;
+      
+      if (input.type === "password") {
+        input.type = "text";
+        icon.classList.remove("bi-eye-fill");
+        icon.classList.add("bi-eye-slash-fill");
+      } else {
+        input.type = "password";
+        icon.classList.remove("bi-eye-slash-fill");
+        icon.classList.add("bi-eye-fill");
+      }
+    }
+
+    // Validation du formulaire
+    document.addEventListener('DOMContentLoaded', function() {
+      const forms = document.querySelectorAll('form');
+      
+      forms.forEach(form => {
+        form.addEventListener('submit', function(e) {
+          // Validation basique pour le changement de mot de passe
+          if (this.querySelector('[name="change_password"]')) {
+            const newPassword = this.querySelector('#new_password').value;
+            const confirmPassword = this.querySelector('#confirm_password').value;
+            
+            if (newPassword !== confirmPassword) {
+              e.preventDefault();
+              alert('Les mots de passe ne correspondent pas');
+            }
+            
+            if (newPassword.length < 8) {
+              e.preventDefault();
+              alert('Le mot de passe doit contenir au moins 8 caractères');
+            }
+          }
+        });
+      });
+    });
+  </script>
+</body>
+</html>

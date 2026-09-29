@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>PEPDM - Ajouter une alerte</title>
+  <meta name="description" content="Ajouter une nouvelle alerte environnementale">
+  <meta name="keywords" content="PEPDM, alerte, environnement, données">
+
+  <!-- Favicons -->
+  <link href="{{ url_for('static', filename='img/favicon.png') }}" rel="icon">
+  <link href="{{ url_for('static', filename='img/apple-touch-icon.png') }}" rel="apple-touch-icon">
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
+
+  <!-- Vendor CSS Files -->
+  <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet">
+  <link href="{{ url_for('static', filename='vendor/bootstrap-icons/bootstrap-icons.css') }}" rel="stylesheet">
+  <link href="{{ url_for('static', filename='vendor/aos/aos.css') }}" rel="stylesheet">
+
+  <!-- Main CSS File -->
+  <link href="{{ url_for('static', filename='css/main.css') }}" rel="stylesheet">
+
+  <style>
+    :root {
+      --primary-color: #4361ee;
+      --secondary-color: #3f37c9;
+      --accent-color: #4cc9f0;
+      --light-color: #f8f9fa;
+      --dark-color: #212529;
+      --success-color: #4bb543;
+      --warning-color: #f0ad4e;
+      --danger-color: #d9534f;
+    }
+    
+    body {
+      background-color: #f5f7fb;
+      font-family: 'Inter', sans-serif;
+      color: var(--dark-color);
+      padding-top: 70px;
+    }
+    
+    /* Header Styles */
+    .header {
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      box-shadow: 0 2px 20px rgba(67, 97, 238, 0.2);
+      height: 70px;
+    }
+    
+    .header .logo h1 {
+      color: white;
+      font-weight: 700;
+      font-size: 1.5rem;
+    }
+    
+    .header .navmenu ul li a {
+      color: rgba(255, 255, 255, 0.8);
+      font-weight: 500;
+      transition: all 0.3s;
+    }
+    
+    .header .navmenu ul li a:hover,
+    .header .navmenu ul li a.active {
+      color: white;
+    }
+    
+    .user-menu {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+    
+    .username {
+      color: white;
+      font-weight: 500;
+      margin-right: 10px;
+    }
+    
+    .btn-custom {
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-weight: 500;
+      transition: 0.3s ease-in-out;
+    }
+    
+    .btn-primary-custom {
+      background: white;
+      color: var(--primary-color);
+      border: none;
+    }
+    
+    .btn-primary-custom:hover {
+      background: rgba(255, 255, 255, 0.9);
+    }
+    
+    .btn-secondary-custom {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid white;
+      color: white;
+    }
+    
+    .btn-secondary-custom:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+    
+    /* Main Content Styles */
+    .main-content {
+      padding: 3rem 0;
+      min-height: calc(100vh - 70px - 60px);
+    }
+    
+    .hero {
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .hero-bg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+    }
+    
+    .hero-bg img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0.1;
+    }
+    
+    .form-container {
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+      padding: 2.5rem;
+      width: 90%;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    
+    .form-title {
+      color: var(--primary-color);
+      font-weight: 700;
+      margin-bottom: 2rem;
+      text-align: center;
+      font-family: 'Manrope', sans-serif;
+      position: relative;
+      padding-bottom: 0.5rem;
+    }
+    
+    .form-title::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 80px;
+      height: 3px;
+      background: var(--accent-color);
+    }
+    
+    /* Form Styles */
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+    
+    .form-label {
+      font-weight: 500;
+      color: #495057;
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+    
+    .form-control {
+      width: 100%;
+      padding: 12px 15px;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      font-size: 15px;
+      transition: all 0.3s;
+      background-color: #f9f9f9;
+    }
+    
+    .form-control:focus {
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+      background-color: white;
+    }
+    
+    textarea.form-control {
+      min-height: 120px;
+      resize: vertical;
+    }
+    
+    .btn-submit {
+      background: var(--primary-color);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 12px 25px;
+      font-weight: 500;
+      letter-spacing: 0.5px;
+      transition: all 0.3s;
+      font-size: 16px;
+      width: 100%;
+      margin-top: 1rem;
+    }
+    
+    .btn-submit:hover {
+      background: var(--secondary-color);
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(67, 97, 238, 0.3);
+    }
+    
+    /* Alert Styles */
+    .alert {
+      border-radius: 8px;
+      padding: 12px 15px;
+      margin-bottom: 1.5rem;
+    }
+    
+    .alert-success {
+      background-color: rgba(75, 181, 67, 0.1);
+      border-color: rgba(75, 181, 67, 0.3);
+      color: var(--success-color);
+    }
+    
+    .alert-danger {
+      background-color: rgba(217, 83, 79, 0.1);
+      border-color: rgba(217, 83, 79, 0.3);
+      color: var(--danger-color);
+    }
+    
+    /* Notification Styles */
+    .notification-icon {
+      position: relative;
+      cursor: pointer;
+      color: white;
+      font-size: 1.2rem;
+    }
+    
+    .notification-count {
+      position: absolute;
+      top: -8px;
+      right: -8px;
+      background: var(--danger-color);
+      color: white;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.7rem;
+      font-weight: bold;
+    }
+    
+    .notification-list {
+      position: absolute;
+      top: 50px;
+      right: 0;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+      width: 300px;
+      z-index: 1000;
+      padding: 1rem;
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+      .form-container {
+        padding: 1.5rem;
+      }
+      
+      .header .logo h1 {
+        font-size: 1.3rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header id="header" class="header d-flex align-items-center fixed-top">
+    <div class="container-fluid container-xl position-relative d-flex align-items-center">
+      <a href="{{ url_for('index') }}" class="logo d-flex align-items-center me-auto">
+        <img src="{{ url_for('static', filename='img/logo1.png') }}" alt="PEPDM Logo">
+        <h1>PEPDM</h1>
+      </a>
+
+      <nav id="navmenu" class="navmenu">
+        <ul>
+          <li><a href="{{ url_for('index') }}">Accueil</a></li>
+          <li><a href="{{ url_for('dashboard') }}">Tableau de bord</a></li>
+          <li><a href="{{ url_for('map') }}">Géoportail</a></li>
+          <li><a href="{{ url_for('portfolio') }}">Données</a></li>
+          <li><a href="{{ url_for('gestion_droits') }}">Droits</a></li>
+          <li><a href="{{ url_for('alerte') }}" class="active">Alertes</a></li>
+          <li><a href="{{ url_for('api') }}">API</a></li>
+        </ul>
+      </nav>
+
+      <div class="user-menu ms-auto">
+        {% if current_user.is_authenticated %}
+          <span class="username">{{ current_user.username }}</span>
+          <a href="{{ url_for('logout') }}" class="btn btn-sm btn-primary-custom">Déconnexion</a>
+        {% else %}
+          <a href="{{ url_for('login') }}" class="btn btn-sm btn-primary-custom">Connexion</a>
+          <a href="{{ url_for('register') }}" class="btn btn-sm btn-secondary-custom">Inscription</a>
+        {% endif %}
+        <span id="notification-icon" class="notification-icon" onclick="toggleNotifications()">
+          <i class="fas fa-bell"></i>
+          <span id="notification-count" class="notification-count">0</span>
+        </span>
+      </div>
+      
+      <div id="notification-list" class="notification-list" style="display: none;">
+        <!-- Notifications affichées via JavaScript -->
+      </div>
+
+      <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
+    </div>
+  </header>
+
+  <main class="main-content">
+    <section id="hero" class="hero section">
+      <div class="hero-bg">
+        <img src="{{ url_for('static', filename='img/hero-bg-light.webp') }}" alt="">
+      </div>
+      
+      <div class="form-container" data-aos="fade-up">
+        <h2 class="form-title"><i class="fas fa-plus-circle"></i> Modifier une  alerte</h2>
+        
+        {% with messages = get_flashed_messages(with_categories=True) %}
+          {% if messages %}
+            {% for category, message in messages %}
+              <div class="alert alert-{{ category }}">
+                {{ message }}
+              </div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+    <form method="POST" enctype="multipart/form-data">
+        <div class="form-group">
+        <label for="contenu" class="form-label"><i class="fas fa-align-left"></i>Titre :</label>
+        <input type="text" name="titre" class="form-control" value="{{ alerte[0] }}" required><br><br>
+    </div>
+        <div class="form-group">
+        <label>Contenu :</label>
+        <textarea name="contenu" class="form-control" required>{{ alerte[1] }}</textarea><br><br>
+    </div>
+        <div class="form-group">
+        <label>Fichier (optionnel) :</label>
+        <input type="file" class="form-control" name="fichier"><br><br>
+    </div>
+        <button type="submit" class="btn-submit">
+            <i class="fas fa-check-circle"></i> Enregistrer les modifications
+          </button>
+        <a href="{{ url_for('mes_alertes') }}">Annuler</a>
+</form>
+</div>
+</section>
+</main>
+    <footer id="footer" class="footer position-relative">
+        <div class="container copyright text-center mt-4">
+          <p>© <span>Copyright</span> <strong class="px-1">PEPDM</strong><span>Tous droits réservés</span></p>
+        </div>
+      </footer>
+    
+      <!-- Vendor JS Files -->
+      <script src="{{ url_for('static', filename='vendor/aos/aos.js') }}"></script>
+      <script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>
+      <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    
+      <script>
+        // Initialize AOS animations
+        AOS.init({
+          duration: 800,
+          easing: 'ease-in-out',
+          once: true
+        });
+    
+        // Notification toggle function
+        function toggleNotifications() {
+          const notificationList = document.getElementById('notification-list');
+          notificationList.style.display = notificationList.style.display === 'none' ? 'block' : 'none';
+        }
+      </script>
+    </body>
+    </html>

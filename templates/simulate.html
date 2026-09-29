@@ -1,0 +1,2254 @@
+{% extends "base.html" %}
+
+{% block title %}Simulation de Dérive Avancée - MRCC Maroc{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --primary-color: #001F4D;
+        --secondary-color: #C9A94A;
+        --accent-color: #C9A94A;
+        --gold-light: #D4B15C;
+        --navy-dark: #00112B;
+        --danger-color: #dc3545;
+        --warning-color: #ffc107;
+        --success-color: #28a745;
+        --info-color: #17a2b8;
+    }
+
+    .simulation-container {
+        max-width: 1400px;
+        margin: 2rem auto;
+        padding: 0 2rem;
+    }
+    
+    .card {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 5px 20px rgba(0,31,77,0.15);
+        margin-bottom: 2rem;
+        border: none;
+        overflow: hidden;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .card:hover {
+        box-shadow: 0 8px 25px rgba(0,31,77,0.2);
+    }
+    
+    .card-header {
+        background: linear-gradient(135deg, var(--primary-color), var(--navy-dark));
+        color: white;
+        padding: 1.5rem;
+        border: none;
+    }
+    
+    .card-header h2 {
+        margin: 0;
+        font-size: 1.5rem;
+        font-weight: 600;
+    }
+    
+    .card-header i {
+        color: var(--secondary-color);
+        margin-right: 10px;
+    }
+    
+    .card-body {
+        padding: 2rem;
+    }
+    
+    .form-section {
+        background: #f8f9fa;
+        border-radius: 10px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        border-left: 4px solid var(--secondary-color);
+        transition: border-left-color 0.3s ease;
+    }
+    
+    .form-section:hover {
+        border-left-color: var(--primary-color);
+    }
+    
+    .form-section h3 {
+        color: var(--primary-color);
+        font-size: 1.2rem;
+        margin-bottom: 1rem;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+    }
+    
+    .form-section h3 i {
+        margin-right: 0.5rem;
+        color: var(--secondary-color);
+    }
+    
+    .form-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+    }
+    
+    .form-group {
+        margin-bottom: 1rem;
+    }
+    
+    .form-label {
+        font-weight: 600;
+        color: var(--primary-color);
+        margin-bottom: 0.5rem;
+        display: block;
+        font-size: 0.9rem;
+    }
+    
+    .form-control, .form-select {
+        border: 2px solid #e1e5e9;
+        border-radius: 8px;
+        padding: 0.75rem;
+        transition: all 0.3s ease;
+        font-size: 0.95rem;
+    }
+    
+    .form-control:focus, .form-select:focus {
+        border-color: var(--secondary-color);
+        box-shadow: 0 0 0 3px rgba(201,169,74,0.25);
+        outline: none;
+    }
+    
+    .form-control.is-invalid {
+        border-color: var(--danger-color);
+    }
+    
+    .btn-primary {
+        background: linear-gradient(135deg, var(--primary-color), var(--navy-dark));
+        color: white;
+        border: none;
+        padding: 1rem 2rem;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        width: 100%;
+        font-size: 1.1rem;
+        letter-spacing: 0.5px;
+    }
+    
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(0,31,77,0.3);
+    }
+    
+    .btn-primary:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+    
+    .btn-secondary {
+        background: var(--secondary-color);
+        color: var(--primary-color);
+        border: none;
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-secondary:hover {
+        background: var(--gold-light);
+        transform: translateY(-2px);
+    }
+    
+    .btn-outline {
+        background: transparent;
+        border: 2px solid var(--secondary-color);
+        color: var(--primary-color);
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-outline:hover {
+        background: var(--secondary-color);
+        color: white;
+    }
+    
+    .map-container {
+        height: 500px;
+        border-radius: 10px;
+        overflow: hidden;
+        border: 3px solid var(--primary-color);
+        position: relative;
+    }
+    
+    .map-controls {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        z-index: 1000;
+        background: white;
+        padding: 0.5rem;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    }
+    
+    .results-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin: 1.5rem 0;
+    }
+    
+    .metric-card {
+        background: linear-gradient(135deg, var(--primary-color), var(--navy-dark));
+        color: white;
+        padding: 1.5rem;
+        border-radius: 10px;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+        cursor: pointer;
+        transition: transform 0.3s ease;
+    }
+    
+    .metric-card:hover {
+        transform: translateY(-5px);
+    }
+    
+    .metric-card::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+        transform: rotate(45deg);
+    }
+    
+    .metric-value {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin: 0.5rem 0;
+        position: relative;
+    }
+    
+    .metric-label {
+        font-size: 0.9rem;
+        opacity: 0.9;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        position: relative;
+    }
+    
+    .metric-trend {
+        position: relative;
+        font-size: 0.8rem;
+        margin-top: 0.5rem;
+    }
+    
+    .risk-indicator {
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-weight: 600;
+        display: inline-block;
+        font-size: 0.9rem;
+    }
+    
+    .risk-low {
+        background: var(--success-color);
+        color: white;
+    }
+    
+    .risk-medium {
+        background: var(--warning-color);
+        color: black;
+    }
+    
+    .risk-high {
+        background: var(--danger-color);
+        color: white;
+    }
+    
+    .risk-critical {
+        background: #7b1fa2;
+        color: white;
+    }
+    
+    .recommendation-item {
+        background: #f8f9fa;
+        border-left: 4px solid var(--secondary-color);
+        padding: 1rem;
+        margin-bottom: 0.5rem;
+        border-radius: 0 8px 8px 0;
+        transition: transform 0.3s ease;
+    }
+    
+    .recommendation-item:hover {
+        transform: translateX(5px);
+        background: #fff3e0;
+    }
+    
+    .timeline-container {
+        max-height: 400px;
+        overflow-y: auto;
+        padding-right: 1rem;
+    }
+    
+    .timeline-item {
+        background: white;
+        border: 1px solid #e1e5e9;
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        position: relative;
+        transition: all 0.3s ease;
+    }
+    
+    .timeline-item:hover {
+        transform: translateX(5px);
+        border-color: var(--secondary-color);
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    
+    .timeline-item::before {
+        content: '';
+        position: absolute;
+        left: -2rem;
+        top: 50%;
+        width: 1rem;
+        height: 1rem;
+        background: var(--secondary-color);
+        border-radius: 50%;
+        transform: translateY(-50%);
+        border: 2px solid white;
+    }
+    
+    .pattern-btn {
+        border: 2px solid var(--primary-color);
+        background: white;
+        color: var(--primary-color);
+        padding: 0.5rem 1rem;
+        border-radius: 5px;
+        margin: 0 0.25rem;
+        transition: all 0.3s ease;
+        font-weight: 500;
+    }
+    
+    .pattern-btn:hover, .pattern-btn.active {
+        background: var(--primary-color);
+        color: white;
+    }
+    
+    .loading-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(255,255,255,0.9);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+        border-radius: 10px;
+    }
+    
+    .spinner {
+        width: 50px;
+        height: 50px;
+        border: 5px solid #f3f3f3;
+        border-top: 5px solid var(--secondary-color);
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+    
+    .info-tooltip {
+        background: var(--primary-color);
+        color: white;
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        font-size: 0.8rem;
+        margin-left: 0.5rem;
+        cursor: help;
+        display: inline-block;
+    }
+    
+    .chart-container {
+        height: 300px;
+        margin-top: 2rem;
+    }
+    
+    .badge-route {
+        background: var(--secondary-color);
+        color: var(--primary-color);
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
+    
+    .weather-widget {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 1rem;
+        border-radius: 10px;
+        margin-bottom: 1rem;
+    }
+    
+    .weather-icon {
+        font-size: 2rem;
+        margin-right: 1rem;
+    }
+    
+    .weather-info {
+        display: flex;
+        align-items: center;
+    }
+    
+    .weather-temp {
+        font-size: 1.5rem;
+        font-weight: 600;
+    }
+    
+    .table-custom {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    
+    .table-custom th {
+        background: var(--primary-color);
+        color: white;
+        padding: 0.75rem;
+        text-align: left;
+    }
+    
+    .table-custom td {
+        padding: 0.75rem;
+        border-bottom: 1px solid #e1e5e9;
+    }
+    
+    .table-custom tr:hover {
+        background: #f8f9fa;
+    }
+    
+    .progress {
+        height: 20px;
+        border-radius: 10px;
+        background: #e1e5e9;
+    }
+    
+    .progress-bar {
+        border-radius: 10px;
+        transition: width 0.3s ease;
+    }
+    
+    .alert-custom {
+        padding: 1rem;
+        border-radius: 8px;
+        margin-bottom: 1rem;
+        border-left: 4px solid;
+    }
+    
+    .alert-success {
+        background: #d4edda;
+        border-color: var(--success-color);
+        color: #155724;
+    }
+    
+    .alert-warning {
+        background: #fff3cd;
+        border-color: var(--warning-color);
+        color: #856404;
+    }
+    
+    .alert-danger {
+        background: #f8d7da;
+        border-color: var(--danger-color);
+        color: #721c24;
+    }
+    
+    .alert-info {
+        background: #d1ecf1;
+        border-color: var(--info-color);
+        color: #0c5460;
+    }
+    
+    .stat-card {
+        background: white;
+        border-radius: 10px;
+        padding: 1rem;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        margin-bottom: 1rem;
+    }
+    
+    .stat-title {
+        font-size: 0.9rem;
+        color: #6c757d;
+        margin-bottom: 0.5rem;
+    }
+    
+    .stat-value {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: var(--primary-color);
+    }
+    
+    .stat-unit {
+        font-size: 0.8rem;
+        color: #6c757d;
+        margin-left: 0.25rem;
+    }
+    
+    .stat-change {
+        font-size: 0.8rem;
+        margin-top: 0.25rem;
+    }
+    
+    .stat-change.positive {
+        color: var(--success-color);
+    }
+    
+    .stat-change.negative {
+        color: var(--danger-color);
+    }
+    
+    .legend {
+        display: flex;
+        align-items: center;
+        margin-bottom: 0.5rem;
+    }
+    
+    .legend-color {
+        width: 20px;
+        height: 20px;
+        border-radius: 4px;
+        margin-right: 0.5rem;
+    }
+    
+    .legend-label {
+        font-size: 0.9rem;
+    }
+    
+    @media print {
+        .no-print {
+            display: none !important;
+        }
+        
+        .card {
+            break-inside: avoid;
+        }
+    }
+
+    /* Animations */
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .fade-in {
+        animation: fadeIn 0.5s ease forwards;
+    }
+    
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+        100% { transform: scale(1); }
+    }
+    
+    .pulse {
+        animation: pulse 2s infinite;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- templates/simulate.html - Modification de l'en-tête -->
+<div class="simulation-container">
+    <!-- En-tête avec météo en temps réel -->
+    <div class="card no-print">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h2><i class="fas fa-water"></i>Simulation de Dérive Avancée - MRCC Maroc</h2>
+            <div class="d-flex align-items-center">
+                <div class="weather-widget me-3" id="weatherWidget">
+                    <div class="weather-info">
+                        <i class="fas fa-sun weather-icon"></i>
+                        <div>
+                            <div class="weather-temp" id="currentTemp">18°C</div>
+                            <div id="currentWeather">Mer calme</div>
+                        </div>
+                    </div>
+                </div>
+                <span class="badge bg-light text-dark me-2" id="currentTime"></span>
+                <!-- MODIFICATION: Lien vers la page de guide au lieu d'un modal -->
+                <a href="{{ url_for('derive_guide') }}" class="btn btn-secondary me-2" target="_blank">
+                    <i class="fas fa-info-circle"></i> Guide
+                </a>
+                <button class="btn btn-outline" onclick="exportReport()">
+                    <i class="fas fa-file-pdf"></i> Exporter
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Barre d'alerte d'urgence -->
+    <div class="alert alert-danger no-print" id="emergencyAlert" style="display: none;">
+        <i class="fas fa-exclamation-triangle me-2"></i>
+        <span id="emergencyMessage">⚠️ ALERTE ROUGE - Conditions extrêmes détectées</span>
+        <button class="btn btn-sm btn-light ms-3" onclick="acknowledgeEmergency()">
+            Accuser réception
+        </button>
+    </div>
+    
+    <!-- Contenu principal -->
+    <div class="row">
+        <!-- Colonne de gauche - Paramètres -->
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-header">
+                    <h2><i class="fas fa-sliders-h"></i>Paramètres de Simulation</h2>
+                </div>
+                <div class="card-body">
+                    <form id="simulationForm">
+                        <!-- Position initiale avec prédiction -->
+                        <div class="form-section">
+                            <h3><i class="fas fa-map-marker-alt"></i> Position Initiale</h3>
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label class="form-label">
+                                        Latitude (degrés)
+                                        <span class="info-tooltip" title="Latitude en degrés décimaux (ex: 33.5731)">?</span>
+                                    </label>
+                                    <input type="number" class="form-control" id="startLat" 
+                                           step="0.0001" value="33.5731" min="-90" max="90" required>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">
+                                        Longitude (degrés)
+                                        <span class="info-tooltip" title="Longitude en degrés décimaux (ex: -7.5898)">?</span>
+                                    </label>
+                                    <input type="number" class="form-control" id="startLon" 
+                                           step="0.0001" value="-7.5898" min="-180" max="180" required>
+                                </div>
+                            </div>
+                            <button type="button" class="btn btn-sm btn-outline mt-2" onclick="useCurrentPosition()">
+                                <i class="fas fa-location-arrow"></i> Utiliser ma position
+                            </button>
+                        </div>
+                        
+                        <!-- Conditions environnementales avec prédictions -->
+                        <div class="form-section">
+                            <h3><i class="fas fa-wind"></i> Courants Marins</h3>
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label class="form-label">
+                                        Vitesse (noeuds)
+                                        <span class="info-tooltip" title="Vitesse du courant en nœuds (1 nœud = 1.852 km/h)">?</span>
+                                    </label>
+                                    <input type="number" class="form-control" id="currentSpeed" 
+                                           step="0.1" value="2.5" min="0" max="10" required>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">
+                                        Direction (°)
+                                        <span class="info-tooltip" title="Direction d'où vient le courant (0° = Nord, 90° = Est)">?</span>
+                                    </label>
+                                    <input type="number" class="form-control" id="currentDirection" 
+                                           step="1" value="45" min="0" max="359" required>
+                                </div>
+                            </div>
+                            <div class="form-check mt-2">
+                                <input class="form-check-input" type="checkbox" id="useRealTimeCurrents">
+                                <label class="form-check-label">
+                                    Utiliser les données de courant en temps réel
+                                </label>
+                            </div>
+                            
+                            <h3 class="mt-3"><i class="fas fa-cloud"></i> Vent</h3>
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label class="form-label">
+                                        Vitesse (noeuds)
+                                        <span class="info-tooltip" title="Vitesse du vent en nœuds">?</span>
+                                    </label>
+                                    <input type="number" class="form-control" id="windSpeed" 
+                                           step="0.1" value="15" min="0" max="100" required>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">
+                                        Direction (°)
+                                        <span class="info-tooltip" title="Direction d'où vient le vent (0° = Nord, 90° = Est)">?</span>
+                                    </label>
+                                    <input type="number" class="form-control" id="windDirection" 
+                                           step="1" value="90" min="0" max="359" required>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Caractéristiques de l'objet avec descriptions -->
+                        <div class="form-section">
+                            <h3><i class="fas fa-ship"></i> Caractéristiques</h3>
+                            <div class="form-group">
+                                <label class="form-label">
+                                    Type d'objet
+                                    <span class="info-tooltip" title="Sélectionnez le type d'objet à simuler">?</span>
+                                </label>
+                                <select class="form-select" id="objectType">
+                                    <option value="person" data-coeff="0.03">Personne en mer (coeff. vent: 3%)</option>
+                                    <option value="life_raft" data-coeff="0.04">Radeau de sauvetage (coeff. vent: 4%)</option>
+                                    <option value="lifeboat" data-coeff="0.02">Canot de sauvetage (coeff. vent: 2%)</option>
+                                    <option value="fishing_vessel" data-coeff="0.01">Bateau de pêche (coeff. vent: 1%)</option>
+                                    <option value="cargo_container" data-coeff="0.02">Conteneur (coeff. vent: 2%)</option>
+                                    <option value="yacht" data-coeff="0.025">Voilier (coeff. vent: 2.5%)</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">
+                                    État de la mer (échelle Douglas)
+                                    <span class="info-tooltip" title="État de la mer selon l'échelle de Douglas">?</span>
+                                </label>
+                                <select class="form-select" id="seaState">
+                                    <option value="1">Calme (vagues &lt; 0.1m)</option>
+                                    <option value="2">Peu agitée (vagues 0.1-0.5m)</option>
+                                    <option value="3" selected>Agitée (vagues 0.5-1.25m)</option>
+                                    <option value="4">Très agitée (vagues 1.25-2.5m)</option>
+                                    <option value="5">Grosse mer (vagues 2.5-4m)</option>
+                                    <option value="6">Forte mer (vagues 4-6m)</option>
+                                    <option value="7">Très forte mer (vagues 6-9m)</option>
+                                    <option value="8">Grosse mer (vagues 9-14m)</option>
+                                    <option value="9">Mer énorme (vagues >14m)</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">
+                                    Visibilité (km)
+                                    <span class="info-tooltip" title="Distance de visibilité horizontale">?</span>
+                                </label>
+                                <input type="number" class="form-control" id="visibility" 
+                                       value="10" min="0" max="50" step="0.1">
+                            </div>
+                        </div>
+                        
+                        <!-- Paramètres avancés -->
+                        <div class="form-section">
+                            <h3><i class="fas fa-cog"></i> Paramètres avancés</h3>
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label class="form-label">Durée simulation</label>
+                                    <select class="form-select" id="duration">
+                                        <option value="6">6 heures</option>
+                                        <option value="12">12 heures</option>
+                                        <option value="24" selected>24 heures</option>
+                                        <option value="48">48 heures</option>
+                                        <option value="72">72 heures</option>
+                                        <option value="96">96 heures</option>
+                                        <option value="120">120 heures (5 jours)</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label">Pas de temps</label>
+                                    <select class="form-select" id="timeStep">
+                                        <option value="0.1">6 minutes (haute précision)</option>
+                                        <option value="0.25">15 minutes</option>
+                                        <option value="0.5">30 minutes</option>
+                                        <option value="1">1 heure</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label class="form-label">Température eau (°C)</label>
+                                    <input type="number" class="form-control" id="waterTemp" 
+                                           value="18" step="0.1" min="-2" max="35">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Salinité (PSU)</label>
+                                    <input type="number" class="form-control" id="salinity" 
+                                           value="35" step="0.1" min="0" max="40">
+                                </div>
+                            </div>
+                            
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" id="hasSurvivalGear">
+                                <label class="form-check-label">
+                                    Équipement de survie disponible
+                                    <span class="info-tooltip" title="Gilet de sauvetage, combinaison, etc.">?</span>
+                                </label>
+                            </div>
+                            
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" id="useEnsemble">
+                                <label class="form-check-label">
+                                    Utiliser la simulation d'ensemble (plus précise)
+                                    <span class="info-tooltip" title="Génère plusieurs simulations pour estimer l'incertitude">?</span>
+                                </label>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Nombre de personnes</label>
+                                <input type="number" class="form-control" id="personsCount" 
+                                       value="1" min="1" max="100">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Heures depuis l'incident</label>
+                                <input type="number" class="form-control" id="hoursSince" 
+                                       value="0" min="0" max="168">
+                            </div>
+                        </div>
+                        
+                        <!-- Boutons d'action -->
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn-primary" id="simulateBtn">
+                                <i class="fas fa-play"></i> Lancer la simulation
+                            </button>
+                            <button type="button" class="btn-secondary" onclick="resetForm()">
+                                <i class="fas fa-undo"></i> Réinitialiser
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Aide contextuelle -->
+            <div class="card no-print">
+                <div class="card-header">
+                    <h2><i class="fas fa-lightbulb"></i> Conseils d'utilisation</h2>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info mb-2">
+                        <i class="fas fa-info-circle"></i> Pour une personne en mer, utilisez un pas de temps de 6 minutes
+                    </div>
+                    <div class="alert alert-warning mb-2">
+                        <i class="fas fa-exclamation-triangle"></i> La température de l'eau influence le temps de survie
+                    </div>
+                    <div class="alert alert-success mb-0">
+                        <i class="fas fa-check-circle"></i> Activez la simulation d'ensemble pour une meilleure précision
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Colonne de droite - Résultats -->
+        <div class="col-lg-8">
+            <!-- Carte interactive -->
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h2><i class="fas fa-map"></i> Visualisation</h2>
+                    <div class="map-controls btn-group" role="group">
+                        <button class="btn btn-sm btn-outline" onclick="mapZoomIn()">
+                            <i class="fas fa-search-plus"></i>
+                        </button>
+                        <button class="btn btn-sm btn-outline" onclick="mapZoomOut()">
+                            <i class="fas fa-search-minus"></i>
+                        </button>
+                        <button class="btn btn-sm btn-outline" onclick="resetMapView()">
+                            <i class="fas fa-home"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body p-0 position-relative">
+                    <div class="map-container">
+                        <div id="map" style="height: 100%;"></div>
+                    </div>
+                    
+                    <!-- Légende de la carte -->
+                    <div class="position-absolute bottom-0 start-0 m-3 p-2 bg-white rounded shadow-sm" style="z-index: 1000;">
+                        <div class="legend">
+                            <div class="legend-color" style="background: #001F4D;"></div>
+                            <span class="legend-label">Trajectoire estimée</span>
+                        </div>
+                        <div class="legend">
+                            <div class="legend-color" style="background: #dc3545;"></div>
+                            <span class="legend-label">Zone de recherche</span>
+                        </div>
+                        <div class="legend">
+                            <div class="legend-color" style="background: #28a745;"></div>
+                            <span class="legend-label">Point de départ</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Résultats de simulation (cachés par défaut) -->
+            <div id="resultsSection" style="display: none;">
+                <!-- Métriques principales -->
+                <div class="results-grid">
+                    <div class="metric-card" onclick="showDetail('distance')">
+                        <div class="metric-label">
+                            <i class="fas fa-route"></i> Distance totale
+                        </div>
+                        <div class="metric-value" id="totalDistance">0</div>
+                        <div class="metric-unit">kilomètres</div>
+                        <div class="metric-trend" id="distanceTrend"></div>
+                    </div>
+                    <div class="metric-card" onclick="showDetail('speed')">
+                        <div class="metric-label">
+                            <i class="fas fa-tachometer-alt"></i> Vitesse moyenne
+                        </div>
+                        <div class="metric-value" id="avgSpeed">0</div>
+                        <div class="metric-unit">nœuds</div>
+                        <div class="metric-trend" id="speedTrend"></div>
+                    </div>
+                    <div class="metric-card" onclick="showDetail('area')">
+                        <div class="metric-label">
+                            <i class="fas fa-draw-polygon"></i> Zone de recherche
+                        </div>
+                        <div class="metric-value" id="searchRadius">0</div>
+                        <div class="metric-unit">km²</div>
+                        <div class="metric-trend" id="areaTrend"></div>
+                    </div>
+                </div>
+                
+                <!-- Analyse de risque et recommandations -->
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h2><i class="fas fa-exclamation-triangle"></i> Analyse de risque</h2>
+                            </div>
+                            <div class="card-body">
+                                <!-- Indicateur de risque -->
+                                <div class="d-flex align-items-center justify-content-between mb-3">
+                                    <span class="risk-indicator" id="riskLevel">FAIBLE</span>
+                                    <span class="badge bg-secondary" id="riskScore">0/100</span>
+                                </div>
+                                
+                                <!-- Jauge de risque -->
+                                <div class="progress mb-3" style="height: 25px;">
+                                    <div class="progress-bar" id="riskBar" role="progressbar" 
+                                         style="width: 0%; background: var(--success-color);">
+                                        <span id="riskPercent">0%</span>
+                                    </div>
+                                </div>
+                                
+                                <!-- Facteurs critiques -->
+                                <h6 class="mb-2">
+                                    <i class="fas fa-exclamation-circle text-danger"></i>
+                                    Facteurs critiques :
+                                </h6>
+                                <ul id="riskFactors" class="list-unstyled">
+                                    <!-- Rempli dynamiquement -->
+                                </ul>
+                                
+                                <!-- Temps de survie -->
+                                <h6 class="mt-3 mb-2">
+                                    <i class="fas fa-clock"></i>
+                                    Temps de survie estimé :
+                                </h6>
+                                <div class="progress mb-2" style="height: 20px;">
+                                    <div class="progress-bar bg-warning" id="survivalBar" 
+                                         role="progressbar" style="width: 0%"></div>
+                                </div>
+                                <p id="survivalTime" class="text-center mb-0"></p>
+                                
+                                <!-- Probabilité de survie -->
+                                <div class="stat-card mt-3">
+                                    <div class="stat-title">Probabilité de survie</div>
+                                    <div class="stat-value" id="survivalProbability">75%</div>
+                                    <div class="stat-change positive" id="survivalChange">+5% avec équipement</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h2><i class="fas fa-list"></i> Recommandations opérationnelles</h2>
+                            </div>
+                            <div class="card-body">
+                                <ul id="recommendationsList" class="list-unstyled">
+                                    <!-- Rempli dynamiquement -->
+                                </ul>
+                                
+                                <!-- Plan d'action -->
+                                <div class="mt-3">
+                                    <h6><i class="fas fa-tasks"></i> Plan d'action prioritaire :</h6>
+                                    <ol id="actionPlan" class="mt-2">
+                                        <!-- Rempli dynamiquement -->
+                                    </ol>
+                                </div>
+                                
+                                <!-- Moyens recommandés -->
+                                <div class="mt-3">
+                                    <h6><i class="fas fa-helicopter"></i> Moyens recommandés :</h6>
+                                    <div id="recommendedAssets" class="d-flex flex-wrap gap-2">
+                                        <!-- Rempli dynamiquement -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Graphiques d'analyse -->
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h2><i class="fas fa-chart-line"></i> Évolution de la distance</h2>
+                            </div>
+                            <div class="card-body">
+                                <div class="chart-container">
+                                    <canvas id="distanceChart"></canvas>
+                                </div>
+                                <div class="text-center mt-2">
+                                    <small class="text-muted">Distance cumulative depuis le point de départ</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h2><i class="fas fa-chart-pie"></i> Facteurs de risque</h2>
+                            </div>
+                            <div class="card-body">
+                                <div class="chart-container">
+                                    <canvas id="riskChart"></canvas>
+                                </div>
+                                <div class="text-center mt-2">
+                                    <small class="text-muted">Contribution des facteurs au risque global</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Motifs de recherche -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2><i class="fas fa-search"></i> Motifs de recherche</h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="btn-group mb-3" role="group">
+                            <button class="pattern-btn active" data-pattern="expanding_square">
+                                <i class="fas fa-square"></i> Carré expansif
+                            </button>
+                            <button class="pattern-btn" data-pattern="sector_search">
+                                <i class="fas fa-compass"></i> Recherche sectorielle
+                            </button>
+                            <button class="pattern-btn" data-pattern="parallel_track">
+                                <i class="fas fa-grip-lines"></i> Traces parallèles
+                            </button>
+                            <button class="pattern-btn" data-pattern="shoreline">
+                                <i class="fas fa-mountain"></i> Recherche côtière
+                            </button>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6>Caractéristiques du motif :</h6>
+                                <ul id="patternDetails" class="small">
+                                    <li><strong>Type :</strong> Carré expansif</li>
+                                    <li><strong>Espacement :</strong> 0.5 NM</li>
+                                    <li><strong>Durée estimée :</strong> 2 heures</li>
+                                    <li><strong>Zone couverte :</strong> 25 km²</li>
+                                </ul>
+                            </div>
+                            <div class="col-md-6">
+                                <h6>Moyens adaptés :</h6>
+                                <div class="d-flex flex-wrap gap-2">
+                                    <span class="badge bg-primary">Patrouilleur</span>
+                                    <span class="badge bg-success">Hélicoptère</span>
+                                    <span class="badge bg-info">Vedette</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Timeline détaillée -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2><i class="fas fa-clock"></i> Chronologie des positions</h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="timeline-container" id="timeline">
+                            <!-- Rempli dynamiquement -->
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Rapport détaillé -->
+                <div class="card no-print">
+                    <div class="card-header">
+                        <h2><i class="fas fa-file-alt"></i> Rapport détaillé</h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-custom">
+                                <thead>
+                                    <tr>
+                                        <th>Paramètre</th>
+                                        <th>Valeur</th>
+                                        <th>Interprétation</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="detailedReport">
+                                    <!-- Rempli dynamiquement -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal d'information détaillé -->
+<div class="modal fade" id="infoModal" tabindex="-1">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-info-circle"></i> Guide d'utilisation - MRCC Maroc
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>📊 Modèle de calcul IAMSAR</h6>
+                        <p>Le système utilise les équations standardisées de l'IAMSAR (International Aeronautical and Maritime Search and Rescue Manual) pour calculer la dérive :</p>
+                        
+                        <table class="table table-bordered table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Type d'objet</th>
+                                    <th>Coeff. vent</th>
+                                    <th>Angle dérive</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Personne</td>
+                                    <td>3%</td>
+                                    <td>2.0°</td>
+                                    <td>Personne avec gilet</td>
+                                </tr>
+                                <tr>
+                                    <td>Radeau</td>
+                                    <td>4%</td>
+                                    <td>1.5°</td>
+                                    <td>Radeau gonflable</td>
+                                </tr>
+                                <tr>
+                                    <td>Canot</td>
+                                    <td>2%</td>
+                                    <td>1.0°</td>
+                                    <td>Canot rigide</td>
+                                </tr>
+                                <tr>
+                                    <td>Bateau pêche</td>
+                                    <td>1%</td>
+                                    <td>0.8°</td>
+                                    <td>&lt; 15 mètres</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        
+                        <h6 class="mt-3">🧮 Formules de calcul</h6>
+                        <code>
+                            V<sub>totale</sub> = V<sub>courant</sub> + (V<sub>vent</sub> × C<sub>vent</sub>)<br>
+                            θ<sub>eff</sub> = θ<sub>courant</sub> + (Leeway × État mer)<br>
+                            Distance = ∫ V(t) dt
+                        </code>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <h6>🎯 Instructions détaillées</h6>
+                        <ol>
+                            <li><strong>Position initiale</strong> : Saisissez les coordonnées du dernier contact</li>
+                            <li><strong>Courants</strong> : Utilisez les données des bouées ou des modèles</li>
+                            <li><strong>Vent</strong> : Données météo en temps réel ou prévisions</li>
+                            <li><strong>Type d'objet</strong> : Sélectionnez l'objet le plus proche</li>
+                            <li><strong>État de mer</strong> : Échelle de Douglas (observation visuelle)</li>
+                            <li><strong>Durée</strong> : Adaptez à la situation (max 72h recommandé)</li>
+                        </ol>
+                        
+                        <h6 class="mt-3">⚠️ Facteurs d'incertitude</h6>
+                        <ul>
+                            <li>Courants : ±20%</li>
+                            <li>Vent : ±30%</li>
+                            <li>Position initiale : ±10%</li>
+                            <li>Angle de dérive : ±15%</li>
+                        </ul>
+                        
+                        <div class="alert alert-warning mt-3">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <strong>Note importante :</strong> Les résultats sont des estimations. Toujours prévoir une marge d'incertitude et confirmer par des observations visuelles.
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row mt-3">
+                    <div class="col-12">
+                        <h6>📈 Interprétation des résultats</h6>
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Niveau risque</th>
+                                        <th>Score</th>
+                                        <th>Action requise</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><span class="badge bg-success">Faible</span></td>
+                                        <td>0-40</td>
+                                        <td>Surveillance standard, mise à jour 4h</td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="badge bg-warning">Modéré</span></td>
+                                        <td>40-60</td>
+                                        <td>Surveillance accrue, mise à jour 2h</td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="badge bg-danger">Élevé</span></td>
+                                        <td>60-80</td>
+                                        <td>Déclenchement alerte régionale</td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="badge bg-dark">Critique</span></td>
+                                        <td>80-100</td>
+                                        <td>Alerte générale, tous moyens</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+                <button type="button" class="btn btn-primary" onclick="window.print()">
+                    <i class="fas fa-print"></i> Imprimer le guide
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de détails -->
+<div class="modal fade" id="detailModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="detailModalTitle">Détails</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="detailModalBody">
+                <!-- Rempli dynamiquement -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+// Classe principale de simulation - VERSION AMÉLIORÉE
+class DriftSimulation {
+    constructor() {
+        this.map = null;
+        this.trajectoryLayer = null;
+        this.patternLayer = null;
+        this.routesLayer = null;
+        this.chart = null;
+        this.riskChart = null;
+        this.currentResults = null;
+        this.isSimulating = false;
+        this.weatherInterval = null;
+        
+        this.init();
+    }
+    
+    init() {
+        this.initMap();
+        this.initCharts();
+        this.bindEvents();
+        this.updateDateTime();
+        this.initWeatherUpdates();
+        
+        // Mise à jour de l'heure toutes les secondes
+        setInterval(() => this.updateDateTime(), 1000);
+    }
+    
+    initMap() {
+        try {
+            // Initialiser la carte centrée sur le Maroc
+            this.map = L.map('map').setView([33.5731, -7.5898], 8);
+            
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors',
+                maxZoom: 18
+            }).addTo(this.map);
+            
+            // Ajouter une couche satellite optionnelle
+            L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+                attribution: '© Esri',
+                maxZoom: 18
+            }).addTo(this.map);
+            
+            // Initialiser les calques
+            this.trajectoryLayer = L.layerGroup().addTo(this.map);
+            this.patternLayer = L.layerGroup().addTo(this.map);
+            this.routesLayer = L.layerGroup().addTo(this.map);
+            
+            // Ajouter les routes maritimes
+            this.addMaritimeRoutes();
+            
+            // Ajouter les ports principaux
+            this.addPorts();
+            
+            // Ajouter un marqueur pour le MRCC
+            L.marker([33.5731, -7.5898])
+                .addTo(this.map)
+                .bindPopup('<b>MRCC Casablanca</b><br>Centre de Coordination<br>VHF: Canal 16')
+                .openPopup();
+                
+        } catch (error) {
+            console.error('Erreur initialisation carte:', error);
+            this.showError('Erreur de chargement de la carte');
+        }
+    }
+    
+    addMaritimeRoutes() {
+        fetch('/api/maritime-routes')
+            .then(response => response.json())
+            .then(data => {
+                if (data.routes) {
+                    data.routes.forEach(route => {
+                        const points = route.waypoints.map(w => [w.lat, w.lon]);
+                        const color = route.risk_level === 'CRITIQUE' ? '#ff0000' :
+                                    route.risk_level === 'ÉLEVÉ' ? '#ff6600' : 
+                                    route.risk_level === 'MODÉRÉ' ? '#ffaa00' : '#00aa00';
+                        
+                        const polyline = L.polyline(points, {
+                            color: color,
+                            weight: 3,
+                            opacity: 0.7,
+                            dashArray: '5, 5'
+                        }).addTo(this.routesLayer);
+                        
+                        polyline.bindPopup(`
+                            <b>${route.name}</b><br>
+                            Type: ${route.type}<br>
+                            Trafic: ${route.traffic_density}<br>
+                            Niveau risque: ${route.risk_level}
+                        `);
+                    });
+                }
+            })
+            .catch(error => console.error('Erreur chargement routes:', error));
+    }
+    
+    addPorts() {
+        const ports = [
+            {name: 'Tanger Med', coords: [35.9017, -5.4833], traffic: 'Élevé'},
+            {name: 'Casablanca', coords: [33.6000, -7.6167], traffic: 'Très élevé'},
+            {name: 'Agadir', coords: [30.4167, -9.6000], traffic: 'Moyen'},
+            {name: 'Rabat', coords: [34.0333, -6.8333], traffic: 'Moyen'},
+            {name: 'Safi', coords: [32.2833, -9.2333], traffic: 'Faible'}
+        ];
+        
+        ports.forEach(port => {
+            L.marker(port.coords)
+                .addTo(this.routesLayer)
+                .bindPopup(`<b>Port de ${port.name}</b><br>Trafic: ${port.traffic}`);
+        });
+    }
+    
+    initCharts() {
+        // Graphique de distance
+        const ctx = document.getElementById('distanceChart')?.getContext('2d');
+        if (ctx) {
+            this.chart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'Distance du point de départ (km)',
+                        data: [],
+                        borderColor: '#001F4D',
+                        backgroundColor: 'rgba(0, 31, 77, 0.1)',
+                        tension: 0.4,
+                        fill: true,
+                        pointRadius: 3,
+                        pointHoverRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: (context) => `Distance: ${context.raw.toFixed(1)} km`
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: { display: true, text: 'Distance (km)' }
+                        },
+                        x: {
+                            title: { display: true, text: 'Temps (heures)' }
+                        }
+                    }
+                }
+            });
+        }
+        
+        // Graphique des risques
+        const ctxRisk = document.getElementById('riskChart')?.getContext('2d');
+        if (ctxRisk) {
+            this.riskChart = new Chart(ctxRisk, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Environnemental', 'Opérationnel', 'Médical', 'Navigation'],
+                    datasets: [{
+                        data: [25, 25, 25, 25],
+                        backgroundColor: [
+                            '#ff6b6b',
+                            '#4ecdc4',
+                            '#45b7d1',
+                            '#96ceb4'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom' }
+                    }
+                }
+            });
+        }
+    }
+    
+    bindEvents() {
+        const form = document.getElementById('simulationForm');
+        if (form) {
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+                this.runSimulation();
+            });
+        }
+        
+        // Validation en temps réel
+        ['startLat', 'startLon', 'currentSpeed', 'windSpeed'].forEach(id => {
+            const input = document.getElementById(id);
+            if (input) {
+                input.addEventListener('input', () => this.validateInput(input));
+            }
+        });
+        
+        // Boutons de motifs de recherche
+        document.querySelectorAll('.pattern-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                document.querySelectorAll('.pattern-btn').forEach(b => 
+                    b.classList.remove('active'));
+                e.target.classList.add('active');
+                this.showSearchPattern(e.target.dataset.pattern);
+            });
+        });
+    }
+    
+    validateInput(input) {
+        const value = parseFloat(input.value);
+        const min = parseFloat(input.min) || -Infinity;
+        const max = parseFloat(input.max) || Infinity;
+        
+        if (value < min || value > max || isNaN(value)) {
+            input.classList.add('is-invalid');
+            return false;
+        } else {
+            input.classList.remove('is-invalid');
+            return true;
+        }
+    }
+    
+    initWeatherUpdates() {
+        // Simuler des mises à jour météo
+        this.weatherInterval = setInterval(() => {
+            this.updateWeatherWidget();
+        }, 60000); // Mise à jour toutes les minutes
+    }
+    
+    updateWeatherWidget() {
+        const conditions = [
+            {icon: 'sun', text: 'Ensoleillé', temp: 18 + Math.random() * 5},
+            {icon: 'cloud-sun', text: 'Partiellement nuageux', temp: 16 + Math.random() * 4},
+            {icon: 'cloud', text: 'Nuageux', temp: 15 + Math.random() * 3},
+            {icon: 'cloud-rain', text: 'Pluie faible', temp: 14 + Math.random() * 2}
+        ];
+        
+        const condition = conditions[Math.floor(Math.random() * conditions.length)];
+        const temp = condition.temp.toFixed(1);
+        
+        document.getElementById('currentTemp').textContent = temp + '°C';
+        document.getElementById('currentWeather').innerHTML = `
+            <i class="fas fa-${condition.icon}"></i> ${condition.text}
+        `;
+    }
+    
+    updateDateTime() {
+        const now = new Date();
+        document.getElementById('currentTime').textContent = 
+            now.toLocaleString('fr-FR', { 
+                dateStyle: 'full', 
+                timeStyle: 'medium' 
+            });
+    }
+    
+    async runSimulation() {
+        if (this.isSimulating) return;
+        
+        // Valider tous les champs
+        const inputs = ['startLat', 'startLon', 'currentSpeed', 'currentDirection', 
+                       'windSpeed', 'windDirection'];
+        let isValid = true;
+        
+        inputs.forEach(id => {
+            const input = document.getElementById(id);
+            if (!this.validateInput(input)) isValid = false;
+        });
+        
+        if (!isValid) {
+            this.showError('Veuillez corriger les erreurs de saisie');
+            return;
+        }
+        
+        this.isSimulating = true;
+        this.showLoading();
+        
+        try {
+            const formData = {
+                start_lat: parseFloat(document.getElementById('startLat').value),
+                start_lon: parseFloat(document.getElementById('startLon').value),
+                current_speed: parseFloat(document.getElementById('currentSpeed').value),
+                current_direction: parseFloat(document.getElementById('currentDirection').value),
+                wind_speed: parseFloat(document.getElementById('windSpeed').value),
+                wind_direction: parseFloat(document.getElementById('windDirection').value),
+                object_type: document.getElementById('objectType').value,
+                sea_state: parseInt(document.getElementById('seaState').value),
+                simulation_hours: parseInt(document.getElementById('duration').value),
+                time_step: parseFloat(document.getElementById('timeStep').value),
+                water_temperature: parseFloat(document.getElementById('waterTemp').value),
+                has_survival_gear: document.getElementById('hasSurvivalGear').checked,
+                incident_type: 'man_overboard',
+                persons: parseInt(document.getElementById('personsCount').value),
+                hours_since: parseFloat(document.getElementById('hoursSince').value),
+                visibility: parseFloat(document.getElementById('visibility').value),
+                use_ensemble: document.getElementById('useEnsemble').checked
+            };
+            
+            const response = await fetch('/api/simulate-drift', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(formData)
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                this.currentResults = data;
+                this.displayResults(data);
+                this.visualizeTrajectory(data.simulation_results);
+                this.updateCharts(data);
+                this.showTimeline(data.simulation_results);
+                this.updateDetailedReport(data);
+                this.checkEmergencyConditions(data);
+                
+                document.getElementById('resultsSection').style.display = 'block';
+                
+                // Faire défiler jusqu'aux résultats
+                document.getElementById('resultsSection').scrollIntoView({ 
+                    behavior: 'smooth' 
+                });
+            } else {
+                this.showError(data.error || 'Erreur de simulation');
+            }
+        } catch (error) {
+            console.error('Erreur:', error);
+            this.showError('Erreur de connexion au serveur');
+        } finally {
+            this.isSimulating = false;
+            this.hideLoading();
+        }
+    }
+    
+    displayResults(data) {
+        const results = data.simulation_results;
+        const risk = data.risk_analysis;
+        
+        // Métriques principales avec tendances
+        document.getElementById('totalDistance').textContent = 
+            results.total_drift_distance.toFixed(1);
+        document.getElementById('avgSpeed').textContent = 
+            results.average_speed.toFixed(1);
+        document.getElementById('searchRadius').textContent = 
+            results.search_area.area_km2.toFixed(1);
+        
+        // Tendances
+        document.getElementById('distanceTrend').innerHTML = 
+            results.total_drift_distance > 50 ? 
+            '<i class="fas fa-arrow-up text-warning"></i> Forte dérive' :
+            '<i class="fas fa-minus text-info"></i> Dérive modérée';
+        
+        // Niveau de risque
+        const riskLevel = document.getElementById('riskLevel');
+        const riskScore = document.getElementById('riskScore');
+        const riskBar = document.getElementById('riskBar');
+        const riskPercent = document.getElementById('riskPercent');
+        
+        riskLevel.textContent = risk.priority_level.level;
+        riskScore.textContent = `${risk.global_score.toFixed(0)}/100`;
+        riskPercent.textContent = `${risk.global_score.toFixed(0)}%`;
+        
+        // Couleur de la jauge
+        let barColor = '#28a745';
+        if (risk.global_score > 80) barColor = '#7b1fa2';
+        else if (risk.global_score > 60) barColor = '#dc3545';
+        else if (risk.global_score > 40) barColor = '#ffc107';
+        
+        riskBar.style.width = `${risk.global_score}%`;
+        riskBar.style.background = barColor;
+        
+        riskLevel.className = 'risk-indicator ' + 
+            (risk.global_score > 80 ? 'risk-critical' :
+             risk.global_score > 60 ? 'risk-high' :
+             risk.global_score > 40 ? 'risk-medium' : 'risk-low');
+        
+        // Facteurs de risque
+        const factorsList = document.getElementById('riskFactors');
+        factorsList.innerHTML = '';
+        
+        Object.entries(risk.risk_factors || {}).forEach(([key, value]) => {
+            if (value.factors && value.factors.length > 0) {
+                value.factors.forEach(factor => {
+                    const li = document.createElement('li');
+                    li.className = 'mb-2 d-flex align-items-start';
+                    li.innerHTML = `
+                        <i class="fas fa-exclamation-circle text-danger me-2 mt-1"></i>
+                        <span>${factor}</span>
+                    `;
+                    factorsList.appendChild(li);
+                });
+            }
+        });
+        
+        // Temps de survie
+        const survivalTime = risk.estimated_survival_time || 12;
+        const survivalProb = Math.min(95, (survivalTime / 24) * 100);
+        
+        document.getElementById('survivalTime').textContent = 
+            `Environ ${survivalTime} heures`;
+        document.getElementById('survivalBar').style.width = `${survivalProb}%`;
+        document.getElementById('survivalProbability').textContent = 
+            `${survivalProb.toFixed(0)}%`;
+        
+        // Recommandations
+        const recList = document.getElementById('recommendationsList');
+        recList.innerHTML = '';
+        
+        (risk.recommendations || []).forEach((rec, index) => {
+            const li = document.createElement('li');
+            li.className = 'recommendation-item';
+            li.innerHTML = `<strong>${index + 1}.</strong> ${rec}`;
+            recList.appendChild(li);
+        });
+        
+        // Plan d'action
+        const actionPlan = document.getElementById('actionPlan');
+        actionPlan.innerHTML = '';
+        
+        const actions = [
+            'Évaluer les conditions météo actuelles',
+            'Déployer les moyens de recherche adaptés',
+            'Coordonner avec les unités en mer',
+            'Mettre à jour les positions toutes les heures'
+        ];
+        
+        actions.forEach(action => {
+            const li = document.createElement('li');
+            li.textContent = action;
+            actionPlan.appendChild(li);
+        });
+        
+        // Moyens recommandés
+        const assets = document.getElementById('recommendedAssets');
+        assets.innerHTML = '';
+        
+        const recommendedAssets = [
+            {type: 'Patrouilleur', icon: 'ship'},
+            {type: 'Hélicoptère', icon: 'helicopter'},
+            {type: 'Vedette', icon: 'ship'}
+        ];
+        
+        recommendedAssets.forEach(asset => {
+            const span = document.createElement('span');
+            span.className = 'badge bg-primary p-2';
+            span.innerHTML = `<i class="fas fa-${asset.icon} me-1"></i>${asset.type}`;
+            assets.appendChild(span);
+        });
+    }
+    
+    visualizeTrajectory(results) {
+        if (!this.map) return;
+        
+        this.trajectoryLayer.clearLayers();
+        
+        const positions = results.trajectory.map(p => [p.lat, p.lon]);
+        
+        if (positions.length === 0) return;
+        
+        // Ligne de trajectoire
+        const line = L.polyline(positions, {
+            color: '#001F4D',
+            weight: 4,
+            opacity: 0.8
+        }).addTo(this.trajectoryLayer);
+        
+        // Ajouter des flèches de direction
+        for (let i = 0; i < positions.length; i += Math.floor(positions.length / 10)) {
+            if (i < positions.length - 1) {
+                const start = positions[i];
+                const end = positions[i + 1];
+                const angle = Math.atan2(end[1] - start[1], end[0] - start[0]) * 180 / Math.PI;
+                
+                const arrow = L.marker(end, {
+                    icon: L.divIcon({
+                        html: `<i class="fas fa-arrow-up" style="transform: rotate(${angle}deg); color: #001F4D;"></i>`,
+                        iconSize: [20, 20],
+                        className: 'arrow-marker'
+                    })
+                }).addTo(this.trajectoryLayer);
+            }
+        }
+        
+        // Points horaires
+        results.hourly_positions.forEach((pos, index) => {
+            const circle = L.circleMarker([pos.lat, pos.lon], {
+                radius: index === 0 ? 8 : 5,
+                color: index === 0 ? '#28a745' : '#ffc107',
+                fillColor: index === 0 ? '#28a745' : '#ffc107',
+                fillOpacity: 0.8,
+                weight: 2
+            }).addTo(this.trajectoryLayer);
+            
+            circle.bindPopup(`
+                <b>${index === 0 ? 'Départ' : `T+${pos.time}h`}</b><br>
+                Lat: ${pos.lat.toFixed(4)}°<br>
+                Lon: ${pos.lon.toFixed(4)}°<br>
+                Distance: ${pos.distance_from_start_km.toFixed(1)} km<br>
+                Vitesse: ${pos.speed_knots.toFixed(1)} nœuds
+            `);
+        });
+        
+        // Position finale
+        if (results.final_position) {
+            L.marker([results.final_position.lat, results.final_position.lon], {
+                icon: L.divIcon({
+                    html: '<i class="fas fa-flag-checkered" style="color: #dc3545; font-size: 24px;"></i>',
+                    iconSize: [24, 24],
+                    className: 'flag-marker'
+                })
+            }).addTo(this.trajectoryLayer)
+              .bindPopup('<b>Position finale estimée</b>');
+        }
+        
+        // Zone de recherche (ellipse de dispersion)
+        if (results.search_area) {
+            const searchArea = results.search_area;
+            
+            // Cercle principal
+            L.circle([searchArea.center.lat, searchArea.center.lon], {
+                radius: searchArea.radius_km * 1000,
+                color: '#dc3545',
+                weight: 2,
+                opacity: 0.6,
+                fillOpacity: 0.1,
+                dashArray: '5, 10'
+            }).addTo(this.trajectoryLayer).bindPopup(`
+                <b>Zone de recherche</b><br>
+                Rayon: ${searchArea.radius_km.toFixed(1)} km<br>
+                Surface: ${searchArea.area_km2.toFixed(1)} km²<br>
+                Confiance: 95%
+            `);
+            
+            // Cercles de probabilité
+            [0.5, 0.75].forEach(prob => {
+                L.circle([searchArea.center.lat, searchArea.center.lon], {
+                    radius: searchArea.radius_km * prob * 1000,
+                    color: '#ffc107',
+                    weight: 1,
+                    opacity: 0.3,
+                    fillOpacity: 0,
+                    dashArray: '2, 5'
+                }).addTo(this.trajectoryLayer);
+            });
+        }
+        
+        // Ajuster la vue
+        try {
+            this.map.fitBounds(line.getBounds().pad(0.2));
+        } catch (e) {
+            console.warn('Erreur ajustement vue:', e);
+        }
+    }
+    
+    updateCharts(data) {
+        // Mettre à jour le graphique de distance
+        if (this.chart && data.simulation_results.hourly_positions) {
+            const hourlyData = data.simulation_results.hourly_positions;
+            
+            this.chart.data.labels = hourlyData.map(p => `${p.time}h`);
+            this.chart.data.datasets[0].data = hourlyData.map(p => p.distance_from_start_km);
+            this.chart.update();
+        }
+        
+        // Mettre à jour le graphique des risques
+        if (this.riskChart && data.risk_analysis.risk_factors) {
+            const factors = data.risk_analysis.risk_factors;
+            const riskData = [
+                factors.environmental?.score || 25,
+                factors.operational?.score || 25,
+                factors.medical?.score || 25,
+                factors.navigational?.score || 25
+            ];
+            
+            this.riskChart.data.datasets[0].data = riskData;
+            this.riskChart.update();
+        }
+    }
+    
+    showTimeline(results) {
+        const timeline = document.getElementById('timeline');
+        timeline.innerHTML = '';
+        
+        if (!results.hourly_positions) return;
+        
+        results.hourly_positions.slice(0, 24).forEach(pos => {
+            const item = document.createElement('div');
+            item.className = 'timeline-item';
+            item.innerHTML = `
+                <div class="d-flex justify-content-between">
+                    <strong>T+${pos.time}h</strong>
+                    <span class="badge bg-info">${pos.speed_knots.toFixed(1)} nœuds</span>
+                </div>
+                <small class="text-muted d-block">
+                    <i class="fas fa-map-marker-alt"></i> 
+                    ${pos.lat.toFixed(4)}°, ${pos.lon.toFixed(4)}°
+                </small>
+                <small class="text-muted d-block">
+                    <i class="fas fa-route"></i> 
+                    Distance: ${pos.distance_from_start_km.toFixed(1)} km
+                </small>
+                <small class="text-muted">
+                    <i class="fas fa-compass"></i> 
+                    Direction: ${pos.direction.toFixed(0)}°
+                </small>
+            `;
+            timeline.appendChild(item);
+        });
+    }
+    
+    updateDetailedReport(data) {
+        const report = document.getElementById('detailedReport');
+        report.innerHTML = '';
+        
+        const metrics = data.simulation_results.metrics;
+        const risk = data.risk_analysis;
+        const params = data.metadata.parameters_used;
+        
+        const details = [
+            {param: 'Position initiale', value: `${params.start_lat}°, ${params.start_lon}°`, 
+             interpretation: 'Point de départ'},
+            {param: 'Distance totale', value: `${metrics.total_distance.toFixed(1)} km`, 
+             interpretation: metrics.total_distance > 50 ? 'Dérive importante' : 'Dérive modérée'},
+            {param: 'Vitesse moyenne', value: `${metrics.avg_speed.toFixed(1)} nœuds`, 
+             interpretation: metrics.avg_speed > 3 ? 'Dérive rapide' : 'Dérive lente'},
+            {param: 'Vitesse maximale', value: `${metrics.max_speed.toFixed(1)} nœuds`, 
+             interpretation: 'Pointe de vitesse'},
+            {param: 'Rayon de recherche', value: `${data.simulation_results.search_area.radius_km.toFixed(1)} km`, 
+             interpretation: 'Zone de probabilité 95%'},
+            {param: 'Score de risque', value: `${risk.global_score.toFixed(0)}/100`, 
+             interpretation: risk.priority_level.level},
+            {param: 'Temps de survie', value: `${risk.estimated_survival_time} heures`, 
+             interpretation: risk.estimated_survival_time < 6 ? 'Critique' : 'Standard'}
+        ];
+        
+        details.forEach(detail => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td><strong>${detail.param}</strong></td>
+                <td>${detail.value}</td>
+                <td><span class="badge bg-light text-dark">${detail.interpretation}</span></td>
+            `;
+            report.appendChild(tr);
+        });
+    }
+    
+    checkEmergencyConditions(data) {
+        const riskScore = data.risk_analysis.global_score;
+        const alertDiv = document.getElementById('emergencyAlert');
+        
+        if (riskScore > 75) {
+            alertDiv.style.display = 'block';
+            document.getElementById('emergencyMessage').innerHTML = `
+                ⚠️ ALERTE ROUGE - Risque critique (${riskScore.toFixed(0)}/100)<br>
+                Conditions extrêmes - Intervention immédiate requise
+            `;
+            
+            // Jouer une alerte sonore
+            try {
+                const audio = new Audio('data:audio/wav;base64,UklGRlwAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YVoAAACAgICAf39/f3+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v78=');
+                audio.play();
+            } catch (e) {
+                console.log('Alerte sonore non disponible');
+            }
+        } else {
+            alertDiv.style.display = 'none';
+        }
+    }
+    
+    async showSearchPattern(patternType) {
+        if (!this.currentResults || !this.currentResults.simulation_results.final_position) return;
+        
+        this.patternLayer.clearLayers();
+        
+        const pos = this.currentResults.simulation_results.final_position;
+        
+        // Mettre à jour les détails du motif
+        const details = {
+            'expanding_square': {
+                desc: 'Carré expansif',
+                spacing: '0.5 NM',
+                duration: '2-4 heures',
+                area: '25-100 km²'
+            },
+            'sector_search': {
+                desc: 'Sectorielle',
+                spacing: 'Rayon 2 NM',
+                duration: '1-2 heures',
+                area: '12-50 km²'
+            },
+            'parallel_track': {
+                desc: 'Parallèle',
+                spacing: '0.3 NM',
+                duration: '3-6 heures',
+                area: '50-200 km²'
+            },
+            'shoreline': {
+                desc: 'Côtière',
+                spacing: '1 NM',
+                duration: '2-3 heures',
+                area: '30-80 km²'
+            }
+        };
+        
+        const patternDetail = details[patternType] || details['expanding_square'];
+        
+        document.getElementById('patternDetails').innerHTML = `
+            <li><strong>Type :</strong> ${patternDetail.desc}</li>
+            <li><strong>Espacement :</strong> ${patternDetail.spacing}</li>
+            <li><strong>Durée estimée :</strong> ${patternDetail.duration}</li>
+            <li><strong>Zone couverte :</strong> ${patternDetail.area}</li>
+        `;
+        
+        try {
+            const response = await fetch('/api/search-patterns', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    lat: pos.lat,
+                    lon: pos.lon,
+                    pattern: patternType,
+                    radius: 2
+                })
+            });
+            
+            const data = await response.json();
+            
+            if (data.success && data.coordinates) {
+                // Dessiner le pattern
+                const patternLine = L.polyline(data.coordinates, {
+                    color: patternType === 'expanding_square' ? '#ff0000' :
+                           patternType === 'sector_search' ? '#00ff00' : 
+                           patternType === 'parallel_track' ? '#0000ff' : '#ff00ff',
+                    weight: 3,
+                    opacity: 0.8,
+                    dashArray: '5, 10'
+                }).addTo(this.patternLayer);
+                
+                patternLine.bindPopup(`
+                    <b>Motif: ${patternDetail.desc}</b><br>
+                    ${data.metadata.pattern_description || ''}
+                `);
+                
+                // Centrer la vue
+                try {
+                    this.map.fitBounds(patternLine.getBounds().pad(0.1));
+                } catch (e) {
+                    console.warn('Erreur ajustement vue pattern');
+                }
+            }
+        } catch (error) {
+            console.error('Erreur pattern:', error);
+        }
+    }
+    
+    showLoading() {
+        let overlay = document.querySelector('.loading-overlay');
+        if (!overlay) {
+            overlay = document.createElement('div');
+            overlay.className = 'loading-overlay';
+            overlay.innerHTML = `
+                <div class="spinner"></div>
+                <div class="mt-3 text-primary">Calcul de la trajectoire...</div>
+            `;
+            document.querySelector('.map-container').appendChild(overlay);
+        }
+        overlay.style.display = 'flex';
+        document.getElementById('simulateBtn').disabled = true;
+    }
+    
+    hideLoading() {
+        const overlay = document.querySelector('.loading-overlay');
+        if (overlay) {
+            overlay.style.display = 'none';
+        }
+        document.getElementById('simulateBtn').disabled = false;
+    }
+    
+    showError(message) {
+        const alert = document.createElement('div');
+        alert.className = 'alert alert-danger alert-dismissible fade show';
+        alert.style.position = 'fixed';
+        alert.style.top = '20px';
+        alert.style.right = '20px';
+        alert.style.zIndex = '9999';
+        alert.style.minWidth = '300px';
+        alert.innerHTML = `
+            <strong><i class="fas fa-exclamation-triangle"></i> Erreur!</strong><br>
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        `;
+        document.body.appendChild(alert);
+        
+        setTimeout(() => {
+            if (alert.parentNode) {
+                alert.parentNode.removeChild(alert);
+            }
+        }, 5000);
+    }
+    
+    destroy() {
+        if (this.weatherInterval) {
+            clearInterval(this.weatherInterval);
+        }
+        if (this.map) {
+            this.map.remove();
+        }
+    }
+}
+
+// Fonctions globales
+function showInfo() {
+    const modal = new bootstrap.Modal(document.getElementById('infoModal'));
+    modal.show();
+}
+
+function showDetail(type) {
+    const modal = new bootstrap.Modal(document.getElementById('detailModal'));
+    const modalTitle = document.getElementById('detailModalTitle');
+    const modalBody = document.getElementById('detailModalBody');
+    
+    const details = {
+        'distance': {
+            title: 'Détails - Distance totale',
+            content: `
+                <p>La distance totale représente la longueur cumulée de la trajectoire de dérive.</p>
+                <ul>
+                    <li>< 10 km : Dérive faible</li>
+                    <li>10-50 km : Dérive modérée</li>
+                    <li>50-100 km : Dérive importante</li>
+                    <li>> 100 km : Dérive majeure</li>
+                </ul>
+                <p>Facteurs influents :</p>
+                <ul>
+                    <li>Vitesse du courant</li>
+                    <li>Force du vent</li>
+                    <li>Type d'objet</li>
+                </ul>
+            `
+        },
+        'speed': {
+            title: 'Détails - Vitesse moyenne',
+            content: `
+                <p>La vitesse moyenne de dérive est calculée sur toute la durée de la simulation.</p>
+                <ul>
+                    <li>< 1 nœud : Dérive très lente</li>
+                    <li>1-2 nœuds : Dérive lente</li>
+                    <li>2-3 nœuds : Dérive modérée</li>
+                    <li>> 3 nœuds : Dérive rapide</li>
+                </ul>
+            `
+        },
+        'area': {
+            title: 'Détails - Zone de recherche',
+            content: `
+                <p>La zone de recherche est calculée avec un intervalle de confiance de 95%.</p>
+                <p>Elle tient compte :</p>
+                <ul>
+                    <li>De la dispersion des trajectoires possibles</li>
+                    <li>Des incertitudes de mesure</li>
+                    <li>Des conditions environnementales</li>
+                </ul>
+            `
+        }
+    };
+    
+    const detail = details[type] || details['distance'];
+    modalTitle.textContent = detail.title;
+    modalBody.innerHTML = detail.content;
+    
+    modal.show();
+}
+
+function useCurrentPosition() {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                document.getElementById('startLat').value = position.coords.latitude.toFixed(4);
+                document.getElementById('startLon').value = position.coords.longitude.toFixed(4);
+            },
+            (error) => {
+                alert('Impossible d\'obtenir votre position: ' + error.message);
+            }
+        );
+    } else {
+        alert('Géolocalisation non supportée');
+    }
+}
+
+function resetForm() {
+    document.getElementById('simulationForm').reset();
+    document.getElementById('resultsSection').style.display = 'none';
+    if (window.simulation) {
+        window.simulation.trajectoryLayer.clearLayers();
+        window.simulation.patternLayer.clearLayers();
+    }
+}
+
+function mapZoomIn() {
+    if (window.simulation && window.simulation.map) {
+        window.simulation.map.zoomIn();
+    }
+}
+
+function mapZoomOut() {
+    if (window.simulation && window.simulation.map) {
+        window.simulation.map.zoomOut();
+    }
+}
+
+function resetMapView() {
+    if (window.simulation && window.simulation.map) {
+        window.simulation.map.setView([33.5731, -7.5898], 8);
+    }
+}
+
+function acknowledgeEmergency() {
+    document.getElementById('emergencyAlert').style.display = 'none';
+}
+
+function exportReport() {
+    if (!window.simulation || !window.simulation.currentResults) {
+        alert('Veuillez d\'abord lancer une simulation');
+        return;
+    }
+    
+    // Créer un rapport texte
+    const results = window.simulation.currentResults;
+    const data = results.simulation_results;
+    const risk = results.risk_analysis;
+    
+    let report = 'RAPPORT DE SIMULATION - MRCC MAROC\n';
+    report += '='.repeat(50) + '\n\n';
+    report += `Date: ${new Date().toLocaleString('fr-FR')}\n\n`;
+    
+    report += 'PARAMÈTRES\n';
+    report += '-'.repeat(30) + '\n';
+    report += `Position: ${results.metadata.parameters_used.start_lat}°, ${results.metadata.parameters_used.start_lon}°\n`;
+    report += `Courant: ${results.metadata.parameters_used.current_speed} nœuds / ${results.metadata.parameters_used.current_direction}°\n`;
+    report += `Vent: ${results.metadata.parameters_used.wind_speed} nœuds / ${results.metadata.parameters_used.wind_direction}°\n\n`;
+    
+    report += 'RÉSULTATS\n';
+    report += '-'.repeat(30) + '\n';
+    report += `Distance totale: ${data.total_drift_distance.toFixed(1)} km\n`;
+    report += `Vitesse moyenne: ${data.average_speed.toFixed(1)} nœuds\n`;
+    report += `Zone de recherche: ${data.search_area.area_km2.toFixed(1)} km²\n`;
+    report += `Niveau risque: ${risk.priority_level.level} (${risk.global_score.toFixed(0)}/100)\n\n`;
+    
+    report += 'RECOMMANDATIONS\n';
+    report += '-'.repeat(30) + '\n';
+    risk.recommendations.forEach(rec => {
+        report += `- ${rec}\n`;
+    });
+    
+    // Télécharger le rapport
+    const blob = new Blob([report], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `rapport_simulation_${Date.now()}.txt`;
+    a.click();
+    URL.revokeObjectURL(url);
+}
+
+// Initialisation
+document.addEventListener('DOMContentLoaded', () => {
+    // Nettoyer l'instance précédente si elle existe
+    if (window.simulation) {
+        window.simulation.destroy();
+    }
+    window.simulation = new DriftSimulation();
+});
+
+// Nettoyage à la fermeture
+window.addEventListener('beforeunload', () => {
+    if (window.simulation) {
+        window.simulation.destroy();
+    }
+});
+</script>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Scripts supplémentaires optionnels -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+{% endblock %}

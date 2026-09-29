@@ -1,0 +1,1096 @@
+<!-- templates/moyens.html -->
+{% extends "base.html" %}
+
+{% block title %}Moyens de Secours - MRCC Maroc{% endblock %}
+
+{% block extra_css %}
+<style>
+    .resource-card {
+        border: none;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        transition: transform 0.2s, box-shadow 0.2s;
+        margin-bottom: 20px;
+    }
+    
+    .resource-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    }
+    
+    .resource-header {
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        color: white;
+        padding: 15px;
+        border-radius: 12px 12px 0 0;
+    }
+    
+    .status-badge {
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
+    
+    .status-available { background-color: #28a745; color: white; }
+    .status-on_mission { background-color: #ffc107; color: #856404; }
+    .status-maintenance { background-color: #fd7e14; color: white; }
+    .status-out_of_service { background-color: #dc3545; color: white; }
+    
+    .map-container {
+        height: 500px;
+        border-radius: 12px;
+        overflow: hidden;
+        margin-bottom: 30px;
+    }
+    
+    .filter-section {
+        background: #f8f9fa;
+        padding: 20px;
+        border-radius: 12px;
+        margin-bottom: 30px;
+    }
+    
+    .resource-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        margin-right: 15px;
+    }
+    
+    .resource-icon.boat { background: #e3f2fd; color: #1976d2; }
+    .resource-icon.helicopter { background: #f3e5f5; color: #7b1fa2; }
+    .resource-icon.vehicle { background: #e8f5e9; color: #388e3c; }
+    
+    .export-buttons {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 20px;
+    }
+    
+    .action-buttons {
+        display: flex;
+        gap: 5px;
+        justify-content: center;
+    }
+    
+    .action-buttons .btn {
+        padding: 5px 10px;
+        font-size: 0.8rem;
+    }
+    
+    .toast-container {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        z-index: 9999;
+    }
+    
+    .loading-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 9998;
+    }
+    
+    .stats-summary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 20px;
+        border-radius: 12px;
+        margin-bottom: 20px;
+    }
+    
+    .stats-summary h3 {
+        margin: 0 0 10px 0;
+    }
+    
+    .stats-summary .stats-numbers {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 15px;
+    }
+    
+    .stats-summary .stat-item {
+        text-align: center;
+    }
+    
+    .stats-summary .stat-value {
+        font-size: 24px;
+        font-weight: bold;
+    }
+    
+    .stats-summary .stat-label {
+        font-size: 12px;
+        opacity: 0.9;
+    }
+    
+    .search-box {
+        position: relative;
+    }
+    
+    .search-box i {
+        position: absolute;
+        left: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #999;
+    }
+    
+    .search-box input {
+        padding-left: 35px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1>
+                    <i class="bi bi-life-preserver me-2"></i>
+                    Moyens de Secours
+                </h1>
+                <div class="export-buttons">
+                    <button class="btn btn-success" onclick="exportToExcel()">
+                        <i class="bi bi-file-excel me-2"></i>Excel
+                    </button>
+                    <button class="btn btn-danger" onclick="exportToPDF()">
+                        <i class="bi bi-file-pdf me-2"></i>PDF
+                    </button>
+                    <button class="btn btn-info" onclick="exportToCSV()">
+                        <i class="bi bi-filetype-csv me-2"></i>CSV
+                    </button>
+                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addResourceModal">
+                        <i class="bi bi-plus-circle me-2"></i>Ajouter
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Statistiques -->
+    <div class="stats-summary" id="statsSummary">
+        <h3><i class="bi bi-bar-chart me-2"></i>Statistiques des moyens</h3>
+        <div class="stats-numbers">
+            <div class="stat-item">
+                <div class="stat-value" id="totalCount">0</div>
+                <div class="stat-label">Total moyens</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value text-success" id="availableCount">0</div>
+                <div class="stat-label">Disponibles</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value text-warning" id="missionCount">0</div>
+                <div class="stat-label">En mission</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value text-danger" id="outCount">0</div>
+                <div class="stat-label">Hors service</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Filtres -->
+    <div class="filter-section">
+        <div class="row g-3">
+            <div class="col-md-3">
+                <label class="form-label">Recherche</label>
+                <div class="search-box">
+                    <i class="bi bi-search"></i>
+                    <input type="text" id="searchInput" class="form-control" placeholder="Nom, code, base...">
+                </div>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Statut</label>
+                <select id="statusFilter" class="form-select">
+                    <option value="">Tous</option>
+                    <option value="available">Disponible</option>
+                    <option value="on_mission">En mission</option>
+                    <option value="maintenance">Maintenance</option>
+                    <option value="out_of_service">Hors service</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Type</label>
+                <select id="typeFilter" class="form-select">
+                    <option value="">Tous</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Base</label>
+                <select id="baseFilter" class="form-select">
+                    <option value="">Toutes</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Capacité min</label>
+                <input type="number" id="capacityFilter" class="form-control" placeholder="Personnes">
+            </div>
+            <div class="col-md-1 d-flex align-items-end">
+                <button id="applyFilters" class="btn btn-primary w-100">
+                    <i class="bi bi-funnel me-1"></i>Filtrer
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Carte des moyens -->
+    <div class="map-container">
+        <div id="resourcesMap" style="height: 100%; width: 100%;"></div>
+    </div>
+    
+    <!-- Liste des moyens -->
+    <div class="row" id="resourcesList">
+        <div class="col-12 text-center py-5">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Chargement...</span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Pagination -->
+    <nav aria-label="Pagination" class="mt-4">
+        <ul class="pagination justify-content-center" id="pagination">
+        </ul>
+    </nav>
+</div>
+
+<!-- Modal Ajouter/Modifier un moyen -->
+<div class="modal fade" id="addResourceModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="bi bi-plus-circle me-2"></i>
+                    <span id="modalTitle">Ajouter un moyen de secours</span>
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="resourceForm">
+                <input type="hidden" id="resourceId" name="resource_id">
+                <div class="modal-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Nom du moyen *</label>
+                            <input type="text" class="form-control" id="resourceName" name="resource_name" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Code d'identification *</label>
+                            <input type="text" class="form-control" id="identifierCode" name="identifier_code" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Type *</label>
+                            <select class="form-select" id="resourceType" name="type_id" required>
+                                <option value="">Sélectionner...</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Base *</label>
+                            <select class="form-select" id="resourceBase" name="base_id" required>
+                                <option value="">Sélectionner...</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Capacité max (personnes)</label>
+                            <input type="number" class="form-control" id="maxCapacity" name="max_capacity">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Rayon d'action (km)</label>
+                            <input type="number" class="form-control" id="operationalRange" name="operational_range">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Vitesse (noeuds)</label>
+                            <input type="number" class="form-control" id="speed" name="speed" step="0.1">
+                        </div>
+                        <div class="col-md-12">
+                            <label class="form-label">Position (lat, lon)</label>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <input type="text" class="form-control" id="latitude" name="latitude" placeholder="Latitude">
+                                </div>
+                                <div class="col-md-6">
+                                    <input type="text" class="form-control" id="longitude" name="longitude" placeholder="Longitude">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <label class="form-label">Statut opérationnel</label>
+                            <select class="form-select" id="operationalStatus" name="operational_status">
+                                <option value="available">Disponible</option>
+                                <option value="on_mission">En mission</option>
+                                <option value="maintenance">Maintenance</option>
+                                <option value="out_of_service">Hors service</option>
+                            </select>
+                        </div>
+                        <div class="col-md-12">
+                            <label class="form-label">Notes</label>
+                            <textarea class="form-control" id="notes" name="notes" rows="2"></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="submit" class="btn btn-primary">Enregistrer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Détails -->
+<div class="modal fade" id="resourceDetailModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Détails du moyen</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="resourceDetailBody">
+                <!-- Contenu chargé dynamiquement -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-warning" onclick="openEditFromModal()">
+                    <i class="bi bi-pencil me-1"></i>Modifier
+                </button>
+                <button type="button" class="btn btn-danger" onclick="deleteFromModal()">
+                    <i class="bi bi-trash me-1"></i>Supprimer
+                </button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Confirmation Suppression -->
+<div class="modal fade" id="deleteConfirmModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirmer la suppression</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Êtes-vous sûr de vouloir supprimer ce moyen de secours ?</p>
+                <p class="text-danger"><small>Cette action est irréversible.</small></p>
+                <input type="hidden" id="deleteResourceId">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <button type="button" class="btn btn-danger" onclick="confirmDelete()">Supprimer</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Toast notifications -->
+<div class="toast-container">
+    <div id="notificationToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="3000">
+        <div class="toast-header">
+            <i class="bi bi-info-circle-fill me-2"></i>
+            <strong class="me-auto">Notification</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
+        </div>
+        <div class="toast-body" id="toastMessage"></div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.29/jspdf.plugin.autotable.min.js"></script>
+
+<script>
+let map;
+let markers = [];
+let currentResources = [];
+let currentPage = 1;
+let itemsPerPage = 9;
+let resourceTypes = [];
+let resourceBases = [];
+
+// Initialisation de la carte
+function initMap() {
+    map = L.map('resourcesMap').setView([31.7917, -7.0926], 6);
+    
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; CartoDB',
+        subdomains: 'abcd',
+        maxZoom: 19
+    }).addTo(map);
+}
+
+// Charger les ressources
+function loadResources() {
+    showLoading();
+    
+    const filters = {
+        status: document.getElementById('statusFilter').value,
+        type: document.getElementById('typeFilter').value,
+        base: document.getElementById('baseFilter').value,
+        capacity_min: document.getElementById('capacityFilter').value,
+        search: document.getElementById('searchInput').value
+    };
+    
+    const url = new URL('/resources', window.location.origin);
+    if (filters.status) url.searchParams.append('status', filters.status);
+    if (filters.type) url.searchParams.append('type', filters.type);
+    if (filters.base) url.searchParams.append('base', filters.base);
+    if (filters.capacity_min) url.searchParams.append('capacity_min', filters.capacity_min);
+    if (filters.search) url.searchParams.append('search', filters.search);
+    
+    fetch(url)
+        .then(response => response.json())
+        .then(data => {
+            currentResources = data.data || [];
+            updateStats();
+            updateMap();
+            updateResourceList();
+            updatePagination();
+            hideLoading();
+        })
+        .catch(error => {
+            console.error('Erreur:', error);
+            showToast('Erreur de chargement des données', 'error');
+            hideLoading();
+        });
+}
+
+// Mettre à jour les statistiques
+function updateStats() {
+    const total = currentResources.length;
+    const available = currentResources.filter(r => r.operational_status === 'available').length;
+    const onMission = currentResources.filter(r => r.operational_status === 'on_mission').length;
+    const outOfService = currentResources.filter(r => r.operational_status === 'out_of_service').length;
+    
+    document.getElementById('totalCount').textContent = total;
+    document.getElementById('availableCount').textContent = available;
+    document.getElementById('missionCount').textContent = onMission;
+    document.getElementById('outCount').textContent = outOfService;
+}
+
+// Mettre à jour la carte
+function updateMap() {
+    markers.forEach(marker => map.removeLayer(marker));
+    markers = [];
+    
+    currentResources.forEach(resource => {
+        if (resource.current_position && resource.current_position.latitude && resource.current_position.longitude) {
+            const statusColor = {
+                'available': '#28a745',
+                'on_mission': '#ffc107',
+                'maintenance': '#fd7e14',
+                'out_of_service': '#dc3545'
+            }[resource.operational_status] || '#007bff';
+            
+            const marker = L.marker([
+                resource.current_position.latitude,
+                resource.current_position.longitude
+            ], {
+                icon: L.divIcon({
+                    html: `<div style="background: ${statusColor}; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid white;">
+                            <i class="bi ${getResourceIcon(resource.type_name)}" style="color: white; font-size: 12px;"></i>
+                           </div>`,
+                    className: 'custom-marker',
+                    iconSize: [24, 24],
+                    iconAnchor: [12, 12]
+                })
+            }).bindPopup(`
+                <b>${escapeHtml(resource.resource_name)}</b><br>
+                <small>${escapeHtml(resource.identifier_code)}</small><br>
+                Type: ${escapeHtml(resource.type_name)}<br>
+                Base: ${escapeHtml(resource.base_name)}<br>
+                Statut: <span class="status-badge status-${resource.operational_status}">${getStatusText(resource.operational_status)}</span><br>
+                <button class="btn btn-sm btn-primary mt-2" onclick="showResourceDetails(${resource.resource_id})">
+                    Voir détails
+                </button>
+            `);
+            
+            markers.push(marker);
+            marker.addTo(map);
+        }
+    });
+    
+    if (markers.length > 0) {
+        const group = L.featureGroup(markers);
+        map.fitBounds(group.getBounds().pad(0.2));
+    }
+}
+
+// Mettre à jour la liste des ressources
+function updateResourceList() {
+    const container = document.getElementById('resourcesList');
+    const start = (currentPage - 1) * itemsPerPage;
+    const end = start + itemsPerPage;
+    const pageResources = currentResources.slice(start, end);
+    
+    if (pageResources.length === 0) {
+        container.innerHTML = `
+            <div class="col-12 text-center py-5">
+                <i class="bi bi-inbox display-1 text-muted"></i>
+                <p class="mt-3">Aucun moyen de secours trouvé</p>
+            </div>
+        `;
+        return;
+    }
+    
+    container.innerHTML = pageResources.map(resource => `
+        <div class="col-md-6 col-lg-4">
+            <div class="card resource-card">
+                <div class="resource-header">
+                    <div class="d-flex align-items-center">
+                        <div class="resource-icon ${getResourceIconClass(resource.type_name)}">
+                            <i class="bi ${getResourceIcon(resource.type_name)}"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <h5 class="mb-0">${escapeHtml(resource.resource_name)}</h5>
+                            <small>${escapeHtml(resource.identifier_code)}</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-2">
+                        <div class="col-6">
+                            <small class="text-muted">Type</small><br>
+                            <strong>${escapeHtml(resource.type_name)}</strong>
+                        </div>
+                        <div class="col-6">
+                            <small class="text-muted">Base</small><br>
+                            <strong>${escapeHtml(resource.base_name)}</strong>
+                        </div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-6">
+                            <small class="text-muted">Capacité</small><br>
+                            <strong>${resource.max_capacity || 'N/A'} pers.</strong>
+                        </div>
+                        <div class="col-6">
+                            <small class="text-muted">Vitesse</small><br>
+                            <strong>${resource.speed || 'N/A'} noeuds</strong>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <span class="status-badge status-${resource.operational_status}">
+                            ${getStatusText(resource.operational_status)}
+                        </span>
+                    </div>
+                    <div class="action-buttons">
+                        <button class="btn btn-outline-info btn-sm" onclick="showResourceDetails(${resource.resource_id})" title="Détails">
+                            <i class="bi bi-eye"></i>
+                        </button>
+                        <button class="btn btn-outline-warning btn-sm" onclick="editResource(${resource.resource_id})" title="Modifier">
+                            <i class="bi bi-pencil"></i>
+                        </button>
+                        <button class="btn btn-outline-danger btn-sm" onclick="deleteResource(${resource.resource_id}, '${escapeHtml(resource.resource_name)}')" title="Supprimer">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                        <button class="btn btn-outline-success btn-sm" onclick="updateStatusQuick(${resource.resource_id}, '${resource.operational_status}')" title="Changer statut">
+                            <i class="bi bi-arrow-repeat"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `).join('');
+}
+
+// Pagination
+function updatePagination() {
+    const totalPages = Math.ceil(currentResources.length / itemsPerPage);
+    const pagination = document.getElementById('pagination');
+    
+    if (totalPages <= 1) {
+        pagination.innerHTML = '';
+        return;
+    }
+    
+    let html = `
+        <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
+            <a class="page-link" href="#" onclick="changePage(${currentPage - 1}); return false;">Précédent</a>
+        </li>
+    `;
+    
+    for (let i = 1; i <= totalPages; i++) {
+        if (i === 1 || i === totalPages || (i >= currentPage - 2 && i <= currentPage + 2)) {
+            html += `
+                <li class="page-item ${currentPage === i ? 'active' : ''}">
+                    <a class="page-link" href="#" onclick="changePage(${i}); return false;">${i}</a>
+                </li>
+            `;
+        } else if (i === currentPage - 3 || i === currentPage + 3) {
+            html += `<li class="page-item disabled"><span class="page-link">...</span></li>`;
+        }
+    }
+    
+    html += `
+        <li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
+            <a class="page-link" href="#" onclick="changePage(${currentPage + 1}); return false;">Suivant</a>
+        </li>
+    `;
+    
+    pagination.innerHTML = html;
+}
+
+function changePage(page) {
+    currentPage = page;
+    updateResourceList();
+    updatePagination();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// Charger les types et bases
+function loadTypesAndBases() {
+    fetch('/api/resources/types')
+        .then(response => response.json())
+        .then(types => {
+            resourceTypes = types;
+            const typeSelect = document.getElementById('resourceType');
+            const typeFilter = document.getElementById('typeFilter');
+            
+            types.forEach(type => {
+                const option = `<option value="${type.type_id}">${escapeHtml(type.type_name)}</option>`;
+                typeSelect.insertAdjacentHTML('beforeend', option);
+                typeFilter.insertAdjacentHTML('beforeend', option);
+            });
+        });
+    
+    fetch('/api/resources/bases')
+        .then(response => response.json())
+        .then(bases => {
+            resourceBases = bases;
+            const baseSelect = document.getElementById('resourceBase');
+            const baseFilter = document.getElementById('baseFilter');
+            
+            bases.forEach(base => {
+                const option = `<option value="${base.base_id}">${escapeHtml(base.base_name)}</option>`;
+                baseSelect.insertAdjacentHTML('beforeend', option);
+                baseFilter.insertAdjacentHTML('beforeend', option);
+            });
+        });
+}
+
+// Ajouter/Modifier un moyen
+document.getElementById('resourceForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const resourceId = document.getElementById('resourceId').value;
+    const data = {
+        resource_name: document.getElementById('resourceName').value,
+        identifier_code: document.getElementById('identifierCode').value,
+        type_id: parseInt(document.getElementById('resourceType').value),
+        base_id: parseInt(document.getElementById('resourceBase').value),
+        max_capacity: parseInt(document.getElementById('maxCapacity').value) || null,
+        operational_range: parseFloat(document.getElementById('operationalRange').value) || null,
+        speed: parseFloat(document.getElementById('speed').value) || null,
+        operational_status: document.getElementById('operationalStatus').value,
+        notes: document.getElementById('notes').value
+    };
+    
+    const lat = document.getElementById('latitude').value;
+    const lon = document.getElementById('longitude').value;
+    if (lat && lon) {
+        data.current_position = { latitude: parseFloat(lat), longitude: parseFloat(lon) };
+    }
+    
+    const url = resourceId ? `/resources/${resourceId}` : '/resources';
+    const method = resourceId ? 'PUT' : 'POST';
+    
+    fetch(url, {
+        method: method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(() => {
+        bootstrap.Modal.getInstance(document.getElementById('addResourceModal')).hide();
+        loadResources();
+        this.reset();
+        document.getElementById('resourceId').value = '';
+        showToast(resourceId ? 'Moyen modifié avec succès' : 'Moyen ajouté avec succès', 'success');
+    })
+    .catch(error => {
+        console.error('Erreur:', error);
+        showToast('Erreur lors de l\'enregistrement', 'error');
+    });
+});
+
+// Modifier un moyen
+function editResource(resourceId) {
+    const resource = currentResources.find(r => r.resource_id === resourceId);
+    if (!resource) return;
+    
+    document.getElementById('modalTitle').textContent = 'Modifier le moyen de secours';
+    document.getElementById('resourceId').value = resource.resource_id;
+    document.getElementById('resourceName').value = resource.resource_name;
+    document.getElementById('identifierCode').value = resource.identifier_code;
+    document.getElementById('resourceType').value = resource.type_id;
+    document.getElementById('resourceBase').value = resource.base_id;
+    document.getElementById('maxCapacity').value = resource.max_capacity || '';
+    document.getElementById('operationalRange').value = resource.operational_range || '';
+    document.getElementById('speed').value = resource.speed || '';
+    document.getElementById('operationalStatus').value = resource.operational_status;
+    document.getElementById('notes').value = resource.notes || '';
+    
+    if (resource.current_position) {
+        document.getElementById('latitude').value = resource.current_position.latitude;
+        document.getElementById('longitude').value = resource.current_position.longitude;
+    }
+    
+    new bootstrap.Modal(document.getElementById('addResourceModal')).show();
+}
+
+function openEditFromModal() {
+    const resourceId = document.getElementById('resourceDetailBody').getAttribute('data-resource-id');
+    bootstrap.Modal.getInstance(document.getElementById('resourceDetailModal')).hide();
+    editResource(parseInt(resourceId));
+}
+
+// Supprimer un moyen
+function deleteResource(resourceId, resourceName) {
+    document.getElementById('deleteResourceId').value = resourceId;
+    document.getElementById('deleteConfirmModal').querySelector('.modal-body p').innerHTML = 
+        `Êtes-vous sûr de vouloir supprimer le moyen <strong>${escapeHtml(resourceName)}</strong> ?`;
+    new bootstrap.Modal(document.getElementById('deleteConfirmModal')).show();
+}
+
+function confirmDelete() {
+    const resourceId = document.getElementById('deleteResourceId').value;
+    
+    fetch(`/resources/${resourceId}`, {
+        method: 'DELETE'
+    })
+    .then(response => response.json())
+    .then(() => {
+        bootstrap.Modal.getInstance(document.getElementById('deleteConfirmModal')).hide();
+        loadResources();
+        showToast('Moyen supprimé avec succès', 'success');
+    })
+    .catch(error => {
+        console.error('Erreur:', error);
+        showToast('Erreur lors de la suppression', 'error');
+    });
+}
+
+function deleteFromModal() {
+    const resourceId = document.getElementById('resourceDetailBody').getAttribute('data-resource-id');
+    bootstrap.Modal.getInstance(document.getElementById('resourceDetailModal')).hide();
+    deleteResource(parseInt(resourceId), '');
+}
+
+// Mise à jour rapide du statut
+function updateStatusQuick(resourceId, currentStatus) {
+    const statuses = [
+        { value: 'available', label: 'Disponible' },
+        { value: 'on_mission', label: 'En mission' },
+        { value: 'maintenance', label: 'Maintenance' },
+        { value: 'out_of_service', label: 'Hors service' }
+    ];
+    
+    const newStatus = prompt(
+        'Changer le statut:\n' + statuses.map(s => `${s.value}: ${s.label}`).join('\n'),
+        currentStatus
+    );
+    
+    if (newStatus && statuses.some(s => s.value === newStatus)) {
+        fetch(`/resources/${resourceId}/status`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ status: newStatus })
+        })
+        .then(response => response.json())
+        .then(() => {
+            loadResources();
+            showToast('Statut mis à jour avec succès', 'success');
+        })
+        .catch(error => {
+            console.error('Erreur:', error);
+            showToast('Erreur de mise à jour', 'error');
+        });
+    }
+}
+
+// Afficher les détails
+function showResourceDetails(resourceId) {
+    fetch(`/resources/${resourceId}`)
+        .then(response => response.json())
+        .then(resource => {
+            const modalBody = document.getElementById('resourceDetailBody');
+            modalBody.setAttribute('data-resource-id', resourceId);
+            
+            modalBody.innerHTML = `
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>Informations générales</h6>
+                        <table class="table table-sm">
+                            <tr><th>Nom</th><td>${escapeHtml(resource.resource_name)}</td></tr>
+                            <tr><th>Code</th><td>${escapeHtml(resource.identifier_code)}</td></tr>
+                            <tr><th>Type</th><td>${escapeHtml(resource.type_name)}</td></tr>
+                            <tr><th>Base</th><td>${escapeHtml(resource.base_name)}</td></tr>
+                            <tr><th>Statut</th><td><span class="status-badge status-${resource.operational_status}">${getStatusText(resource.operational_status)}</span></td></tr>
+                            <tr><th>Dernière mise à jour</th><td>${new Date(resource.last_updated).toLocaleString() || 'N/A'}</td></tr>
+                        </table>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Caractéristiques techniques</h6>
+                        <table class="table table-sm">
+                            <tr><th>Capacité max</th><td>${resource.max_capacity || 'N/A'} personnes</td></tr>
+                            <tr><th>Rayon d'action</th><td>${resource.operational_range || 'N/A'} km</td></tr>
+                            <tr><th>Vitesse</th><td>${resource.speed || 'N/A'} noeuds</td></tr>
+                            <tr><th>Position</th><td>${resource.current_position ? `${resource.current_position.latitude}, ${resource.current_position.longitude}` : 'N/A'}</td></tr>
+                        </table>
+                    </div>
+                </div>
+                ${resource.notes ? `
+                <div class="mt-3">
+                    <h6>Notes</h6>
+                    <p class="text-muted">${escapeHtml(resource.notes)}</p>
+                </div>
+                ` : ''}
+                ${resource.crew && resource.crew.length ? `
+                <div class="mt-3">
+                    <h6>Équipage</h6>
+                    <table class="table table-sm">
+                        <thead>
+                            <tr><th>Nom</th><th>Fonction</th><th>Qualification</th></tr>
+                        </thead>
+                        <tbody>
+                            ${resource.crew.map(crew => `
+                                <tr>
+                                    <td>${escapeHtml(crew.name)}</td>
+                                    <td>${escapeHtml(crew.role)}</td>
+                                    <td>${escapeHtml(crew.qualification)}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+                ` : ''}
+                ${resource.recent_missions && resource.recent_missions.length ? `
+                <div class="mt-3">
+                    <h6>Missions récentes</h6>
+                    <table class="table table-sm">
+                        <thead>
+                            <tr><th>Mission</th><th>Début</th><th>Fin</th><th>Statut</th></tr>
+                        </thead>
+                        <tbody>
+                            ${resource.recent_missions.map(mission => `
+                                <tr>
+                                    <td>${escapeHtml(mission.incident_name || 'N/A')}</td>
+                                    <td>${new Date(mission.start_time).toLocaleString()}</td>
+                                    <td>${mission.end_time ? new Date(mission.end_time).toLocaleString() : 'En cours'}</td>
+                                    <td>${escapeHtml(mission.status || 'En cours')}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+                ` : ''}
+            `;
+            
+            new bootstrap.Modal(document.getElementById('resourceDetailModal')).show();
+        })
+        .catch(error => {
+            console.error('Erreur:', error);
+            showToast('Erreur de chargement des détails', 'error');
+        });
+}
+
+// Export Excel
+function exportToExcel() {
+    const data = currentResources.map(r => ({
+        'Nom': r.resource_name,
+        'Code': r.identifier_code,
+        'Type': r.type_name,
+        'Base': r.base_name,
+        'Statut': getStatusText(r.operational_status),
+        'Capacité': r.max_capacity || 'N/A',
+        'Rayon (km)': r.operational_range || 'N/A',
+        'Vitesse (noeuds)': r.speed || 'N/A',
+        'Latitude': r.current_position?.latitude || 'N/A',
+        'Longitude': r.current_position?.longitude || 'N/A'
+    }));
+    
+    const ws = XLSX.utils.json_to_sheet(data);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Moyens de secours');
+    XLSX.writeFile(wb, `moyens_secours_${new Date().toISOString().slice(0,19)}.xlsx`);
+    showToast('Export Excel réussi', 'success');
+}
+
+// Export CSV
+function exportToCSV() {
+    const headers = ['Nom', 'Code', 'Type', 'Base', 'Statut', 'Capacité', 'Rayon (km)', 'Vitesse (noeuds)', 'Latitude', 'Longitude'];
+    const rows = currentResources.map(r => [
+        r.resource_name,
+        r.identifier_code,
+        r.type_name,
+        r.base_name,
+        getStatusText(r.operational_status),
+        r.max_capacity || 'N/A',
+        r.operational_range || 'N/A',
+        r.speed || 'N/A',
+        r.current_position?.latitude || 'N/A',
+        r.current_position?.longitude || 'N/A'
+    ]);
+    
+    const csvContent = [headers, ...rows].map(row => row.map(cell => `"${cell}"`).join(',')).join('\n');
+    const blob = new Blob(["\uFEFF" + csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `moyens_secours_${new Date().toISOString().slice(0,19)}.csv`;
+    link.click();
+    showToast('Export CSV réussi', 'success');
+}
+
+// Export PDF
+function exportToPDF() {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF('landscape');
+    
+    doc.text('Moyens de Secours - MRCC Maroc', 14, 15);
+    doc.text(`Généré le: ${new Date().toLocaleString()}`, 14, 22);
+    
+    const tableData = currentResources.map(r => [
+        r.resource_name,
+        r.identifier_code,
+        r.type_name,
+        r.base_name,
+        getStatusText(r.operational_status),
+        r.max_capacity || 'N/A',
+        r.speed || 'N/A'
+    ]);
+    
+    doc.autoTable({
+        head: [['Nom', 'Code', 'Type', 'Base', 'Statut', 'Capacité', 'Vitesse']],
+        body: tableData,
+        startY: 30,
+        theme: 'striped',
+        styles: { fontSize: 8 },
+        headStyles: { fillColor: [0, 102, 204] }
+    });
+    
+    doc.save(`moyens_secours_${new Date().toISOString().slice(0,19)}.pdf`);
+    showToast('Export PDF réussi', 'success');
+}
+
+// Filtres
+document.getElementById('applyFilters').addEventListener('click', () => {
+    currentPage = 1;
+    loadResources();
+});
+
+document.getElementById('searchInput').addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+        currentPage = 1;
+        loadResources();
+    }
+});
+
+// Réinitialisation du formulaire lors de l'ouverture du modal
+document.getElementById('addResourceModal').addEventListener('show.bs.modal', function() {
+    if (!document.getElementById('resourceId').value) {
+        document.getElementById('modalTitle').textContent = 'Ajouter un moyen de secours';
+        document.getElementById('resourceForm').reset();
+        document.getElementById('resourceId').value = '';
+    }
+});
+
+// Fonctions utilitaires
+function getStatusText(status) {
+    const statusMap = {
+        'available': 'Disponible',
+        'on_mission': 'En mission',
+        'maintenance': 'Maintenance',
+        'out_of_service': 'Hors service'
+    };
+    return statusMap[status] || status;
+}
+
+function getResourceIcon(type) {
+    const iconMap = {
+        'Vedette de sauvetage': 'bi-ship',
+        'Hélicoptère SAR': 'bi-helicopter',
+        'Patrouilleur': 'bi-shield-shaded',
+        'Remorqueur': 'bi-truck',
+        'Véhicule côtier': 'bi-truck'
+    };
+    return iconMap[type] || 'bi-life-preserver';
+}
+
+function getResourceIconClass(type) {
+    const classMap = {
+        'Vedette de sauvetage': 'boat',
+        'Hélicoptère SAR': 'helicopter',
+        'Patrouilleur': 'boat',
+        'Remorqueur': 'boat',
+        'Véhicule côtier': 'vehicle'
+    };
+    return classMap[type] || 'boat';
+}
+
+function escapeHtml(str) {
+    if (!str) return '';
+    return str.replace(/[&<>]/g, function(m) {
+        if (m === '&') return '&amp;';
+        if (m === '<') return '&lt;';
+        if (m === '>') return '&gt;';
+        return m;
+    });
+}
+
+function showToast(message, type) {
+    const toast = document.getElementById('notificationToast');
+    const toastBody = document.getElementById('toastMessage');
+    const headerIcon = toast.querySelector('.toast-header i');
+    
+    toastBody.textContent = message;
+    
+    if (type === 'success') {
+        headerIcon.className = 'bi bi-check-circle-fill me-2 text-success';
+    } else if (type === 'error') {
+        headerIcon.className = 'bi bi-exclamation-triangle-fill me-2 text-danger';
+    } else {
+        headerIcon.className = 'bi bi-info-circle-fill me-2 text-info';
+    }
+    
+    const bsToast = new bootstrap.Toast(toast);
+    bsToast.show();
+}
+
+function showLoading() {
+    if (!document.querySelector('.loading-overlay')) {
+        const overlay = document.createElement('div');
+        overlay.className = 'loading-overlay';
+        overlay.innerHTML = '<div class="spinner-border text-light" style="width: 3rem; height: 3rem;"></div>';
+        document.body.appendChild(overlay);
+    }
+}
+
+function hideLoading() {
+    const overlay = document.querySelector('.loading-overlay');
+    if (overlay) overlay.remove();
+}
+
+// Initialisation
+document.addEventListener('DOMContentLoaded', () => {
+    initMap();
+    loadTypesAndBases();
+    loadResources();
+});
+</script>
+{% endblock %}

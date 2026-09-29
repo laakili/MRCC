@@ -1,0 +1,326 @@
+{% extends "base.html" %}
+
+{% block title %}Titre de ma page - MRCC Maroc{% endblock %}
+
+{% block extra_css %}
+<style>
+  #marine-map { height: 600px; }
+  .map-container { position: relative; }
+  .map-overlay {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      z-index: 1000;
+      background: white;
+      padding: 10px;
+      border-radius: 5px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.2);
+  }
+  .depth-marker {
+      background: rgba(0, 119, 190, 0.7);
+      border-radius: 50%;
+      text-align: center;
+      color: white;
+      font-weight: bold;
+      padding: 2px;
+  }
+  .hazard-marker {
+      background: rgba(255, 0, 0, 0.7);
+      border-radius: 50%;
+      width: 12px;
+      height: 12px;
+  }
+  .aid-marker {
+      background: rgba(0, 255, 0, 0.7);
+      border-radius: 50%;
+      width: 12px;
+      height: 12px;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+
+  <main class="main">
+ 
+    
+
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">Cartes Marines Maroc</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+     
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-md-3">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Contrôles de la Carte</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label class="form-label">Fond de Carte</label>
+                            <select class="form-select" id="base-map-select">
+                                <option value="OpenStreetMap">OpenStreetMap Standard</option>
+                                <option value="OpenSeaMap (superposition)">OpenSeaMap</option>
+                                <option value="OpenTopoMap">OpenTopoMap</option>
+                                <option value="Esri World Imagery">Esri World Imagery (Satellite)</option>
+                                <option value="Stamen Terrain">Stamen Terrain</option>
+                                <option value="Stamen Toner (noir & blanc)">Stamen Toner (N&B)</option>
+                                <option value="NOAA Raster Nautical Charts (Global)">NOAA Nautical Charts</option>
+                                <option value="OSM + OpenSeaMap">OpenStreetMap + OpenSeaMap</option>
+                            </select>
+                            
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Couches Marines</label>
+                            <div class="form-check">
+                                <input class="form-check-input layer-checkbox" type="checkbox" id="depth-layer" checked>
+                                <label class="form-check-label" for="depth-layer">Profondeurs</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input layer-checkbox" type="checkbox" id="hazards-layer" checked>
+                                <label class="form-check-label" for="hazards-layer">Dangers</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input layer-checkbox" type="checkbox" id="aids-layer" checked>
+                                <label class="form-check-label" for="aids-layer">Aides à la navigation</label>
+                            </div>
+                        </div>
+                        <button id="refresh-btn" class="btn btn-primary">Actualiser</button>
+                    </div>
+                </div>
+                <div class="card mt-3">
+                    <div class="card-header">
+                        <h5>Légende</h5>
+                    </div>
+                    <div class="card-body">
+                        <div><span class="badge bg-primary">■</span> Profondeurs</div>
+                        <div><span class="badge bg-danger">■</span> Dangers</div>
+                        <div><span class="badge bg-success">■</span> Aides navigation</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-9">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between">
+                        <h5>Carte Marine Interactive</h5>
+                        <div id="coordinates-display" class="text-muted">31.79°N, -7.09°W</div>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="map-container">
+                            <div id="marine-map"></div>
+                            <div class="map-overlay">
+                                <div>Zoom: <span id="zoom-level">6</span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+ 
+  {% endblock %}
+
+  {% block extra_js %}
+    <!-- Scripts JS spécifiques à cette page -->
+    <script>
+      // Variables globales
+      let map;
+      let currentBaseLayer;
+      let depthLayer;
+      let hazardsLayer;
+      let aidsLayer;
+      const baseLayers = {
+  'OpenStreetMap': L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+  }),
+
+  'OpenSeaMap (superposition)': L.tileLayer('https://tiles.openseamap.org/seamark/{z}/{x}/{y}.png', {
+      attribution: '&copy; <a href="https://www.openseamap.org">OpenSeaMap</a> contributors'
+  }),
+
+  'OpenTopoMap': L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; <a href="https://opentopomap.org">OpenTopoMap</a> contributors'
+  }),
+
+  'Esri World Imagery': L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+      attribution: '&copy; <a href="https://www.esri.com/">Esri</a>, DigitalGlobe, GeoEye, Earthstar Geographics, CNES/Airbus DS'
+  }),
+
+  'Stamen Terrain': L.tileLayer('https://stamen-tiles.a.ssl.fastly.net/terrain/{z}/{x}/{y}.jpg', {
+      attribution: '&copy; <a href="https://stamen.com/">Stamen Design</a>, <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors'
+  }),
+
+  'Stamen Toner (noir & blanc)': L.tileLayer('https://stamen-tiles.a.ssl.fastly.net/toner/{z}/{x}/{y}.png', {
+      attribution: '&copy; <a href="https://stamen.com/">Stamen Design</a>, <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors'
+  }),
+
+  // Carte marine Raster (NOAA - couverture mondiale variable, zoom <= 10 recommandé)
+  'NOAA Raster Nautical Charts (Global)': L.tileLayer('https://tileservice.charts.noaa.gov/tiles/wmts/50000_1/{z}/{x}/{y}.png', {
+      attribution: '&copy; NOAA Nautical Charts',
+      maxZoom: 10
+  }),
+
+  // Variante hybride OSM + OpenSeaMap
+  'OSM + OpenSeaMap': L.layerGroup([
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'),
+      L.tileLayer('https://tiles.openseamap.org/seamark/{z}/{x}/{y}.png')
+  ])
+};
+
+
+      // Initialisation de la carte
+      function initMap() {
+          map = L.map('marine-map').setView([31.7917, -7.0926], 6);
+          
+          // Ajouter le fond de carte par défaut
+          currentBaseLayer = baseLayers['OpenStreetMap'].addTo(map);
+
+          
+          // Gestionnaire d'événements pour le changement de fond de carte
+          document.getElementById('base-map-select').addEventListener('change', function() {
+              map.removeLayer(currentBaseLayer);
+              currentBaseLayer = baseLayers[this.value].addTo(map);
+          });
+          
+          // Afficher les coordonnées et le niveau de zoom
+          map.on('mousemove', function(e) {
+              const lat = e.latlng.lat.toFixed(4);
+              const lng = e.latlng.lng.toFixed(4);
+              document.getElementById('coordinates-display').textContent = 
+                  `${lat}°${lat > 0 ? 'N' : 'S'}, ${Math.abs(lng)}°${lng > 0 ? 'E' : 'W'}`;
+          });
+          
+          map.on('zoomend', function() {
+              document.getElementById('zoom-level').textContent = map.getZoom();
+              loadMapData();  // Recharger les données avec le nouveau zoom
+          });
+          
+          // Charger les données initiales
+          loadMapData();
+          
+          // Gérer les clics sur la carte
+          map.on('click', function(e) {
+              fetch(`/api/depth_data?lat=${e.latlng.lat}&lon=${e.latlng.lng}`)
+                  .then(response => response.json())
+                  .then(data => {
+                      let hazardsList = data.hazards.map(h => 
+                          `<li>${h.type} (${h.position[0].toFixed(4)}, ${h.position[1].toFixed(4)})</li>`
+                      ).join('');
+                      
+                      let aidsList = data.navigation_aids.map(a => 
+                          `<li>${a.name} (${a.position[0].toFixed(4)}, ${a.position[1].toFixed(4)})</li>`
+                      ).join('');
+                      
+                      const popupContent = `
+                          <div><b>Profondeur:</b> ${data.depth}m</div>
+                          <div><b>Dangers à proximité:</b></div>
+                          <ul>${hazardsList}</ul>
+                          <div><b>Aides à la navigation:</b></div>
+                          <ul>${aidsList}</ul>
+                      `;
+                      
+                      L.popup()
+                          .setLatLng(e.latlng)
+                          .setContent(popupContent)
+                          .openOn(map);
+                  });
+          });
+      }
+
+      // Charger les données cartographiques
+   // Modifier la fonction loadMapData comme suit:
+function loadMapData() {
+  const zoom = map.getZoom();
+  
+  fetch(`/api/map_data?zoom=${zoom}`)
+      .then(response => response.json())
+      .then(data => {
+          // Supprimer les anciennes couches si elles existent
+          if (depthLayer) map.removeLayer(depthLayer);
+          if (hazardsLayer) map.removeLayer(hazardsLayer);
+          if (aidsLayer) map.removeLayer(aidsLayer);
+          
+          // Créer des groupes de marqueurs
+          const depthMarkers = [];
+          const hazardMarkers = [];
+          const aidMarkers = [];
+          
+          // Profondeurs
+          if (document.getElementById('depth-layer').checked && data.depths) {
+              data.depths.forEach(d => {
+                  const marker = L.circleMarker([d.lat, d.lon], {
+                      radius: 8,
+                      fillColor: '#0077be',
+                      color: '#000',
+                      weight: 1,
+                      opacity: 1,
+                      fillOpacity: 0.8
+                  }).bindPopup(`<b>Profondeur:</b> ${d.depth}m`);
+                  depthMarkers.push(marker);
+              });
+          }
+          
+          // Dangers
+          if (document.getElementById('hazards-layer').checked && data.hazards) {
+              data.hazards.forEach(h => {
+                  const marker = L.circleMarker([h.lat, h.lon], {
+                      radius: 6,
+                      fillColor: '#ff0000',
+                      color: '#000',
+                      weight: 1,
+                      opacity: 1,
+                      fillOpacity: 0.8
+                  }).bindPopup(`<b>${h.type}</b><br>${h.description}`);
+                  hazardMarkers.push(marker);
+              });
+          }
+          
+          // Aides à la navigation
+          if (document.getElementById('aids-layer').checked && data.navigation_aids) {
+              data.navigation_aids.forEach(a => {
+                  const marker = L.circleMarker([a.lat, a.lon], {
+                      radius: 6,
+                      fillColor: '#00ff00',
+                      color: '#000',
+                      weight: 1,
+                      opacity: 1,
+                      fillOpacity: 0.8
+                  }).bindPopup(`<b>${a.name}</b><br>Type: ${a.type}`);
+                  aidMarkers.push(marker);
+              });
+          }
+          
+          // Ajouter les couches à la carte
+          depthLayer = L.layerGroup(depthMarkers).addTo(map);
+          hazardsLayer = L.layerGroup(hazardMarkers).addTo(map);
+          aidsLayer = L.layerGroup(aidMarkers).addTo(map);
+          
+          // Ajuster la vue pour voir tous les marqueurs si nécessaire
+          if (depthMarkers.length > 0 || hazardMarkers.length > 0 || aidMarkers.length > 0) {
+              const group = new L.featureGroup([...depthMarkers, ...hazardMarkers, ...aidMarkers]);
+              map.fitBounds(group.getBounds().pad(0.1));
+          }
+      })
+      .catch(error => {
+          console.error("Erreur lors du chargement des données:", error);
+      });
+}
+      // Gérer le bouton d'actualisation
+      document.getElementById('refresh-btn').addEventListener('click', loadMapData);
+      
+      // Gérer les cases à cocher
+      document.querySelectorAll('.layer-checkbox').forEach(checkbox => {
+          checkbox.addEventListener('change', loadMapData);
+      });
+
+      // Initialiser la carte lorsque le DOM est chargé
+      document.addEventListener('DOMContentLoaded', initMap);
+  </script>
+  {% endblock %}

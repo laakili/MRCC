@@ -1,0 +1,1150 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>MRCC - Dashboard Simulation Alertes</title>
+
+  <meta name="description" content="Plateforme nationale de gestion des sauvetages et des données maritimes pour le MRCC Maroc">
+  <meta name="keywords" content="MRCC, sauvetage maritime, Maroc, données maritimes, secours en mer">
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com" rel="preconnect">
+  <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
+
+  <!-- Vendor CSS Files -->
+  <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet">
+  <link href="{{ url_for('static', filename='vendor/bootstrap-icons/bootstrap-icons.css') }}" rel="stylesheet">
+  <link href="{{ url_for('static', filename='vendor/aos/aos.css') }}" rel="stylesheet">
+  <link href="{{ url_for('static', filename='vendor/glightbox/css/glightbox.min.css') }}" rel="stylesheet">
+  <link href="{{ url_for('static', filename='vendor/swiper/swiper-bundle.min.css') }}" rel="stylesheet">
+
+  <!-- Main CSS File -->
+  <link href="{{ url_for('static', filename='css/main.css') }}" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+  <style>
+    :root {
+      --primary-color: #4361ee;
+      --secondary-color: #3f37c9;
+      --accent-color: #4cc9f0;
+      --light-color: #f8f9fa;
+      --dark-color: #212529;
+      --success-color: #4bb543;
+      --warning-color: #f0ad4e;
+      --danger-color: #d9534f;
+    }
+    
+    body {
+      background-color: #f5f7fb;
+      font-family: 'Inter', sans-serif;
+      color: var(--dark-color);
+      padding-top: 70px;
+    }
+    
+    /* Header Styles - Identique aux autres pages */
+    .header {
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      box-shadow: 0 2px 20px rgba(67, 97, 238, 0.2);
+      height: 70px;
+    }
+    
+    .header .logo h1 {
+      color: white;
+      font-weight: 700;
+      font-size: 1.5rem;
+    }
+    
+    .header .navmenu ul li a {
+      color: rgba(255, 255, 255, 0.8);
+      font-weight: 500;
+      transition: all 0.3s;
+    }
+    
+    .header .navmenu ul li a:hover,
+    .header .navmenu ul li a.active {
+      color: white;
+    }
+    
+    .user-menu {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+    
+    .username {
+      color: white;
+      font-weight: 500;
+      margin-right: 10px;
+    }
+    
+    .btn-custom {
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-weight: 500;
+      transition: 0.3s ease-in-out;
+    }
+    
+    .btn-primary-custom {
+      background: white;
+      color: var(--primary-color);
+      border: none;
+    }
+    
+    .btn-primary-custom:hover {
+      background: rgba(255, 255, 255, 0.9);
+    }
+    
+    .btn-secondary-custom {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid white;
+      color: white;
+    }
+    
+    .btn-secondary-custom:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+    
+    
+/* Notifications */
+.notification-wrapper {
+  position: relative;
+  margin-left: 10px;
+}
+
+.notification-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f0f2f5;
+  color: #4a4a6a;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.notification-icon:hover {
+  background: #e4e6eb;
+  color: var(--primary-color);
+}
+
+.notification-badge {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background: #f94144;
+  color: white;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+
+.notification-dropdown {
+  position: absolute;
+  top: 50px;
+  right: 0;
+  width: 350px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 5px 25px rgba(0, 0, 0, 0.1);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(10px);
+  transition: all 0.3s ease;
+  z-index: 1000;
+}
+
+.notification-wrapper:hover .notification-dropdown {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.notification-header {
+  padding: 15px;
+  border-bottom: 1px solid #eee;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.notification-header h5 {
+  margin: 0;
+  font-size: 1rem;
+  color: #2b2d42;
+}
+
+.mark-all-read {
+  background: none;
+  border: none;
+  color: var(--primary-color);
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.notification-content {
+  max-height: 400px;
+  overflow-y: auto;
+  padding: 10px;
+}
+
+.empty-notifications {
+  padding: 20px;
+  text-align: center;
+  color: #888;
+}
+.notification-item {
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+    transition: background 0.2s;
+}
+
+.notification-item:hover {
+    background: #f9f9f9;
+}
+
+.notification-title {
+    font-weight: 600;
+    color: #2b2d42;
+    margin-bottom: 5px;
+}
+
+.notification-text {
+    color: #4a4a6a;
+    font-size: 0.9rem;
+    margin-bottom: 8px;
+}
+
+.mark-as-read {
+    background: none;
+    border: none;
+    color: var(--primary-color);
+    font-size: 0.8rem;
+    cursor: pointer;
+    padding: 0;
+}
+
+.mark-as-read:hover {
+    text-decoration: underline;
+}
+    /* Mobile Navigation */
+    .mobile-nav-toggle {
+      color: white;
+      font-size: 1.5rem;
+      cursor: pointer;
+      display: none;
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+      .header .logo h1 {
+        font-size: 1.3rem;
+      }
+      
+      .mobile-nav-toggle {
+        display: block;
+      }
+      
+      .navmenu {
+        position: fixed;
+        top: 70px;
+        right: -100%;
+        width: 80%;
+        height: calc(100vh - 70px);
+        background: white;
+        transition: 0.3s;
+        z-index: 999;
+      }
+      
+      .navmenu ul {
+        flex-direction: column;
+        padding: 1rem;
+      }
+      
+      .navmenu ul li a {
+        color: var(--dark-color) !important;
+        padding: 1rem 0;
+        border-bottom: 1px solid #eee;
+      }
+      
+      .navmenu.active {
+        right: 0;
+      }
+    }
+    :root {
+      --primary-color: #005baa; /* Bleu marine */
+      --secondary-color: #003366; /* Bleu foncé */
+      --accent-color: #00a1e0; /* Bleu clair */
+      --light-color: #f8f9fa;
+      --dark-color: #212529;
+      --success-color: #28a745;
+      --warning-color: #ffc107;
+      --danger-color: #dc3545;
+    }
+    
+    .hero {
+      background: linear-gradient(rgba(0, 91, 170, 0.8), rgba(0, 51, 102, 0.8)), url('img/hero-bg-rescue.jpg');
+      background-size: cover;
+      background-position: center;
+      color: white;
+    }
+    
+    .feature-card {
+      border-left: 4px solid var(--accent-color);
+      transition: transform 0.3s;
+    }
+    
+    .feature-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    }
+    
+    .real-time-map {
+      height: 400px;
+      background: #f0f0f0;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    
+    .emergency-btn {
+      background-color: var(--danger-color);
+      color: white;
+      font-weight: bold;
+      padding: 12px 24px;
+      border-radius: 30px;
+      transition: all 0.3s;
+    }
+    
+    .emergency-btn:hover {
+      background-color: #c82333;
+      transform: scale(1.05);
+    }
+    
+    .status-badge {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      padding: 5px 10px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: bold;
+    }
+    
+    .status-active {
+      background-color: var(--success-color);
+      color: white;
+    }
+    
+    .status-warning {
+      background-color: var(--warning-color);
+      color: var(--dark-color);
+    }
+    #map-container {
+  width: 100%;
+  height: 400px; /* ou la hauteur souhaitée */
+}
+
+  </style>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.min.css">
+    <style>
+      :root {
+        --primary-blue: #005baa;
+        --secondary-blue: #003366;
+        --accent-blue: #00a1e0;
+        --success-green: #28a745;
+        --warning-yellow: #ffc107;
+        --danger-red: #dc3545;
+        --light-gray: #f8f9fa;
+        --dark-gray: #212529;
+      }
+      
+      body {
+        font-family: 'Segoe UI', system-ui, sans-serif;
+        background-color: #f5f7fb;
+      }
+      
+      .dashboard-header {
+        background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+        color: white;
+        padding: 2rem 0;
+        margin-bottom: 2rem;
+      }
+      
+      .stat-card {
+        border-radius: 10px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+        transition: transform 0.3s;
+        background: white;
+      }
+      
+      .stat-card:hover {
+        transform: translateY(-5px);
+      }
+      
+      .stat-value {
+        font-size: 2.5rem;
+        font-weight: 700;
+      }
+      
+      .stat-label {
+        font-size: 1rem;
+        color: #6c757d;
+      }
+      
+      .alert-card {
+        border-left: 4px solid var(--primary-blue);
+        transition: all 0.2s;
+        margin-bottom: 1rem;
+      }
+      
+      .alert-card.critique {
+        border-left-color: var(--danger-red);
+      }
+      
+      .alert-card.urgent {
+        border-left-color: var(--warning-yellow);
+      }
+      
+      .alert-card.normal {
+        border-left-color: var(--accent-blue);
+      }
+      
+      .badge-statut {
+        padding: 0.35em 0.65em;
+        font-weight: 500;
+      }
+      
+      .statut-nouvelle {
+        background-color: #e2e3e5;
+        color: #383d41;
+      }
+      
+      .statut-en_cours {
+        background-color: #d1ecf1;
+        color: #0c5460;
+      }
+      
+      .statut-terminee {
+        background-color: #d4edda;
+        color: #155724;
+      }
+      
+      .map-container {
+        height: 400px;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+      }
+      
+      .timeline {
+        position: relative;
+        padding-left: 1.5rem;
+      }
+      
+      .timeline::before {
+        content: '';
+        position: absolute;
+        left: 7px;
+        top: 0;
+        bottom: 0;
+        width: 2px;
+        background-color: #e9ecef;
+      }
+      
+      .pagination .page-item.active .page-link {
+        background-color: var(--primary-blue);
+        border-color: var(--primary-blue);
+      }
+      
+      .pagination .page-link {
+        color: var(--primary-blue);
+      }
+      
+      @media (max-width: 768px) {
+        .map-container {
+          height: 300px;
+        }
+        
+        .stat-value {
+          font-size: 2rem;
+        }
+      }
+    </style>
+</head>
+
+<body class="index-page">
+
+  <header id="header" class="header d-flex align-items-center fixed-top">
+    <div class="container-fluid container-xl position-relative d-flex align-items-center">
+      <a href="index.html" class="logo d-flex align-items-center me-auto">
+        <img src="{{ url_for('static', filename='img/mrcc-logo.png') }}" alt=""> 
+        <h1>MRCC</h1>
+      </a>
+
+      <nav id="navmenu" class="navmenu">
+        <ul>
+          <li><a href="{{ url_for('index') }}">Accueil</a></li>
+          <li><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
+          <li><a href="http://geoai-solutions.ddns.net:8888/MRCC/">Géoportail</a></li>
+          <li><a href="{{ url_for('marine') }}">Flotte maritime</a></li>
+          <li><a href="{{ url_for('moyens') }}">Moyens de secours</a></li>
+          <li><a href="{{ url_for('alerte') }}">Alertes</a></li>
+          <li><a href="{{ url_for('api') }}">API</a></li>
+        </ul>
+      </nav>
+
+      <div class="user-menu ms-auto">
+        {% if current_user.is_authenticated %}
+          <span class="username">{{ current_user.username }}</span>
+          <a href="{{ url_for('logout') }}" class="btn btn-sm btn-primary-custom">Déconnexion</a>
+        {% else %}
+          <a href="{{ url_for('login') }}" class="btn btn-sm btn-primary-custom">Connexion</a>
+          <a href="{{ url_for('register') }}" class="btn btn-sm btn-secondary-custom">Inscription</a>
+        {% endif %}
+     
+      </div>
+      
+      <div class="notification-wrapper ms-3">
+        <button id="notification-icon" class="notification-icon" aria-label="Notifications">
+          <i class="bi bi-bell"></i>
+          <span id="notification-count" class="notification-badge">3</span>
+        </button>
+        <div id="notification-list" class="notification-dropdown">
+          <div class="notification-header">
+            <h5>Alertes récentes</h5>
+            <button class="mark-all-read">Tout marquer comme lu</button>
+          </div>
+          <div class="notification-content">
+            <div class="notification-item">
+              <div class="notification-title">Alerte détresse</div>
+              <div class="notification-text">Signal de détresse reçu à 12:34 - Position: 33.5°N, 7.6°W</div>
+              <button class="mark-as-read" data-id="1">Marquer comme lu</button>
+            </div>
+            <div class="notification-item">
+              <div class="notification-title">Météo</div>
+              <div class="notification-text">Avertissement de tempête pour la zone Atlantique Nord</div>
+              <button class="mark-as-read" data-id="2">Marquer comme lu</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <button class="mobile-nav-toggle d-xl-none">
+      <i class="bi bi-list"></i>
+    </button>
+  </header>
+
+
+
+  <!-- Header -->
+  <header class="dashboard-header">
+    <div class="container">
+      <div class="row align-items-center">
+        <div class="col-md-8">
+          <h1><i class="bi bi-life-preserver me-2"></i> Simulation - Gestion des Alertes de Sauvetage</h1>
+          <p class="lead mb-0">Tableau de bord de simulation avec données fictives</p>
+        </div>
+        <div class="col-md-4 text-md-end mt-3 mt-md-0">
+          <button class="btn btn-light btn-lg" onclick="simulateNewAlert()">
+            <i class="bi bi-plus-circle me-2"></i> Simuler Alerte
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+  
+  <!-- Main Content -->
+  <div class="container py-4">
+    <!-- Stats Row -->
+    <div class="row mb-4" id="stats-container">
+      <!-- Les stats seront injectées par JavaScript -->
+    </div>
+    
+    <!-- Charts and Map Row -->
+    <div class="row mb-4">
+      <div class="col-lg-8">
+        <div class="card border-0 shadow-sm mb-4">
+          <div class="card-body">
+            <h5 class="card-title"><i class="bi bi-map me-2"></i> Carte des interventions actives</h5>
+            <div id="map" class="map-container"></div>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-4">
+        <div class="card border-0 shadow-sm mb-4">
+          <div class="card-body">
+            <h5 class="card-title"><i class="bi bi-pie-chart me-2"></i> Types d'incidents</h5>
+            <canvas id="incidentChart"></canvas>
+          </div>
+        </div>
+        <div class="card border-0 shadow-sm">
+          <div class="card-body">
+            <h5 class="card-title"><i class="bi bi-graph-up me-2"></i> Activité mensuelle</h5>
+            <canvas id="monthlyChart"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Alertes récentes -->
+    <div class="card border-0 shadow-sm mb-4">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h5 class="card-title mb-0"><i class="bi bi-list-ul me-2"></i> Dernières alertes</h5>
+          <div>
+            <button class="btn btn-sm btn-outline-primary me-2" onclick="refreshData()">
+              <i class="bi bi-arrow-clockwise"></i> Actualiser
+            </button>
+            <button class="btn btn-sm btn-outline-danger" onclick="clearData()">
+              <i class="bi bi-trash"></i> Réinitialiser
+            </button>
+          </div>
+        </div>
+        
+        <div class="table-responsive">
+          <table class="table table-hover" id="alertes-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Titre</th>
+                <th>Type</th>
+                <th>Urgence</th>
+                <th>Statut</th>
+                <th>Créée par</th>
+                <th>Date</th>
+                <th>Moyens</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="alertes-body">
+              <!-- Les alertes seront injectées par JavaScript -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  
+  <script>
+    // Données de simulation
+    const simulateData = {
+      organismes: [
+        { id: 1, nom: "MRCC Casablanca", code: "MRCC-CASA" },
+        { id: 2, nom: "MRCC Rabat", code: "MRCC-RABAT" },
+        { id: 3, nom: "MRCC Tanger", code: "MRCC-TANGER" }
+      ],
+      users: [
+        { id: 1, nom: "El Mansouri", prenom: "Ahmed", organisme_id: 1 },
+        { id: 2, nom: "Ben Ali", prenom: "Karim", organisme_id: 1 },
+        { id: 3, nom: "Amrani", prenom: "Mohamed", organisme_id: 2 }
+      ],
+      moyens: [
+        { id: 1, nom: "Patrouilleur 101", type: "Patrouilleur", statut: "disponible" },
+        { id: 2, nom: "Hélicoptère SAR-1", type: "Hélicoptère", statut: "maintenance" },
+        { id: 3, nom: "Vedette Rapide 202", type: "Vedette", statut: "disponible" }
+      ],
+      typesIncidents: [
+        "Navire en détresse", "Homme à la mer", "Incendie à bord", 
+        "Pollution", "Avarie moteur", "Collision", "Échouement"
+      ],
+      alertes: [],
+      stats: {
+        total: 0,
+        nouvelles: 0,
+        en_cours: 0,
+        terminees: 0,
+        critiques: 0
+      }
+    };
+
+    // Générer des données aléatoires
+    function generateRandomAlert() {
+      const types = simulateData.typesIncidents;
+      const urgencies = ['normal', 'urgent', 'critique'];
+      const statuses = ['nouvelle', 'en_cours', 'terminee'];
+      const users = simulateData.users;
+      const moyens = simulateData.moyens.filter(m => m.statut === 'disponible');
+      
+      const type = types[Math.floor(Math.random() * types.length)];
+      const urgency = urgencies[Math.floor(Math.random() * urgencies.length)];
+      const status = statuses[Math.floor(Math.random() * statuses.length)];
+      const user = users[Math.floor(Math.random() * users.length)];
+      
+      // Coordonnées aléatoires au large du Maroc
+      const latitude = 30 + Math.random() * 6; // Entre 30°N et 36°N
+      const longitude = -10 - Math.random() * 5; // Entre -10°W et -15°W
+      
+      const alert = {
+        id: simulateData.alertes.length + 1,
+        titre: `Alerte ${type}`,
+        description: `Incident de type ${type} signalé par un navire`,
+        type_incident: type,
+        niveau_urgence: urgency,
+        statut: status,
+        latitude: latitude.toFixed(6),
+        longitude: longitude.toFixed(6),
+        createur: `${user.prenom} ${user.nom}`,
+        date_creation: new Date().toISOString(),
+        moyens_engages: []
+      };
+      
+      // Engager aléatoirement des moyens si l'alerte est en cours
+      if (status === 'en_cours' && moyens.length > 0) {
+        const nbMoyens = Math.min(Math.floor(Math.random() * 3) + 1, moyens.length);
+        for (let i = 0; i < nbMoyens; i++) {
+          const moyen = moyens[i];
+          alert.moyens_engages.push({
+            id: moyen.id,
+            nom: moyen.nom,
+            type: moyen.type,
+            date_engagement: new Date().toISOString()
+          });
+        }
+      }
+      
+      return alert;
+    }
+
+    // Initialiser avec 5 alertes de simulation
+    function initSimulationData() {
+      simulateData.alertes = [];
+      for (let i = 0; i < 5; i++) {
+        simulateData.alertes.push(generateRandomAlert());
+      }
+      updateStats();
+    }
+
+    // Mettre à jour les statistiques
+    function updateStats() {
+      simulateData.stats = {
+        total: simulateData.alertes.length,
+        nouvelles: simulateData.alertes.filter(a => a.statut === 'nouvelle').length,
+        en_cours: simulateData.alertes.filter(a => a.statut === 'en_cours').length,
+        terminees: simulateData.alertes.filter(a => a.statut === 'terminee').length,
+        critiques: simulateData.alertes.filter(a => a.niveau_urgence === 'critique').length
+      };
+    }
+
+    // Afficher les statistiques
+    function displayStats() {
+      const stats = simulateData.stats;
+      const statsHtml = `
+        <div class="col-md-3">
+          <div class="stat-card">
+            <div class="stat-value text-primary">${stats.total}</div>
+            <div class="stat-label">Alertes totales</div>
+            <div class="text-muted small mt-2"><i class="bi bi-calendar3 me-1"></i> Simulation</div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="stat-card">
+            <div class="stat-value text-warning">${stats.nouvelles}</div>
+            <div class="stat-label">Nouvelles alertes</div>
+            <div class="text-muted small mt-2"><i class="bi bi-exclamation-triangle me-1"></i> En attente</div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="stat-card">
+            <div class="stat-value text-info">${stats.en_cours}</div>
+            <div class="stat-label">Interventions en cours</div>
+            <div class="text-muted small mt-2"><i class="bi bi-activity me-1"></i> Actives</div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="stat-card">
+            <div class="stat-value text-danger">${stats.critiques}</div>
+            <div class="stat-label">Alertes critiques</div>
+            <div class="text-muted small mt-2"><i class="bi bi-exclamation-octagon me-1"></i> Urgence maximale</div>
+          </div>
+        </div>
+      `;
+      document.getElementById('stats-container').innerHTML = statsHtml;
+    }
+
+    // Afficher les alertes dans le tableau
+    function displayAlertes() {
+      const tableBody = document.getElementById('alertes-body');
+      tableBody.innerHTML = '';
+      
+      simulateData.alertes.forEach(alerte => {
+        const row = document.createElement('tr');
+        row.className = `alert-card ${alerte.niveau_urgence}`;
+        
+        // Formatage de la date
+        const date = new Date(alerte.date_creation);
+        const dateStr = date.toLocaleDateString('fr-FR') + ' ' + date.toLocaleTimeString('fr-FR').slice(0, 5);
+        
+        // Badge d'urgence
+        let urgencyBadge;
+        if (alerte.niveau_urgence === 'critique') {
+          urgencyBadge = `<span class="badge bg-danger">critique</span>`;
+        } else if (alerte.niveau_urgence === 'urgent') {
+          urgencyBadge = `<span class="badge bg-warning text-dark">urgent</span>`;
+        } else {
+          urgencyBadge = `<span class="badge bg-primary">normal</span>`;
+        }
+        
+        // Badge de statut
+        let statusBadge;
+        if (alerte.statut === 'nouvelle') {
+          statusBadge = `<span class="badge statut-nouvelle">nouvelle</span>`;
+        } else if (alerte.statut === 'en_cours') {
+          statusBadge = `<span class="badge statut-en_cours">en cours</span>`;
+        } else {
+          statusBadge = `<span class="badge statut-terminee">terminée</span>`;
+        }
+        
+        // Moyens engagés
+        let moyensHtml = '<small>Aucun</small>';
+        if (alerte.moyens_engages.length > 0) {
+          moyensHtml = alerte.moyens_engages.map(m => 
+            `<span class="badge bg-secondary me-1">${m.nom}</span>`
+          ).join('');
+        }
+        
+        row.innerHTML = `
+          <td>#${alerte.id}</td>
+          <td>${alerte.titre}</td>
+          <td>${alerte.type_incident}</td>
+          <td>${urgencyBadge}</td>
+          <td>${statusBadge}</td>
+          <td>${alerte.createur}</td>
+          <td>${dateStr}</td>
+          <td>${moyensHtml}</td>
+          <td>
+            <button class="btn btn-sm btn-outline-primary me-1" onclick="showAlertDetails(${alerte.id})">
+              <i class="bi bi-eye"></i>
+            </button>
+            <button class="btn btn-sm btn-outline-success" onclick="engageMoyens(${alerte.id})" ${alerte.statut !== 'nouvelle' ? 'disabled' : ''}>
+              <i class="bi bi-send"></i>
+            </button>
+          </td>
+        `;
+        tableBody.appendChild(row);
+      });
+    }
+
+    // Initialiser la carte
+    function initMap() {
+      const map = L.map('map').setView([32.0, -8.0], 6);
+      L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', {
+        attribution: 'Tiles © Esri — Source: Esri, Garmin, USGS, NGA, and others'
+      }).addTo(map);
+      
+      // Icônes personnalisées
+      const iconCritique = L.divIcon({
+        html: '<i class="bi bi-exclamation-octagon-fill" style="color: #dc3545; font-size: 24px;"></i>',
+        className: 'd-flex justify-content-center align-items-center',
+        iconSize: [24, 24],
+        iconAnchor: [12, 12]
+      });
+      
+      const iconUrgent = L.divIcon({
+        html: '<i class="bi bi-exclamation-triangle-fill" style="color: #ffc107; font-size: 24px;"></i>',
+        className: 'd-flex justify-content-center align-items-center',
+        iconSize: [24, 24],
+        iconAnchor: [12, 12]
+      });
+      
+      const iconNormal = L.divIcon({
+        html: '<i class="bi bi-info-circle-fill" style="color: #0d6efd; font-size: 24px;"></i>',
+        className: 'd-flex justify-content-center align-items-center',
+        iconSize: [24, 24],
+        iconAnchor: [12, 12]
+      });
+      
+      // Ajouter les marqueurs des alertes actives
+      simulateData.alertes
+        .filter(a => a.statut !== 'terminee')
+        .forEach(alerte => {
+          let marker;
+          
+          if (alerte.niveau_urgence === 'critique') {
+            marker = L.marker([alerte.latitude, alerte.longitude], {icon: iconCritique});
+          } else if (alerte.niveau_urgence === 'urgent') {
+            marker = L.marker([alerte.latitude, alerte.longitude], {icon: iconUrgent});
+          } else {
+            marker = L.marker([alerte.latitude, alerte.longitude], {icon: iconNormal});
+          }
+          
+          marker.addTo(map)
+            .bindPopup(`<b>${alerte.titre}</b><br>Type: ${alerte.type_incident}<br>Urgence: ${alerte.niveau_urgence}`);
+        });
+      
+      return map;
+    }
+
+    // Initialiser les graphiques
+    function initCharts() {
+      // Graphique des types d'incidents
+      const incidentCtx = document.getElementById('incidentChart').getContext('2d');
+      
+      // Compter les types d'incidents
+      const typeCounts = {};
+      simulateData.alertes.forEach(alerte => {
+        typeCounts[alerte.type_incident] = (typeCounts[alerte.type_incident] || 0) + 1;
+      });
+      
+      const types = Object.keys(typeCounts);
+      const counts = Object.values(typeCounts);
+      
+      new Chart(incidentCtx, {
+        type: 'doughnut',
+        data: {
+          labels: types,
+          datasets: [{
+            data: counts,
+            backgroundColor: [
+              '#005baa', '#00a1e0', '#003366', '#4cc9f0', '#4361ee', '#3f37c9', '#4895ef'
+            ],
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: {
+              position: 'bottom'
+            }
+          }
+        }
+      });
+      
+      // Graphique mensuel (simulation)
+      const monthlyCtx = document.getElementById('monthlyChart').getContext('2d');
+      const months = ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil', 'Août', 'Sep', 'Oct', 'Nov', 'Déc'];
+      
+      // Générer des données aléatoires pour le graphique mensuel
+      const totalData = months.map(() => Math.floor(Math.random() * 10) + 2);
+      const resolvedData = totalData.map(val => Math.floor(val * 0.6));
+      
+      new Chart(monthlyCtx, {
+        type: 'line',
+        data: {
+          labels: months,
+          datasets: [
+            {
+              label: 'Alertes totales',
+              data: totalData,
+              borderColor: '#005baa',
+              backgroundColor: 'rgba(0, 91, 170, 0.1)',
+              tension: 0.3,
+              fill: true
+            },
+            {
+              label: 'Interventions terminées',
+              data: resolvedData,
+              borderColor: '#28a745',
+              backgroundColor: 'rgba(40, 167, 69, 0.1)',
+              tension: 0.3,
+              fill: true
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: {
+              position: 'bottom'
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true
+            }
+          }
+        }
+      });
+    }
+
+    // Simuler une nouvelle alerte
+    function simulateNewAlert() {
+      const newAlert = generateRandomAlert();
+      simulateData.alertes.unshift(newAlert); // Ajouter au début
+      updateStats();
+      refreshData();
+      
+      // Animation visuelle
+      const tableBody = document.getElementById('alertes-body');
+      const newRow = tableBody.firstChild;
+      newRow.classList.add('table-success');
+      setTimeout(() => newRow.classList.remove('table-success'), 2000);
+    }
+
+    // Simuler l'engagement de moyens
+    function engageMoyens(alerteId) {
+      const alerte = simulateData.alertes.find(a => a.id === alerteId);
+      if (!alerte || alerte.statut !== 'nouvelle') return;
+      
+      const moyensDisponibles = simulateData.moyens.filter(m => m.statut === 'disponible');
+      if (moyensDisponibles.length === 0) {
+        alert("Aucun moyen disponible actuellement");
+        return;
+      }
+      
+      // Engager 1 ou 2 moyens aléatoirement
+      const nbMoyens = Math.min(Math.floor(Math.random() * 2) + 1, moyensDisponibles.length);
+      for (let i = 0; i < nbMoyens; i++) {
+        const moyen = moyensDisponibles[i];
+        alerte.moyens_engages.push({
+          id: moyen.id,
+          nom: moyen.nom,
+          type: moyen.type,
+          date_engagement: new Date().toISOString()
+        });
+        moyen.statut = 'operation';
+      }
+      
+      alerte.statut = 'en_cours';
+      updateStats();
+      refreshData();
+      
+      alert(`${nbMoyens} moyen(s) engagé(s) pour l'alerte #${alerteId}`);
+    }
+
+    // Afficher les détails d'une alerte
+    function showAlertDetails(alerteId) {
+      const alerte = simulateData.alertes.find(a => a.id === alerteId);
+      if (!alerte) return;
+      
+      const date = new Date(alerte.date_creation);
+      const dateStr = date.toLocaleDateString('fr-FR') + ' à ' + date.toLocaleTimeString('fr-FR');
+      
+      let moyensHtml = '<p>Aucun moyen engagé</p>';
+      if (alerte.moyens_engages.length > 0) {
+        moyensHtml = `
+          <ul class="list-group mb-3">
+            ${alerte.moyens_engages.map(m => `
+              <li class="list-group-item d-flex justify-content-between align-items-center">
+                ${m.nom} <span class="badge bg-primary">${m.type}</span>
+              </li>
+            `).join('')}
+          </ul>
+        `;
+      }
+      
+      const modalHtml = `
+        <div class="modal fade" id="alertModal" tabindex="-1" aria-hidden="true">
+          <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title">Détails alerte #${alerte.id}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                <div class="row mb-3">
+                  <div class="col-md-6">
+                    <h6>Titre</h6>
+                    <p>${alerte.titre}</p>
+                  </div>
+                  <div class="col-md-6">
+                    <h6>Type d'incident</h6>
+                    <p>${alerte.type_incident}</p>
+                  </div>
+                </div>
+                <div class="row mb-3">
+                  <div class="col-md-6">
+                    <h6>Niveau d'urgence</h6>
+                    <p><span class="badge ${alerte.niveau_urgence === 'critique' ? 'bg-danger' : alerte.niveau_urgence === 'urgent' ? 'bg-warning text-dark' : 'bg-primary'}">
+                      ${alerte.niveau_urgence}
+                    </span></p>
+                  </div>
+                  <div class="col-md-6">
+                    <h6>Statut</h6>
+                    <p><span class="badge ${alerte.statut === 'nouvelle' ? 'statut-nouvelle' : alerte.statut === 'en_cours' ? 'statut-en_cours' : 'statut-terminee'}">
+                      ${alerte.statut}
+                    </span></p>
+                  </div>
+                </div>
+                <div class="row mb-3">
+                  <div class="col-md-6">
+                    <h6>Position</h6>
+                    <p>${alerte.latitude}°N, ${alerte.longitude}°W</p>
+                  </div>
+                  <div class="col-md-6">
+                    <h6>Créée le</h6>
+                    <p>${dateStr}</p>
+                  </div>
+                </div>
+                <div class="mb-3">
+                  <h6>Description</h6>
+                  <p>${alerte.description}</p>
+                </div>
+                <div class="mb-3">
+                  <h6>Moyens engagés</h6>
+                  ${moyensHtml}
+                </div>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+      
+      // Injecter et afficher le modal
+      document.body.insertAdjacentHTML('beforeend', modalHtml);
+      const modal = new bootstrap.Modal(document.getElementById('alertModal'));
+      modal.show();
+      
+      // Nettoyer après fermeture
+      document.getElementById('alertModal').addEventListener('hidden.bs.modal', function() {
+        this.remove();
+      });
+    }
+
+    // Rafraîchir toutes les données affichées
+    function refreshData() {
+      displayStats();
+      displayAlertes();
+      initMap();
+      initCharts();
+    }
+
+    // Réinitialiser les données de simulation
+    function clearData() {
+      if (confirm("Voulez-vous vraiment réinitialiser toutes les données de simulation ?")) {
+        initSimulationData();
+        refreshData();
+      }
+    }
+
+    // Initialisation au chargement
+    document.addEventListener('DOMContentLoaded', function() {
+      initSimulationData();
+      refreshData();
+    });
+  </script>
+</body>
+</html>

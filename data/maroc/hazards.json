@@ -1,0 +1,4 @@
+[
+    {"type": "rock", "lat": 35.7810, "lon": -5.8050, "description": "Rocher submergé"},
+    {"type": "wreck", "lat": 33.5750, "lon": -7.5910, "description": "Épave à 10m de profondeur"}
+]

@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>PEPDM - Gestion des métadonnées</title>
+  <meta name="description" content="Plateforme de gestion des métadonnées">
+  <meta name="keywords" content="métadonnées, données, gestion">
+
+  <!-- Favicons -->
+  <link href="{{ url_for('static', filename='img/favicon.png') }}" rel="icon">
+  <link href="{{ url_for('static', filename='img/apple-touch-icon.png') }}" rel="apple-touch-icon">
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
+
+  <!-- Vendor CSS Files -->
+  <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet">
+  <link href="{{ url_for('static', filename='vendor/bootstrap-icons/bootstrap-icons.css') }}" rel="stylesheet">
+  <link href="{{ url_for('static', filename='vendor/aos/aos.css') }}" rel="stylesheet">
+
+  <!-- DataTables CSS -->
+  <link href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css" rel="stylesheet">
+  <link href="https://cdn.datatables.net/buttons/2.3.6/css/buttons.dataTables.min.css" rel="stylesheet">
+
+  <!-- Main CSS File -->
+  <link href="{{ url_for('static', filename='css/main.css') }}" rel="stylesheet">
+
+  <style>
+    :root {
+      --primary-color: #4361ee;
+      --secondary-color: #3f37c9;
+      --accent-color: #4cc9f0;
+      --light-color: #f8f9fa;
+      --dark-color: #212529;
+      --success-color: #4bb543;
+      --warning-color: #f0ad4e;
+      --danger-color: #d9534f;
+    }
+    
+    body {
+      background-color: #f5f7fb;
+      font-family: 'Inter', sans-serif;
+      color: var(--dark-color);
+      padding-top: 70px;
+    }
+    
+    /* Header Styles */
+    .header {
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      box-shadow: 0 2px 20px rgba(67, 97, 238, 0.2);
+      height: 70px;
+    }
+    
+    .header .logo h1 {
+      color: white;
+      font-weight: 700;
+      font-size: 1.8rem;
+    }
+    
+    .header .navmenu ul li a {
+      color: rgba(255, 255, 255, 0.8);
+      font-weight: 500;
+      transition: all 0.3s;
+    }
+    
+    .header .navmenu ul li a:hover,
+    .header .navmenu ul li a.active {
+      color: white;
+    }
+    
+    .user-menu {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+    
+    .username {
+      color: white;
+      font-weight: 500;
+      margin-right: 10px;
+    }
+    
+    .btn-custom {
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-weight: 500;
+      transition: 0.3s ease-in-out;
+    }
+    
+    .btn-primary-custom {
+      background: white;
+      color: var(--primary-color);
+      border: none;
+    }
+    
+    .btn-primary-custom:hover {
+      background: rgba(255, 255, 255, 0.9);
+    }
+    
+    .btn-secondary-custom {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid white;
+      color: white;
+    }
+    
+    .btn-secondary-custom:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+    
+    /* Main Content */
+    .main-content {
+      padding: 3rem 0;
+    }
+    
+    /* Table Styles */
+    .data-table-container {
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+      padding: 2rem;
+      margin-bottom: 2rem;
+    }
+    
+    .table-title {
+      color: var(--primary-color);
+      font-weight: 700;
+      margin-bottom: 1.5rem;
+      font-family: 'Manrope', sans-serif;
+    }
+    
+    #modern-table {
+      width: 100% !important;
+    }
+    
+    #modern-table thead th {
+      background-color: var(--primary-color);
+      color: white;
+      font-weight: 500;
+      padding: 12px 15px;
+    }
+    
+    #modern-table tbody td {
+      padding: 10px 15px;
+      vertical-align: middle;
+    }
+    
+    #modern-table tbody tr:nth-child(even) {
+      background-color: rgba(76, 201, 240, 0.05);
+    }
+    
+    #modern-table tbody tr:hover {
+      background-color: rgba(76, 201, 240, 0.1);
+    }
+    
+    .btn-action {
+      padding: 5px 10px;
+      font-size: 0.85rem;
+      border-radius: 5px;
+      margin: 2px;
+    }
+    
+    .btn-edit {
+      background-color: var(--warning-color);
+      color: white;
+    }
+    
+    .btn-delete {
+      background-color: var(--danger-color);
+      color: white;
+    }
+    
+    .btn-add {
+      background-color: var(--success-color);
+      color: white;
+      margin-bottom: 1.5rem;
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+      .data-table-container {
+        padding: 1rem;
+      }
+      
+      .header .logo h1 {
+        font-size: 1.5rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header id="header" class="header d-flex align-items-center fixed-top">
+    <div class="container-fluid container-xl position-relative d-flex align-items-center">
+      <a href="{{ url_for('index') }}" class="logo d-flex align-items-center me-auto">
+        <img src="{{ url_for('static', filename='img/logo1.png') }}" alt="PEPDM Logo">
+        <h1>PEPDM</h1>
+      </a>
+
+      <nav id="navmenu" class="navmenu">
+        <ul>
+          <li><a href="{{ url_for('index') }}">Accueil</a></li>
+          <li><a href="{{ url_for('dashboard') }}">Tableau de bord</a></li>
+          <li><a href="{{ url_for('map') }}">Géoportail</a></li>
+          <li><a href="{{ url_for('portfolio') }}">Données</a></li>
+          <li><a href="{{ url_for('gestion_droits') }}">Droits</a></li>
+          <li><a href="{{ url_for('alerte') }}">Alertes</a></li>
+          <li><a href="{{ url_for('api') }}">API</a></li>
+        </ul>
+      </nav>
+
+      <div class="user-menu ms-auto">
+        {% if current_user.is_authenticated %}
+          <span class="username">{{ current_user.username }}</span>
+          <a href="{{ url_for('logout') }}" class="btn btn-sm btn-primary-custom">Déconnexion</a>
+        {% else %}
+          <a href="{{ url_for('login') }}" class="btn btn-sm btn-primary-custom">Connexion</a>
+          <a href="{{ url_for('register') }}" class="btn btn-sm btn-secondary-custom">Inscription</a>
+        {% endif %}
+      </div>
+
+      <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
+    </div>
+  </header>
+
+  <main class="main-content">
+    <div class="container">
+      <div class="data-table-container" data-aos="fade-up">
+        <h2 class="table-title"><i class="fas fa-database me-2"></i>Liste des métadonnées</h2>
+        
+        <a href="{{ url_for('ajouter_donnee') }}" class="btn btn-add">
+          <i class="fas fa-plus-circle me-1"></i> Ajouter une métadonnée
+        </a>
+        
+        <table id="modern-table" class="display nowrap" style="width:100%">
+          <thead>
+            <tr>
+              <th>Donnée</th>
+              <th>Descriptif</th>
+              <th>Type</th>
+              <th>Format</th>
+              <th>Taille</th>
+              <th>Producteur</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for donnee in donnees %}
+            <tr>
+              <td>{{ donnee[1] }}</td>  <!-- Nom donnée -->
+              <td>{{ donnee[3]|truncate(50) }}</td>  <!-- Descriptif -->
+              <td>{{ donnee[5] }}</td>  <!-- Type de donnée -->
+              <td>{{ donnee[6] }}</td>  <!-- Format -->
+              <td>{{ donnee[7] }}</td>  <!-- Taille moyenne -->
+              <td>{{ donnee[8] }}</td>  <!-- Producteur -->
+              <td>
+                <div class="d-flex">
+                  <a href="{{ url_for('modifier_donnees', id=donnee[0]) }}" class="btn btn-action btn-edit me-1">
+                    <i class="fas fa-edit"></i>
+                  </a>
+                  <a href="{{ url_for('supprimer_donnee', id=donnee[0]) }}" class="btn btn-action btn-delete" onclick="return confirm('Confirmer la suppression ?')">
+                    <i class="fas fa-trash"></i>
+                  </a>
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <footer id="footer" class="footer position-relative">
+    <div class="container copyright text-center mt-4">
+      <p>© <span>Copyright</span> <strong class="px-1">PEPDM</strong><span>Tous droits réservés</span></p>
+    </div>
+  </footer>
+
+  <!-- Vendor JS Files -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+  <script src="https://cdn.datatables.net/buttons/2.3.6/js/dataTables.buttons.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+  <script src="https://cdn.datatables.net/buttons/2.3.6/js/buttons.html5.min.js"></script>
+  <script src="https://cdn.datatables.net/buttons/2.3.6/js/buttons.print.min.js"></script>
+  
+  <script src="{{ url_for('static', filename='vendor/aos/aos.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+
+  <script>
+    // Initialize AOS animations
+    AOS.init({
+      duration: 800,
+      easing: 'ease-in-out',
+      once: true
+    });
+
+    // Initialize DataTable
+    $(document).ready(function() {
+      $('#modern-table').DataTable({
+        dom: 'Bfrtip',
+        buttons: [
+          'copy', 'csv', 'excel', 'pdf', 'print'
+        ],
+        scrollX: true,
+        responsive: true,
+        language: {
+          "lengthMenu": "Afficher _MENU_ entrées",
+          "zeroRecords": "Aucune donnée trouvée",
+          "info": "Affichage de _START_ à _END_ sur _TOTAL_ entrées",
+          "infoEmpty": "Aucune entrée disponible",
+          "infoFiltered": "(filtré à partir de _MAX_ entrées totales)",
+          "search": "Rechercher :",
+          "paginate": {
+              "first": "Premier",
+              "last": "Dernier",
+              "next": "Suivant",
+              "previous": "Précédent"
+          }
+        }
+      });
+    });
+
+    // Confirmation for delete
+    function confirmDelete() {
+      return confirm('Êtes-vous sûr de vouloir supprimer cette métadonnée ?');
+    }
+  </script>
+</body>
+</html>

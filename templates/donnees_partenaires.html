@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>PEPDM - Métadonnées Partenaires</title>
+  <meta name="description" content="Plateforme de gestion des métadonnées partenaires">
+  <meta name="keywords" content="métadonnées, données, partenaires, gestion">
+
+  <!-- Favicons -->
+  <link href="{{ url_for('static', filename='img/favicon.png') }}" rel="icon">
+  <link href="{{ url_for('static', filename='img/apple-touch-icon.png') }}" rel="apple-touch-icon">
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
+
+  <!-- Vendor CSS Files -->
+  <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet">
+  <link href="{{ url_for('static', filename='vendor/bootstrap-icons/bootstrap-icons.css') }}" rel="stylesheet">
+  <link href="{{ url_for('static', filename='vendor/aos/aos.css') }}" rel="stylesheet">
+
+  <!-- DataTables CSS -->
+  <link href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css" rel="stylesheet">
+  <link href="https://cdn.datatables.net/buttons/2.3.6/css/buttons.dataTables.min.css" rel="stylesheet">
+
+  <!-- Main CSS File -->
+  <link href="{{ url_for('static', filename='css/main.css') }}" rel="stylesheet">
+
+  <style>
+    :root {
+      --primary-color: #4361ee;
+      --secondary-color: #3f37c9;
+      --accent-color: #4cc9f0;
+      --light-color: #f8f9fa;
+      --dark-color: #212529;
+      --success-color: #4bb543;
+      --warning-color: #f0ad4e;
+      --danger-color: #d9534f;
+      --info-color: #388da8;
+    }
+    
+    body {
+      background-color: #f5f7fb;
+      font-family: 'Inter', sans-serif;
+      color: var(--dark-color);
+      padding-top: 70px;
+    }
+    
+    /* Header Styles */
+    .header {
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      box-shadow: 0 2px 20px rgba(67, 97, 238, 0.2);
+      height: 70px;
+    }
+    
+    .header .logo h1 {
+      color: white;
+      font-weight: 700;
+      font-size: 1.8rem;
+    }
+    
+    .header .navmenu ul li a {
+      color: rgba(255, 255, 255, 0.8);
+      font-weight: 500;
+      transition: all 0.3s;
+    }
+    
+    .header .navmenu ul li a:hover,
+    .header .navmenu ul li a.active {
+      color: white;
+    }
+    
+    .user-menu {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+    
+    .username {
+      color: white;
+      font-weight: 500;
+      margin-right: 10px;
+    }
+    
+    .btn-custom {
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-weight: 500;
+      transition: 0.3s ease-in-out;
+    }
+    
+    .btn-primary-custom {
+      background: white;
+      color: var(--primary-color);
+      border: none;
+    }
+    
+    .btn-primary-custom:hover {
+      background: rgba(255, 255, 255, 0.9);
+    }
+    
+    .btn-secondary-custom {
+      background: var(--info-color);
+      color: white;
+      border: none;
+    }
+    
+    .btn-secondary-custom:hover {
+      background: #2c6e83;
+      color: white;
+    }
+    
+    /* Main Content */
+    .main-content {
+      padding: 3rem 0;
+    }
+    
+    /* Hero Section */
+    .hero-section {
+      position: relative;
+      margin-bottom: 3rem;
+    }
+    
+    .hero-content {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 90%;
+      max-width: 1200px;
+      text-align: center;
+    }
+    
+    /* Table Styles */
+    .data-table-container {
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+      padding: 2rem;
+      margin-bottom: 3rem;
+    }
+    
+    .section-title {
+      color: var(--primary-color);
+      font-weight: 700;
+      margin-bottom: 1.5rem;
+      font-family: 'Manrope', sans-serif;
+      position: relative;
+      padding-bottom: 0.5rem;
+    }
+    
+    .section-title::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 60px;
+      height: 3px;
+      background: var(--accent-color);
+    }
+    
+    #modern-table {
+      width: 100% !important;
+    }
+    
+    #modern-table thead th {
+      background-color: var(--info-color);
+      color: white;
+      font-weight: 500;
+      padding: 12px 15px;
+    }
+    
+    #modern-table tbody td {
+      padding: 10px 15px;
+      vertical-align: middle;
+    }
+    
+    #modern-table tbody tr:nth-child(even) {
+      background-color: rgba(76, 201, 240, 0.05);
+    }
+    
+    #modern-table tbody tr:hover {
+      background-color: rgba(76, 201, 240, 0.1);
+    }
+    
+    /* Engagement Section */
+    .engagement-section {
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+      padding: 2.5rem;
+      margin-bottom: 2rem;
+    }
+    
+    .engagement-title {
+      color: var(--info-color);
+      font-weight: 600;
+      margin-bottom: 1.5rem;
+    }
+    
+    .engagement-subtitle {
+      color: var(--info-color);
+      font-weight: 500;
+      margin-top: 1.5rem;
+      margin-bottom: 1rem;
+    }
+    
+    .engagement-list {
+      list-style-type: none;
+      padding-left: 0;
+    }
+    
+    .engagement-list li {
+      padding: 0.5rem 0;
+      position: relative;
+      padding-left: 2rem;
+    }
+    
+    .engagement-list li::before {
+      content: '\f00c';
+      font-family: 'Font Awesome 6 Free';
+      font-weight: 900;
+      color: var(--info-color);
+      position: absolute;
+      left: 0;
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+      .data-table-container,
+      .engagement-section {
+        padding: 1.5rem;
+      }
+      
+      .header .logo h1 {
+        font-size: 1.5rem;
+      }
+      
+      .hero-content {
+        width: 95%;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header id="header" class="header d-flex align-items-center fixed-top">
+    <div class="container-fluid container-xl position-relative d-flex align-items-center">
+      <a href="{{ url_for('index') }}" class="logo d-flex align-items-center me-auto">
+        <img src="{{ url_for('static', filename='img/logo1.png') }}" alt="PEPDM Logo">
+        <h1>PEPDM</h1>
+      </a>
+
+      <nav id="navmenu" class="navmenu">
+        <ul>
+          <li><a href="{{ url_for('index') }}">Accueil</a></li>
+          <li><a href="{{ url_for('dashboard') }}">Tableau de bord</a></li>
+          <li><a href="{{ url_for('map') }}">Géoportail</a></li>
+          <li><a href="{{ url_for('portfolio') }}">Données</a></li>
+          <li><a href="{{ url_for('gestion_droits') }}">Droits</a></li>
+          <li><a href="{{ url_for('alerte') }}">Alertes</a></li>
+          <li><a href="{{ url_for('api') }}">API</a></li>
+        </ul>
+      </nav>
+
+      <div class="user-menu ms-auto">
+        {% if current_user.is_authenticated %}
+          <span class="username">{{ current_user.username }}</span>
+          <a href="{{ url_for('logout') }}" class="btn btn-sm btn-primary-custom">Déconnexion</a>
+        {% else %}
+          <a href="{{ url_for('login') }}" class="btn btn-sm btn-primary-custom">Connexion</a>
+          <a href="{{ url_for('register') }}" class="btn btn-sm btn-secondary-custom">Inscription</a>
+        {% endif %}
+      </div>
+
+      <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
+    </div>
+  </header>
+
+  <main class="main-content">
+    <!-- Hero Section -->
+ 
+
+
+      <div class="container">
+        <div class="data-table-container" data-aos="fade-up">
+          <h2 class="table-title"><i class="fas fa-database me-2"></i>Métadonnées Partenaires</h2>
+          
+          <a href="{{ url_for('ajouter_donnee') }}" class="btn btn-add">
+            <i class="fas fa-plus-circle me-1"></i> Ajouter une métadonnée
+          </a>
+   
+
+ 
+      <!-- Data Table Section -->
+      <div class="data-table-container" data-aos="fade-up">
+        <table id="modern-table" class="display nowrap" style="width:100%">
+          <thead>
+            <tr>
+              <th>Donnée</th>
+              <th>Territoire</th>
+              <th>Descriptif</th>
+              <th>Type</th>
+              <th>Format</th>
+              <th>Taille</th>
+              <th>Producteur</th>
+              <th>Cas d'usage</th>
+              <th>Période</th>
+              <th>Fréquence</th>
+              <th>MAJ</th>
+              <th>Historique</th>
+              <th>Accès</th>
+              <th>Qualité</th>
+              <th>Référence</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for donnee in donnees %}
+            <tr>
+              <td>{{ donnee[1] }}</td>
+              <td>{{ donnee[2] }}</td>
+              <td>{{ donnee[3]|truncate(30) }}</td>
+              <td>{{ donnee[5] }}</td>
+              <td>{{ donnee[6] }}</td>
+              <td>{{ donnee[7] }}</td>
+              <td>{{ donnee[8]|truncate(20) }}</td>
+              <td>{{ donnee[9]|truncate(20) }}</td>
+              <td>{{ donnee[10] }}</td>
+              <td>{{ donnee[11] }}</td>
+              <td>{{ donnee[12] }}</td>
+              <td>{{ donnee[13] }}</td>
+              <td>{{ donnee[14] }}</td>
+              <td>{{ donnee[15]|truncate(15) }}</td>
+              <td>{{ donnee[20] }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Engagement Section -->
+      <div class="engagement-section" data-aos="fade-up" data-aos-delay="100">
+        <h2 class="engagement-title"><i class="fas fa-handshake me-2"></i>Engagements des Parties Prenantes</h2>
+        <p class="lead">Chaque partenaire définit les données qu'il souhaite partager via la plateforme nationale dans le respect des droits liés à la propriété intellectuelle.</p>
+        
+        <h3 class="engagement-subtitle"><i class="fas fa-users-cog me-2"></i>1. En tant que producteur ou détenteur de données</h3>
+        
+        <h4 class="engagement-subtitle"><i class="fas fa-check-circle me-2"></i>A. Qualité et fiabilité de la donnée</h4>
+        <ul class="engagement-list">
+          <li>Le producteur est responsable de la validité, de la qualité et de l'exactitude des données fournies.</li>
+        </ul>
+        
+        <h4 class="engagement-subtitle"><i class="fas fa-file-alt me-2"></i>B. Métadonnées et Spécifications techniques</h4>
+        <ul class="engagement-list">
+          <li>Chaque détenteur de données doit fournir un catalogue et des métadonnées complètes et précises.</li>
+        </ul>
+        
+        <h4 class="engagement-subtitle"><i class="fas fa-plug me-2"></i>C. Interopérabilité des données</h4>
+        <ul class="engagement-list">
+          <li>Les données doivent respecter des formats compatibles avec la plateforme et privilégier les standards ouverts.</li>
+        </ul>
+        
+        <h3 class="engagement-subtitle mt-4"><i class="fas fa-user-shield me-2"></i>2. En tant qu'utilisateur de données</h3>
+        
+        <h4 class="engagement-subtitle"><i class="fas fa-gavel me-2"></i>A. Respect des droits de propriété intellectuelle</h4>
+        <ul class="engagement-list">
+          <li>Les données restent la propriété intellectuelle du producteur et leur utilisation est soumise à des droits spécifiques.</li>
+        </ul>
+        
+        <h4 class="engagement-subtitle"><i class="fas fa-shield-alt me-2"></i>B. Sécurité et Confidentialité</h4>
+        <ul class="engagement-list">
+          <li>Les données sensibles doivent être protégées contre tout accès non autorisé.</li>
+          <li>La diffusion des données est soumise à accord entre producteur et utilisateur.</li>
+        </ul>
+      </div>
+    </div>
+  </main>
+
+  <footer id="footer" class="footer position-relative">
+    <div class="container copyright text-center mt-4">
+      <p>© <span>Copyright</span> <strong class="px-1">PEPDM</strong><span>Tous droits réservés</span></p>
+    </div>
+  </footer>
+
+  <!-- Vendor JS Files -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+  <script src="https://cdn.datatables.net/buttons/2.3.6/js/dataTables.buttons.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+  <script src="https://cdn.datatables.net/buttons/2.3.6/js/buttons.html5.min.js"></script>
+  <script src="https://cdn.datatables.net/buttons/2.3.6/js/buttons.print.min.js"></script>
+  
+  <script src="{{ url_for('static', filename='vendor/aos/aos.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+
+  <script>
+    // Initialize AOS animations
+    AOS.init({
+      duration: 800,
+      easing: 'ease-in-out',
+      once: true
+    });
+
+    // Initialize DataTable
+    $(document).ready(function() {
+      $('#modern-table').DataTable({
+        dom: 'Bfrtip',
+        buttons: [
+          'copy', 'csv', 'excel', 'pdf', 'print'
+        ],
+        scrollX: true,
+        responsive: true,
+        language: {
+          "lengthMenu": "Afficher _MENU_ entrées",
+          "zeroRecords": "Aucune donnée trouvée",
+          "info": "Affichage de _START_ à _END_ sur _TOTAL_ entrées",
+          "infoEmpty": "Aucune entrée disponible",
+          "infoFiltered": "(filtré à partir de _MAX_ entrées totales)",
+          "search": "Rechercher :",
+          "paginate": {
+              "first": "Premier",
+              "last": "Dernier",
+              "next": "Suivant",
+              "previous": "Précédent"
+          }
+        },
+        pageLength: 10
+      });
+    });
+  </script>
+</body>
+</html>

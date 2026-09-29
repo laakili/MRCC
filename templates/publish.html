@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>MRCC - Publication GeoServer</title>
+  <meta name="description" content="Publication de couches géospatiales sur GeoServer">
+  <meta name="keywords" content="MRCC, GeoServer, publication, couche">
+
+  <!-- Favicons -->
+  <link href="{{ url_for('static', filename='img/favicon.png') }}" rel="icon">
+  <link href="{{ url_for('static', filename='img/apple-touch-icon.png') }}" rel="apple-touch-icon">
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
+
+  <!-- Vendor CSS Files -->
+  <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet">
+  <link href="{{ url_for('static', filename='vendor/bootstrap-icons/bootstrap-icons.css') }}" rel="stylesheet">
+  <link href="{{ url_for('static', filename='vendor/aos/aos.css') }}" rel="stylesheet">
+
+  <!-- Main CSS File -->
+  <link href="{{ url_for('static', filename='css/main.css') }}" rel="stylesheet">
+
+  <style>
+    :root {
+      --primary-color: #4361ee;
+      --secondary-color: #3f37c9;
+      --accent-color: #4cc9f0;
+      --light-color: #f8f9fa;
+      --dark-color: #212529;
+      --success-color: #4bb543;
+      --warning-color: #f0ad4e;
+      --danger-color: #d9534f;
+    }
+    
+    body {
+      background-color: #f5f7fb;
+      font-family: 'Inter', sans-serif;
+      color: var(--dark-color);
+      padding-top: 70px;
+    }
+    
+    /* Header Styles */
+    .header {
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      box-shadow: 0 2px 20px rgba(67, 97, 238, 0.2);
+      height: 70px;
+    }
+    
+    .header .logo h1 {
+      color: white;
+      font-weight: 700;
+      font-size: 1.5rem;
+    }
+    
+    .header .navmenu ul li a {
+      color: rgba(255, 255, 255, 0.8);
+      font-weight: 500;
+      transition: all 0.3s;
+    }
+    
+    .header .navmenu ul li a:hover,
+    .header .navmenu ul li a.active {
+      color: white;
+    }
+    
+    .user-menu {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+    
+    .username {
+      color: white;
+      font-weight: 500;
+      margin-right: 10px;
+    }
+    
+    .btn-custom {
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-weight: 500;
+      transition: 0.3s ease-in-out;
+    }
+    
+    .btn-primary-custom {
+      background: white;
+      color: var(--primary-color);
+      border: none;
+    }
+    
+    .btn-primary-custom:hover {
+      background: rgba(255, 255, 255, 0.9);
+    }
+    
+    .btn-secondary-custom {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid white;
+      color: white;
+    }
+    
+    .btn-secondary-custom:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+    
+    /* Main Content Styles */
+    .main-content {
+      padding: 3rem 0;
+      min-height: calc(100vh - 70px - 60px);
+    }
+    
+    .publish-container {
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+      padding: 2.5rem;
+      width: 90%;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    
+    .publish-title {
+      color: var(--primary-color);
+      font-weight: 700;
+      margin-bottom: 1.5rem;
+      text-align: center;
+      font-family: 'Manrope', sans-serif;
+      position: relative;
+      padding-bottom: 0.5rem;
+    }
+    
+    .publish-title::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 80px;
+      height: 3px;
+      background: var(--accent-color);
+    }
+    
+    /* Form Styles */
+    .publish-form {
+      margin-top: 2rem;
+    }
+    
+    .form-label {
+      font-weight: 500;
+      color: #495057;
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+    
+    .form-control {
+      width: 100%;
+      padding: 12px 15px;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      font-size: 15px;
+      transition: all 0.3s;
+      background-color: #f9f9f9;
+    }
+    
+    .form-control:focus {
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+      background-color: white;
+    }
+    
+    .btn-publish {
+      background: var(--primary-color);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 12px 25px;
+      font-weight: 500;
+      letter-spacing: 0.5px;
+      transition: all 0.3s;
+      font-size: 16px;
+      width: 100%;
+      margin-top: 1.5rem;
+    }
+    
+    .btn-publish:hover {
+      background: var(--secondary-color);
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(67, 97, 238, 0.3);
+    }
+    
+    /* Alert Styles */
+    .alert {
+      border-radius: 8px;
+      padding: 12px 15px;
+      margin-bottom: 1.5rem;
+    }
+    
+    .alert-warning {
+      background-color: rgba(240, 173, 78, 0.1);
+      border-color: rgba(240, 173, 78, 0.3);
+      color: var(--warning-color);
+    }
+    
+    /* File Input Customization */
+    .file-input-container {
+      position: relative;
+      margin-bottom: 1.5rem;
+    }
+    
+    .file-input-label {
+      display: flex;
+      align-items: center;
+      padding: 12px 15px;
+      background-color: #f9f9f9;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    
+    .file-input-label:hover {
+      background-color: #f0f0f0;
+    }
+    
+    .file-input-label i {
+      margin-right: 10px;
+      color: var(--primary-color);
+    }
+    
+    .file-input {
+      position: absolute;
+      width: 0.1px;
+      height: 0.1px;
+      opacity: 0;
+      overflow: hidden;
+      z-index: -1;
+    }
+    
+    .file-name {
+      margin-left: 10px;
+      color: #6c757d;
+      font-style: italic;
+    }
+    
+    /* Notification Styles */
+    .notification-icon {
+      position: relative;
+      cursor: pointer;
+      color: white;
+      font-size: 1.2rem;
+    }
+    
+    .notification-count {
+      position: absolute;
+      top: -8px;
+      right: -8px;
+      background: var(--danger-color);
+      color: white;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.7rem;
+      font-weight: bold;
+    }
+    
+    .notification-list {
+      position: absolute;
+      top: 50px;
+      right: 0;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+      width: 300px;
+      z-index: 1000;
+      padding: 1rem;
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+      .publish-container {
+        padding: 1.5rem;
+      }
+      
+      .header .logo h1 {
+        font-size: 1.3rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header id="header" class="header d-flex align-items-center fixed-top">
+    <div class="container-fluid container-xl position-relative d-flex align-items-center">
+      <a href="{{ url_for('index') }}" class="logo d-flex align-items-center me-auto">
+        <img src="{{ url_for('static', filename='img/logo1.png') }}" alt="MRCC Logo">
+        <h1>MRCC</h1>
+      </a>
+
+      <nav id="navmenu" class="navmenu">
+        <ul>
+          <li><a href="{{ url_for('index') }}">Accueil</a></li>
+          <li><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
+          <li><a href="http://geoai-solutions.ddns.net:8888/MRCC/">Géoportail</a></li>
+                    <li><a href="{{ url_for('marine') }}">Flotte maritime</a></li>
+          <li><a href="{{ url_for('moyens') }}">Moyens de secours</a></li>
+          <li><a href="{{ url_for('alerte') }}">Alertes</a></li>
+          <li><a href="{{ url_for('api') }}">API</a></li>
+        </ul>
+      </nav>
+
+      <div class="user-menu ms-auto">
+        {% if current_user.is_authenticated %}
+          <span class="username">{{ current_user.username }}</span>
+          <a href="{{ url_for('logout') }}" class="btn btn-sm btn-primary-custom">Déconnexion</a>
+        {% else %}
+          <a href="{{ url_for('login') }}" class="btn btn-sm btn-primary-custom">Connexion</a>
+          <a href="{{ url_for('register') }}" class="btn btn-sm btn-secondary-custom">Inscription</a>
+        {% endif %}
+        <span id="notification-icon" class="notification-icon" onclick="toggleNotifications()">
+          <i class="fas fa-bell"></i>
+          <span id="notification-count" class="notification-count">0</span>
+        </span>
+      </div>
+      
+      <div id="notification-list" class="notification-list" style="display: none;">
+        <!-- Notifications affichées via JavaScript -->
+      </div>
+
+      <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
+    </div>
+  </header>
+
+  <main class="main-content">
+    <div class="publish-container" data-aos="fade-up">
+      <h2 class="publish-title"><i class="fas fa-layer-group"></i> Publier une couche sur GeoServer</h2>
+      
+      {% with messages = get_flashed_messages() %}
+        {% if messages %}
+          <div class="alert alert-warning">
+            <ul class="mb-0">
+              {% for message in messages %}
+                <li>{{ message }}</li>
+              {% endfor %}
+            </ul>
+          </div>
+        {% endif %}
+      {% endwith %}
+      
+      <form action="{{ url_for('publish') }}" method="POST" enctype="multipart/form-data" class="publish-form">
+        <div class="mb-3">
+            <label for="data_source" class="form-label"><i class="fas fa-database"></i> Source de données :</label>
+            <select name="data_source" id="data_source" class="form-control" required>
+                <option value="postgis">Base de données PostGIS</option>
+                <option value="file">Fichier (Shapefile .zip, GeoTIFF)</option>
+            </select>
+        </div>
+    
+        <!-- Section PostGIS -->
+        <div id="postgis_section" class="mb-3">
+            <label for="postgis_table" class="form-label"><i class="fas fa-table"></i> Table PostGIS :</label>
+            <select name="postgis_table" id="postgis_table" class="form-control" required>
+                {% for table in postgis_tables %}
+                <option value="{{ table }}">{{ table }}</option>
+                {% endfor %}
+            </select>
+        </div>
+    
+        <!-- Section Fichier (masquée par défaut) -->
+        <div id="file_upload_section" class="mb-3" style="display: none;">
+            <label class="form-label"><i class="fas fa-file-upload"></i> Fichier à publier :</label>
+            <div class="file-input-container">
+                <label for="file" class="file-input-label">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    <span>Parcourir les fichiers...</span>
+                    <span id="file-name" class="file-name">Aucun fichier sélectionné</span>
+                </label>
+                <input type="file" name="file" id="file" class="file-input" accept=".zip,.tif,.tiff,.geotiff">
+            </div>
+            <small class="text-muted">Pour les Shapefiles, veuillez fournir un fichier ZIP contenant tous les fichiers (.shp, .shx, .dbf, etc.)</small>
+        </div>
+    
+        <div class="mb-3">
+            <label for="layer_name" class="form-label"><i class="fas fa-tag"></i> Nom de la couche :</label>
+            <input type="text" name="layer_name" id="layer_name" class="form-control" placeholder="ex: ports_maritimes" required>
+        </div>
+        <div class="mb-3">
+          <label for="layer_style" class="form-label"><i class="fas fa-palette"></i> Style de la couche :</label>
+          <div class="style-options">
+            <label class="style-option">
+              <input type="radio" name="layer_style" value="point_bleu_moderne" checked>
+              <div class="style-visual" style="background-color: #3a86ff; border: 2px solid white; box-shadow: 0 0 0 1px #3a86ff;"></div>
+              <span>Bleu Moderne</span>
+            </label>
+            
+            <label class="style-option">
+              <input type="radio" name="layer_style" value="point_gradient_orange">
+              <div class="style-visual" style="background: radial-gradient(circle, #ff9e00, #ff5400); border: 1px solid #ff5400;"></div>
+              <span>Gradient Orange</span>
+            </label>
+            
+            <label class="style-option">
+              <input type="radio" name="layer_style" value="point_eclat_violet">
+              <div class="style-visual" style="background-color: #8338ec; position: relative;">
+                <div style="position: absolute; width: 100%; height: 100%; background-color: #8338ec; opacity: 0.3; border-radius: 50%; transform: scale(1.8);"></div>
+                <span style="color: white; position: relative;">★</span>
+              </div>
+              <span>Éclat Violet</span>
+            </label>
+          </div>
+        </div>
+        <button type="submit" class="btn-publish">
+            <i class="fas fa-share-square"></i> Publier sur GeoServer
+        </button>
+    </form>
+    </div>
+  </main>
+
+  <footer id="footer" class="footer position-relative">
+    <div class="container copyright text-center mt-4">
+      <p>© <span>Copyright</span> <strong class="px-1">MRCC</strong><span>Tous droits réservés</span></p>
+    </div>
+  </footer>
+
+  <!-- Vendor JS Files -->
+  <script src="{{ url_for('static', filename='vendor/aos/aos.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+
+  <script>
+    // Initialize AOS animations
+    AOS.init({
+      duration: 800,
+      easing: 'ease-in-out',
+      once: true
+    });
+
+    // Notification toggle function
+    function toggleNotifications() {
+      const notificationList = document.getElementById('notification-list');
+      notificationList.style.display = notificationList.style.display === 'none' ? 'block' : 'none';
+    }
+
+    // Gestion de l'affichage du champ de fichier
+    document.getElementById('data_source').addEventListener('change', function() {
+      const fileUploadSection = document.getElementById('file_upload_section');
+      fileUploadSection.style.display = this.value === 'file' ? 'block' : 'none';
+    });
+
+    // Affichage du nom du fichier sélectionné
+    document.getElementById('file').addEventListener('change', function(e) {
+      const fileName = e.target.files[0] ? e.target.files[0].name : 'Aucun fichier sélectionné';
+      document.getElementById('file-name').textContent = fileName;
+    });
+  </script>
+  <script>
+    // Gestion de l'affichage des sections
+    document.getElementById('data_source').addEventListener('change', function() {
+        const postgisSection = document.getElementById('postgis_section');
+        const fileSection = document.getElementById('file_upload_section');
+        
+        if (this.value === 'postgis') {
+            postgisSection.style.display = 'block';
+            fileSection.style.display = 'none';
+        } else {
+            postgisSection.style.display = 'none';
+            fileSection.style.display = 'block';
+        }
+    });
+
+    // Initialisation au chargement de la page
+    document.addEventListener('DOMContentLoaded', function() {
+        document.getElementById('postgis_section').style.display = 'block';
+        document.getElementById('file_upload_section').style.display = 'none';
+    });
+</script>
+<style>
+  .style-options {
+    display: flex;
+    gap: 15px;
+    margin-top: 10px;
+  }
+  
+  .style-option {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+  }
+  
+  .style-visual {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 5px;
+    transition: transform 0.2s;
+  }
+  
+  .style-option input[type="radio"] {
+    display: none;
+  }
+  
+  .style-option input[type="radio"]:checked + .style-visual {
+    transform: scale(1.2);
+    box-shadow: 0 0 5px rgba(0,0,0,0.2);
+  }
+  </style>
+</body>
+</html>

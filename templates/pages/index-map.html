@@ -1,0 +1,1363 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>iReal Estate</title>
+
+    <!-- Favicons -->
+    <link href="assets/img/favicon.png" rel="icon">
+    <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="../assets/css/mapstyle.css">
+    <!-- Bootstrap Font Icon CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <title>Interactive Choropleth Map</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/tippy.js@6/dist/tippy.css" />
+    <script src="../assets/js/constant.js" type="text/javascript"></script>
+    <script src="./../assets/js/bootstrap-typeahead.js"></script>
+
+</head>
+
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <nav class="sidebar">
+            <div class="mb-3 d-flex align-items-center px-2">
+                <a href="index.html#hero" class="">
+                    <img src="../assets/img/left-chevron-circle-black.svg" alt="">
+                </a>
+                <h3 class="ms-2 mb-1">iReal Estate</h3>
+            </div>
+
+            <hr class="sidebar-hr">
+
+            <div class="search-field mx-2">
+                <img src="../assets/img/search-icon.svg" alt="">
+                <input type="text" placeholder="Search Data Points" class="form-control search-input">
+            </div>
+
+            <!-- <hr class="sidebar-hr"> -->
+
+            <div class="accordion sidebar-accordion mt-3">
+                <div class="accordion-item">
+                    <h5 class="accordion-header" id="popularDataHeading">
+                        <button class="accordion-button" type="button" data-bs-toggle="collapse"
+                            data-bs-target="#popularDataCollapse" aria-expanded="true"
+                            aria-controls="popularDataCollapse">
+                            Popular Data <span class="accordion-icon"></span>
+                        </button>
+                    </h5>
+                    <div id="popularDataCollapse" class="accordion-collapse collapse show"
+                        aria-labelledby="popularDataHeading">
+                        <div class="accordion-body">
+                            <div class="form-check custom-radio">
+                                <input class="form-check-input" type="radio" name="kpis_title"
+                                    value="askingpricegrowthYOY" id="askingPriceGrowthYOYRadio">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <label class="form-check-label" for="askingPriceGrowthYOYRadio">Asking Price Growth
+                                        YOY</label>
+                                    <img src="../assets/img/tooltip-icon.svg" class="sidebar-tooltip"
+                                        data-video-url="https://www.youtube.com/embed/CRJ7B_fkjh4?si=OdeQgOlBE5w0W08w">
+                                </div>
+                            </div>
+                            <!-- <div class="form-check custom-radio">
+                                <input class="form-check-input" type="radio" name="kpis_title"
+                                    value="askingpricegrowthYTD" id="askingPriceGrowthYTDRadio">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <label class="form-check-label" for="askingPriceGrowthYTDRadio">Asking Price Growth
+                                        YTD</label>
+                                    <img src="../assets/img/tooltip-icon.svg" class="sidebar-tooltip"
+                                        data-video-url="https://www.youtube.com/embed/xjsb3_7Q3Qc?si=I09hIzQ8JXOTTrcj">
+                                </div>
+                            </div> -->
+                            <div class="form-check custom-radio">
+                                <input class="form-check-input" type="radio" name="kpis_title" value="askingprice"
+                                    id="askingPriceRadio">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <label class="form-check-label" for="askingPriceRadio">Asking Price</label>
+                                    <img src="../assets/img/tooltip-icon.svg" class="sidebar-tooltip"
+                                        data-video-url="https://www.youtube.com/embed/C5shYAuFrCc?si=NIVvKuGgsX5p26xN">
+                                </div>
+                            </div>
+                            <div class="form-check custom-radio">
+                                <input class="form-check-input" type="radio" name="kpis_title" value="caprate"
+                                    id="capRateRadio">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <label class="form-check-label" for="capRateRadio">Cap Rate</label>
+                                    <img src="../assets/img/tooltip-icon.svg" class="sidebar-tooltip"
+                                        data-video-url="https://www.youtube.com/embed/qSvXJq6CXwQ?si=5lmGj6fJFFC3XQGd">
+                                </div>
+                            </div>
+                            <div class="form-check custom-radio">
+                                <input class="form-check-input" type="radio" name="kpis_title" value="grossyield"
+                                    id="grossYieldRadio">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <label class="form-check-label" for="grossYieldRadio">Gross Yield</label>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <img src="../assets/img/premium-icon.svg" alt="">
+                                        <img src="../assets/img/tooltip-icon.svg" class="sidebar-tooltip"
+                                            data-video-url="https://www.youtube.com/embed/WegTi0qld9w?si=BUXRBU3NT0zQ2oa7">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-check custom-radio">
+                                <input class="form-check-input" type="radio" name="kpis_title" value="netyield"
+                                    id="netYieldRadio">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <label class="form-check-label" for="netYieldRadio">Net Yield</label>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <img src="../assets/img/premium-icon.svg" alt="">
+                                        <img src="../assets/img/tooltip-icon.svg" class="sidebar-tooltip"
+                                            data-video-url="https://www.youtube.com/embed/UNX7Ngh572Q?si=4Pnj2U0SR4fhYD0A">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-check custom-radio">
+                                <input class="form-check-input" type="radio" name="kpis_title" value="monthlynoi"
+                                    id="monthlyNOIRadio">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <label class="form-check-label" for="monthlyNOIRadio">Monthly NOI</label>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <img src="../assets/img/premium-icon.svg" alt="">
+                                        <img src="../assets/img/tooltip-icon.svg" class="sidebar-tooltip"
+                                            data-video-url="https://www.youtube.com/embed/nbmJnCHXaW8?si=toIlyaViMDZ9Wcfd">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-check custom-radio">
+                                <input class="form-check-input" type="radio" name="kpis_title" value="monthlypayment"
+                                    id="monthlyPaymentRadio">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <label class="form-check-label" for="monthlyPaymentRadio">Monthly Payment</label>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <img src="../assets/img/premium-icon.svg" alt="">
+                                        <img src="../assets/img/tooltip-icon.svg" class="sidebar-tooltip"
+                                            data-video-url="https://www.youtube.com/embed/e9uaEVPNOc8?si=YfRPAQ_lOUEYJfzL">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-check custom-radio">
+                                <input class="form-check-input" type="radio" name="kpis_title" value="pricetorent"
+                                    id="priceToRentRadio">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <label class="form-check-label" for="priceToRentRadio">Price to Rent</label>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <img src="../assets/img/premium-icon.svg" alt="">
+                                        <img src="../assets/img/tooltip-icon.svg" class="sidebar-tooltip"
+                                            data-video-url="https://www.youtube.com/embed/7_fDAKHyHuA?si=wIDUAmPvsQMDe0fv">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-check custom-radio">
+                                <input class="form-check-input" type="radio" name="kpis_title"
+                                    value="purchaseprice" id="purchasePriceRadio">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <label class="form-check-label" for="purchasePriceRadio">Purchase Price</label>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <img src="../assets/img/premium-icon.svg" alt="">
+                                        <img src="../assets/img/tooltip-icon.svg" class="sidebar-tooltip"
+                                            data-video-url="https://www.youtube.com/embed/7aTRzv4eNsk?si=3c5bXwh1dxYj8HBp">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-check custom-radio">
+                                <input class="form-check-input" type="radio" name="kpis_title" value="transfertax"
+                                    id="transferTaxRadio">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <label class="form-check-label" for="transferTaxRadio">Transfer Tax</label>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <img src="../assets/img/premium-icon.svg" alt="">
+                                        <img src="../assets/img/tooltip-icon.svg" class="sidebar-tooltip"
+                                            data-video-url="https://www.youtube.com/embed/nbmJnCHXaW8?si=toIlyaViMDZ9Wcfd">
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="form-check custom-radio">
+                                <input class="form-check-input" type="radio" name="kpis_title" value="renttomortage"
+                                    id="rentToMortageRadio">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <label class="form-check-label" for="rentToMortageRadio">Rent to Mortage</label>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <img src="../assets/img/premium-icon.svg" alt="">
+                                        <img src="../assets/img/tooltip-icon.svg" class="sidebar-tooltip"
+                                            data-video-url="https://www.youtube.com/embed/nbmJnCHXaW8?si=toIlyaViMDZ9Wcfd">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-check custom-radio">
+                                <input class="form-check-input" type="radio" name="kpis_title" value="salarytoaffordahouse"
+                                    id="salaryToAffordAHouseRadio">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <label class="form-check-label" for="salaryToAffordAHouseRadio">Salary to afford a house</label>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <img src="../assets/img/premium-icon.svg" alt="">
+                                        <img src="../assets/img/tooltip-icon.svg" class="sidebar-tooltip"
+                                            data-video-url="https://www.youtube.com/embed/nbmJnCHXaW8?si=toIlyaViMDZ9Wcfd">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-check custom-radio">
+                                <input class="form-check-input" type="radio" name="kpis_title" value="valueonincome"
+                                    id="valueOnIncomeRadio">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <label class="form-check-label" for="valueOnIncomeRadio">Value on income</label>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <img src="../assets/img/premium-icon.svg" alt="">
+                                        <img src="../assets/img/tooltip-icon.svg" class="sidebar-tooltip"
+                                            data-video-url="https://www.youtube.com/embed/nbmJnCHXaW8?si=toIlyaViMDZ9Wcfd">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-check custom-radio">
+                                <input class="form-check-input" type="radio" name="kpis_title" value="mortgagepaymentasofincome"
+                                    id="mortgagePaymentAsOfIncomeRadio">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <label class="form-check-label" for="mortgagePaymentAsOfIncomeRadio">Mortgage payment as % of income</label>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <img src="../assets/img/premium-icon.svg" alt="">
+                                        <img src="../assets/img/tooltip-icon.svg" class="sidebar-tooltip"
+                                            data-video-url="https://www.youtube.com/embed/nbmJnCHXaW8?si=toIlyaViMDZ9Wcfd">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-check custom-radio">
+                                <input class="form-check-input" type="radio" name="kpis_title" value="rentasofincome"
+                                    id="rentAsOfIncomeRadio">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <label class="form-check-label" for="rentAsOfIncomeRadio">Rent as % of income</label>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <img src="../assets/img/premium-icon.svg" alt="">
+                                        <img src="../assets/img/tooltip-icon.svg" class="sidebar-tooltip"
+                                            data-video-url="https://www.youtube.com/embed/nbmJnCHXaW8?si=toIlyaViMDZ9Wcfd">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Main content area -->
+        <div class="main-content">
+
+
+
+
+            <!-- Main container -->
+            <section class="content">
+                <!-- Header -->
+                <header class="header">
+                    <div class="header-inner">
+                        <div class="input-field">
+                            <!-- <input type="text" class="form-control mr-2 search-form-control" placeholder="Search"> -->
+                            <input class="form-control search-form-control" type="text" name="zipCodeSearch" placeholder="Search zipcode" id="zipcode-searchbox" autocomplete="off" />
+                        </div>
+
+                        <div class="header-radio">
+                            <div class="form-check custom-radio">
+                                <input class="form-check-input" type="radio" name="regionOption"
+                                    value="comunidad_autonoma" id="comunidad_autonomaRadio">
+                                <label class="form-check-label" for="comunidad_autonomaRadio">Comunidad Autónoma</label>
+                            </div>
+                            <div class="form-check custom-radio">
+                                <input class="form-check-input" type="radio" name="regionOption" value="provincias"
+                                    id="provinciasRadio">
+                                <label class="form-check-label" for="provinciasRadio">Provincias</label>
+                            </div>
+                            <div class="form-check custom-radio">
+                                <input class="form-check-input" type="radio" name="regionOption" value="district"
+                                    id="districtRadio">
+                                <label class="form-check-label" for="districtRadio">District</label>
+                            </div>
+                            <div class="form-check custom-radio">
+                                <input class="form-check-input" type="radio" name="regionOption" value="barrio"
+                                    id="barrioRadio">
+                                <label class="form-check-label" for="barrioRadio">Barrio</label>
+                            </div>
+                            <div class="form-check custom-radio">
+                                <input class="form-check-input" type="radio" name="regionOption" value="zipcode"
+                                    id="zipcodeRadio">
+                                <label class="form-check-label" for="zipcodeRadio">Zip Code</label>
+                            </div>
+                        </div>
+
+                        <div class="header-more-options">
+                            <button class="btn-share">
+                                <img src="../assets/img/share.svg" alt="">
+                            </button>
+
+
+                            <div class="filter-button">
+                                <img src="../assets/img/filter-icon.svg" alt="">
+                                <span>Filter</span>
+                            </div>
+                            <button type="button" class="signup-btn btn">Sign up</button>
+                            <button type="button" class="btn login-btn">Login</button>
+                        </div>
+
+                    </div>
+
+                </header>
+                <div id="map"></div>
+                <!-- Add more dashboard content here -->
+            </section>
+
+            <div class="spinner-border spinner-position text-primary" role="status" id="loading-spinner">
+                <span class="sr-only">Loading...</span>
+            </div>
+
+            <!-- Bootstrap Modal -->
+            <!-- <div class="modal fade" id="infoModal" tabindex="-1" aria-labelledby="infoModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="infoModalLabel">Province Info</h5>
+                            <button id="modalIconClose" type="button" class="close" data-dismiss="modal"
+                                aria-label="Close">
+                                <span>&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body" id="modalBody">
+                            <canvas id="houseChart" width="400" height="200"></canvas>
+                        </div>
+                        <div class="modal-footer">
+                            <button id="modalClose" type="button" class="btn btn-secondary"
+                                data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div> -->
+
+            <div class="modal fade" id="infoModal" tabindex="-1" aria-labelledby="infoModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <ul class="modal-header-list">
+                                <li style="white-space: nowrap;"><span class="label-title">Source:</span> <span><a
+                                            href="" target="_blank">Zillow</a> / <a href="" target="_blank">Spain Census
+                                            Bureau</a> / <a href="" target="_blank">FRED</a></span></li>
+                                <li style="white-space: nowrap;"><span class="label-title">Next Update:</span>Mid-Nov
+                                </li>
+                                <li style="white-space: nowrap;"><span class="label-title">Data Info:</span>Sep. 2024
+                                </li>
+                            </ul>
+                            <h5 class="modal-title" id="infoModalLabel"></h5>
+                            <div class="d-flex align-items-center" style="gap: 10px;">
+                                <div class="switch-container">
+                                    <div id="yearlyText" class="highlight">Yearly</div>
+                                    <div class="form-check form-switch">
+                                        <input type="checkbox" class="form-check-input" id="toggleSwitch" role="switch"
+                                            onchange="toggleText()">
+                                    </div>
+                                    <div id="monthlyText" class="">Monthly</div>
+                                </div>
+                                <div class="share-button">
+                                    <span class="share-text"">Share</span><img alt=" share" loading="lazy" width="14"
+                                        height="14" decoding="async" data-nimg="1" src="../assets/img/share.svg"
+                                        style="color: transparent;">
+                                </div>
+                                <button id="modalIconClose" type="button" class="btn-close custom-btn-close"
+                                    data-dismiss="modal" aria-label="Close">
+                                </button>
+                            </div>
+
+                        </div>
+                        <div class="modal-body">
+                            <div class="row d-flex" >
+                                <!-- Left Panel - Scorecard -->
+                                <div class="col-md-5" id="scorecard">
+                                    <div class="score">
+                                        <h6>Score (Home Price Forecast)</h6>
+                                        <div class="gauge">
+                                            <canvas id="gaugeChart" width="300" height="300"></canvas>
+                                        </div>
+                                    </div>
+                                    <ul class="stats-list">
+                                        <li>Recent Appreciation <span>54</span></li>
+                                        <li>Days on Market <span>55</span></li>
+                                        <li>Mortgage Rates <span>47</span></li>
+                                        <li>Inventory <span>60</span></li>
+                                        <li>Price Cuts <span>43</span></li>
+                                    </ul>
+                                </div>
+
+                                <!-- Right Panel - Chart -->
+                                <div class="col-md-7" id="chartArea">
+                                    <h6>Salary to Afford a House</h6>
+                                    <p>The household income needed to comfortably afford to buy a house in the area at
+                                        current home prices and mortgage rates. This calculation assumes a household
+                                        spends 30% of their gross income on their mortgage, tax, and insurance payment.
+                                    </p>
+                                    <select id="salaryDropdown">
+                                        <option value="salaryToAfford">Salary to Afford a House</option>
+                                        <option value="medianIncome">Median Income</option>
+                                    </select>
+                                    <br />
+                                    <a href="#" id="watchVideoLink">Watch video to learn about this data point</a>
+
+                                    <!-- Chart canvas -->
+                                    <canvas id="houseChart" width="400" height="200"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button id="modalClose" type="button" class="btn btn-secondary"
+                                data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet-ajax/dist/leaflet.ajax.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.min.js"></script>
+    <!-- Tooltip cdn -->
+    <script src="https://unpkg.com/tippy.js@6"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-doughnutlabel"></script>
+    <script>
+        function ModalData(name, property_rate) {
+            this.regiom_name = name;
+            this.property_rate = property_rate;
+        }
+        var regionModal = {};
+    </script>
+    <script>
+        function toggleText() {
+            const yearlyText = document.getElementById("yearlyText");
+            const monthlyText = document.getElementById("monthlyText");
+            const isChecked = document.getElementById("toggleSwitch").checked;
+
+            if (isChecked) {
+                yearlyText.classList.remove("highlight");
+                monthlyText.classList.add("highlight");
+            } else {
+                yearlyText.classList.add("highlight");
+                monthlyText.classList.remove("highlight");
+            }
+        }
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', (event) => {
+            var ctx = document.getElementById('gaugeChart').getContext('2d');
+
+            var gaugeChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    datasets: [{
+                        data: [53, 47], // Value is 53, remaining part to complete 100 is 47
+                        backgroundColor: ['#007bff', '#f1f1f1'], // Blue color for score, light gray for the rest
+                        borderWidth: 0,
+                        cutout: '80%', // The hole in the middle
+                        circumference: 180, // Half circle (gauge)
+                        rotation: -90 // Rotate to make it a gauge (starting at 0 degree on the bottom)
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        doughnutlabel: {
+                            labels: [
+                                {
+                                    text: '53', // The main value (score)
+                                    font: {
+                                        size: '28',
+                                        weight: 'bold'
+                                    },
+                                    color: '#007bff' // Blue color for the number
+                                },
+                                {
+                                    text: 'Price Stable', // Additional text below
+                                    font: {
+                                        size: '14'
+                                    },
+                                    color: '#666'
+                                }
+                            ]
+                        }
+                    },
+                    cutoutPercentage: 80, // Controls the size of the cutout (hole)
+                    rotation: 1 * Math.PI, // Half gauge, starts at 0
+                    circumference: 1 * Math.PI, // 180 degrees for half
+                    tooltips: { enabled: false }, // Disable tooltips
+                }
+            });
+        });
+
+    </script>
+
+    <!-- Chart shown in modal -->
+    <script>
+        document.addEventListener('DOMContentLoaded', (event) => {
+            var ctx = document.getElementById('houseChart').getContext('2d');
+
+            // Chart.js config
+            var houseChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['2005', '2007', '2009', '2011', '2013', '2015', '2017', '2019', '2021', '2023'],
+                    datasets: [
+                        {
+                            label: 'Salary to Afford House',
+                            data: [24158, 27259, 22741, 19297, 21276, 20659, 22558, 24196, 26062, 50424],
+                            borderColor: 'green',
+                            backgroundColor: 'green',
+                            fill: false,
+                            pointStyle: 'circle',
+                            pointRadius: 6,
+                            pointBackgroundColor: 'green',
+                            tension: 0.4
+                        },
+                        {
+                            label: 'Median Income',
+                            data: [45000, 47000, 48000, 49000, 50000, 51000, 52000, 53000, 54000, 54227],
+                            borderColor: 'lightgray',
+                            backgroundColor: 'lightgray',
+                            fill: false,
+                            pointStyle: 'circle',
+                            pointRadius: 6,
+                            pointBackgroundColor: 'lightgray',
+                            tension: 0.4
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            ticks: {
+                                callback: function (value) {
+                                    return '$' + value.toLocaleString();
+                                }
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: true,
+                            labels: {
+                                color: '#000',
+                                usePointStyle: true
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function (tooltipItem) {
+                                    return '$' + tooltipItem.raw.toLocaleString();
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Event listener for the dropdown to switch datasets
+            document.getElementById('salaryDropdown').addEventListener('change', function () {
+                var selectedOption = this.value;
+                if (selectedOption === 'salaryToAfford') {
+                    houseChart.data.datasets[0].hidden = false; // Show Salary to Afford House
+                    houseChart.data.datasets[1].hidden = true;  // Hide Median Income
+                } else {
+                    houseChart.data.datasets[0].hidden = true;  // Hide Salary to Afford House
+                    houseChart.data.datasets[1].hidden = false; // Show Median Income
+                }
+                houseChart.update();
+            });
+        });
+
+    </script>
+
+    <!-- Tooltip shown in sidebar -->
+    <!-- <div style="padding-top: 5px" class="d-flex">
+        
+        <div style="width: 150px; height:350px; background:red;">
+          Hello
+        </div>
+        <div style="width: 150px; height:350px; background:red;">
+        <h2>Home Value</h2>
+        <h6>In conclusion, the plugin you are trying to use, not updated for 5 years, is not compatible with newer (post v3) versions of chart.js,</h6>
+        </div>
+    </div> -->
+    <script>
+        tippy('.sidebar-tooltip', {
+            content(reference) {
+                const videoUrl = reference.getAttribute('data-video-url');
+                return `<div style="padding-top: 5px padding-top: 5px;
+                            border-width: thin;
+                            border-color: black;
+                            border-style: solid;
+                            padding-left: 5px;
+                            padding-bottom: 5px;
+                            padding-right: 5px;" class="d-flex"
+                        >
+        
+                            <div style="padding-top: 5px">
+                                <iframe width="350" height="300" src=${videoUrl} frameborder="0" 
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                                allowfullscreen style="border-radius: 5px;"></iframe>
+                            </div>
+                            <!-- <div style="width: 200px; height:300px; background:black; padding-top: 5px; padding-left: 10px; margin-top: 5px;">
+                            <h5>Asking Price</h5>
+                            <h6>The asking price is the price that a home seller places on the listing when they put it up for sale</h6>
+                            </div> -->
+                        </div>
+                    `;
+            },
+            allowHTML: true,
+            interactive: true,
+            trigger: 'click',
+            theme: 'light-border',
+            appendTo: document.body,
+            placement: 'right',
+            maxWidth: 530,
+
+        });
+    </script>
+
+    <script>
+        var geoJsonData;
+        // Initialize the map
+        const map = L.map('map', {
+            zoomControl: false
+        }).setView([40.4168, -3.4038], 7)
+        L.control.zoom({
+            position: 'bottomright'
+        }).addTo(map);
+
+        // Add OpenStreetMap tile layer
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '© OpenStreetMap'
+        }).addTo(map);
+        let legendControl; // Declare legendControl outside
+        // Sample GeoJSON data (replace with actual GeoJSON)
+
+        // Function to determine the style of each feature
+        function getColor(d) {
+            return d > 100 ? '#800026' :
+                d > 50 ? '#BD0026' :
+                    d > 20 ? '#E31A1C' :
+                        d > 10 ? '#FC4E2A' :
+                            d > 0 ? '#FD8D3C' :
+                                '#FFEDA0';
+        }
+
+
+        function getColorRange(color, value, min, max) {
+            // Calculate the percentage of the value relative to the range
+            const range = max - min;
+            const percentage = ((value - min) / range) * 100;
+
+            // Determine opacity based on percentage
+            let opacity = '33'; // 20% alpha
+            if (percentage > 100) {
+                opacity = 'E6';
+            } else if (percentage > 80) {
+                opacity = 'CC'; //80% alpha
+            } else if (percentage > 60) {
+                opacity = 'B3'; //70% alpha
+            } else if (percentage > 50) {
+                opacity = '99'; // 60% alpha
+            } else if (percentage > 30) {
+                opacity = '80'; // 50% alpha
+            } else if (percentage > 20) {
+                opacity = '66'; //  40% alpha
+            } else if (percentage > 10) {
+                opacity = '4D'; //  30% alpha
+            } else {
+                opacity = '33'; // No color if below 10%
+            }
+            // Return the color with the calculated opacity
+            return `${color}${opacity}`; // Red color
+            }
+
+            function generateRangeValues(min, max) {
+            const range = max - min;
+            const percentages = [0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]; // Define the percentages
+
+            return percentages.map(percent => percent == 0 ? min : Math. ceil(min + range * percent));
+            }
+
+            function createLegend(min, max) {
+                const values = generateRangeValues(min, max);
+                const legend = L.control({ position: 'bottomright' });
+
+                legend.onAdd = function () {
+                    const div = L.DomUtil.create('div', 'legend');
+                    div.innerHTML += '<strong>Legend</strong><br>';
+
+                    for (var i = 0; i < values.length; i++) {
+                    const color = getColorRange(RED_FILL, values[i], min, max);
+                    div.innerHTML += `<div>
+                                <span class="legend-color" style="background-color: ${color};"></span>
+                                ${values[i] + (values[i + 1] ? '&ndash;' + `${values[i + 1] - 1}` + '<br>' : '+')}
+                            </div>`;
+                    }
+                    return div;
+                };
+
+                legend.addTo(map);
+                return legend;
+            }
+
+        // Style function
+        function style(feature) {
+            return {
+                fillColor: getColor(feature.properties.density),
+                weight: 2,
+                opacity: 1,
+                color: 'white',
+                dashArray: '3',
+                fillOpacity: 0.7
+            };
+        }
+
+        // Function to highlight feature on hover
+        function highlightFeature(e) {
+            const layer = e.target;
+
+            layer.setStyle({
+                weight: 3,
+                dashArray: '',
+                fillOpacity: 0.5
+            });
+
+            if (!L.Browser.ie && !L.Browser.opera) {
+                layer.bringToFront();
+            }
+        }
+
+        function highlightFeature_askingprice_kpi(e) {
+            const layer = e.target;
+
+            layer.setStyle({
+                weight: 3,
+                dashArray: '',
+                fillOpacity: 0.5
+            });
+
+            if (!L.Browser.ie && !L.Browser.opera) {
+                layer.bringToFront();
+            }
+        }
+
+        // Reset highlight
+        function resetHighlight(e) {
+            geojson.resetStyle(e.target);
+        }
+
+        // Bind popups
+        function onEachFeature(feature, layer) {
+            layer.on({
+                mouseover: highlightFeature,
+                mouseout: resetHighlight,
+            });
+            layer.bindPopup(`${feature.properties.name}: Average Property Rate: ${feature.properties.average_rate}`);
+        }
+
+        // Create GeoJSON layer
+        function createGeoJsonLayer(data, options) {
+            return L.geoJson(data, options).addTo(map);
+        }
+
+        function closeModal() {
+            $('#infoModal').modal('hide');
+        }
+
+        document.getElementById("modalIconClose").addEventListener("click", function () {
+            closeModal();
+        }, false);
+
+        document.getElementById("modalClose").addEventListener("click", function () {
+            closeModal();
+        }, false);
+
+        var geojson;
+        // $(document).ready(function() {
+        //   $("input[name='regionOption']").click(function(){
+        //       alert('You clicked radio!');
+        //       if($('input:radio[name=regionOption]:checked').val() == "provincias"){
+        //           alert($('input:radio[name=regionOption]:checked').val());
+        //           //$('#select-table > .roomNumber').attr('enabled',false);
+        //       }
+        //   });
+        // });
+
+        $(window).on("load", function () {
+            // Run code
+            console.log('Window load called!!');
+        });
+
+        $(document).ready(function () {
+      // proviance selected
+      $('input[name="regionOption"][value="provincias"]').prop('checked', true);
+      // Average price is selected
+      $('input[name="kpis_title"][value="askingprice"]').prop('checked', true);
+      // Call the API when the page loads
+      console.log('Document ready called!!');
+      //write a function to pass selected region and selected kpi value and at server side write if else statement
+      if ($('input[name="regionOption"][value="provincias"]').is(':checked') && $('input[name="kpis_title"][value="askingprice"]').is(':checked')) {
+        // The second radio button is selected
+        fetchProvAveragePrice();
+      } else {
+        // The second radio button is not selected
+      }
+      // $('#loading-spinner').show();
+      // fetchData();
+
+
+      // Handle radio button change
+      $('input[name="regionOption"]').change(function () {
+        // if (geojson !== undefined) {
+        //   geojson.clearLayers();
+        //   if (legendControl && typeof legendControl.remove === 'function') {
+        //         map.removeControl(legendControl); // Remove the legend
+        //         legendControl = null; // Optionally reset the variable
+        //     }
+        // }
+        switch ($(this).val()) {
+          case 'comunidad_autonoma':
+            // fetchComunidadAutonomaData();
+            if ($('input[name="kpis_title"][value="askingprice"]').is(':checked')) {
+              // console.log("The second radio button is selected.");
+              fetchCCAAAveragePrice();
+            }
+            if($('input[name="kpis_title"][value="askingpricegrowthYOY"]').is(':checked')){
+                fetchAskingGrowthPriceYOYProviance();
+            }
+            break;
+          case 'provincias':
+            if ($('input[name="kpis_title"][value="askingprice"]').is(':checked')) {
+              // console.log("The second radio button is selected.");
+              fetchProvAveragePrice();
+            }
+            // fetchProvianceData();
+            if($('input[name="kpis_title"][value="askingpricegrowthYOY"]').is(':checked')){
+                fetchAskingGrowthPriceYOYProviance();
+            }
+            break;
+          case 'district':
+            if ($('input[name="kpis_title"][value="askingprice"]').is(':checked')) {
+              // console.log("The second radio button is selected.");
+              fetchDistAveragePrice();
+            }
+            // updateGeoJson(spainArea1data);
+            break;
+          case 'barrio':
+            if ($('input[name="kpis_title"][value="askingprice"]').is(':checked')) {
+              // console.log("The second radio button is selected.");
+              fetchBarrioAveragePrice();
+            }
+            // updateGeoJson(usaGeoData);
+            break;
+          case 'zipcode':
+            break;
+          default:
+            // updateGeoJson(spainArea1data);
+            break;
+        }
+
+      });
+
+      // KPIs - Handle radio button change
+      $('input[name="kpis_title"]').change(function () {
+        // if (geoJson !== undefined) {
+        //   geojson.clearLayers();
+        //   if (legendControl && typeof legendControl.remove === 'function') {
+        //         map.removeControl(legendControl); // Remove the legend
+        //         legendControl = null; // Optionally reset the variable
+        //     }
+        // }
+        switch ($(this).val()) {
+          case 'askingprice':
+            if ($('input[name="regionOption"][value="comunidad_autonoma"]').is(':checked')) {
+              console.log("The comunidad_autonoma radio button is selected.");
+              fetchCCAAAveragePrice();
+            } else if ($('input[name="regionOption"][value="provincias"]').is(':checked')) {
+              console.log("The provincias radio button is not selected.");
+              fetchProvAveragePrice();
+            } else if ($('input[name="regionOption"][value="district"]').is(':checked')) {
+              fetchDistAveragePrice();
+            } else if ($('input[name="regionOption"][value="barrio"]').is(':checked')) {
+              fetchBarrioAveragePrice();
+            } else if ($('input[name="regionOption"][value="zipcode"]').is(':checked')) {
+
+            } else {
+
+            }
+            break;
+          case 'askingpricegrowthYOY':
+          if ($('input[name="regionOption"][value="comunidad_autonoma"]').is(':checked')) {
+              console.log("The comunidad_autonoma radio button is selected.");
+              fetchAskingGrowthPriceYOYProviance();
+            } else if ($('input[name="regionOption"][value="provincias"]').is(':checked')) {
+              console.log("The provincias radio button is not selected.");
+              fetchAskingGrowthPriceYOYProviance();
+            } else if ($('input[name="regionOption"][value="district"]').is(':checked')) {
+
+            } else if ($('input[name="regionOption"][value="barrio"]').is(':checked')) {
+
+            } else if ($('input[name="regionOption"][value="zipcode"]').is(':checked')) {
+
+            } else {
+
+            }
+            break;
+          case 'grossyield':
+            updateGeoJson(spainArea1data);
+            break;
+          case 'netyield':
+            updateGeoJson(usaGeoData);
+            break;
+          case 'pricetorent':
+            break;
+          case 'caprate':
+            break;
+          case 'transfertax':
+            break;
+          case 'purchaseprice':
+            break;
+          case 'pricetorent':
+            break;
+          case 'monthlyNOI':
+            break;
+          default:
+            // updateGeoJson(spainArea1data);
+            break;
+        }
+      });
+    });
+
+        function fetchProvianceData() {
+            $('#loading-spinner').show();
+            $.ajax({
+                url: `${BASE_URL}/proviance-geometries`, // Change to your API endpoint
+                method: 'GET',
+                dataType: 'json',
+                success: function (data) {
+                    // Clear the previous data
+                    $('#loading-spinner').hide();
+                    if (geojson !== undefined) {
+                        geojson.clearLayers();
+                    }
+                    geoJsonData = data;
+
+                    geojson = createGeoJsonLayer(geoJsonData, {
+                        style: { color: 'red', weight: 1 },
+                        onEachFeature: function (feature, layer) {
+                            layer.on({
+                                mouseover: highlightFeature,
+                                mouseout: resetHighlight,
+                                click: function () {
+                                    $('#infoModal').modal('show');
+                                }
+                            });
+                            layer.bindPopup(`${feature.properties.name}: Average Property Rate: ${feature.properties.average_rate}`);
+                        }
+                    });
+                },
+                error: function (xhr, status, error) {
+                    $('#loading-spinner').hide();
+                    console.error('Error fetching data:', error);
+                    $('#data-container').html('<p>Error fetching data. Please try again later.</p>');
+                }
+            });
+        }
+
+        function fetchComunidadAutonomaData() {
+      $('#loading-spinner').show();
+      $.ajax({
+        url: `${BASE_URL}/autonoma-geometries`, // Change to your API endpoint
+        method: 'GET',
+        dataType: 'json',
+        success: function (data) {
+          // Clear the previous data
+          $('#loading-spinner').hide();
+          if (geojson !== undefined) {
+            geojson.clearLayers();
+          }
+          geoJsonData = data;
+
+          geojson = createGeoJsonLayer(geoJsonData, {
+            style: { color: 'red', weight: 1 },
+            onEachFeature: function (feature, layer) {
+              layer.on({
+                mouseover: highlightFeature,
+                mouseout: resetHighlight,
+              });
+              layer.bindPopup(`${feature.properties.name}: Average Property Rate: ${feature.properties.average_rate}`);
+            }
+          });
+        },
+        error: function (xhr, status, error) {
+          $('#loading-spinner').hide();
+          console.error('Error fetching data:', error);
+          $('#data-container').html('<p>Error fetching data. Please try again later.</p>');
+        }
+      });
+    }
+
+    function fetchCCAAAveragePrice() {
+      $('#loading-spinner').show();
+      $.ajax({
+        url: `${BASE_URL}/ccaa-average-price`, // Change to your API endpoint
+        method: 'GET',
+        dataType: 'json',
+        success: function (data) {
+          // Clear the previous data
+          $('#loading-spinner').hide();
+          if (geojson !== undefined) {
+            geojson.clearLayers();
+          }
+          geoJsonData = data;
+
+          geojson = createGeoJsonLayer(geoJsonData, {
+
+            onEachFeature: function (feature, layer) {
+              const originalStyle = {
+                fillColor: getColorRange(RED_FILL, feature.properties.avg_price_for_home, geoJsonData.min, geoJsonData.max),
+                weight: 2,
+                color: 'red',
+                dashArray: '3',
+                fillOpacity: 0.7
+              };
+              layer.setStyle(originalStyle);
+              layer.on('mouseover', function () {
+                layer.setStyle({
+                  fillOpacity: 0.9,
+                  weight: 3,
+                  color: 'red', // Gold color for highlighting
+                  fillOpacity: 0.9
+                });
+              });
+              layer.on('mouseout', function () {
+                layer.setStyle(originalStyle); // Reset to original style
+              });
+              layer.on({
+                click: function () {
+                  // Set the modal content
+                  var content = '<strong>' + feature.properties.name_unit + '</strong><br>' +
+                    'Property Rate: €' + feature.properties.avg_price_for_home;
+                //   document.getElementById('modalBody').innerHTML = content;
+                    regionModal = new ModalData(feature.properties.name_unit, feature.properties.avg_price_for_home);
+                    document.getElementById('infoModalLabel').innerHTML=regionModal.regiom_name;
+                  // Show the modal
+                  $('#infoModal').modal('show');
+                }
+              });
+              // layer.bindPopup(`${feature.properties.name}: Average Property Rate: ${feature.properties.average_rate}`);
+              var content = '<strong>' + feature.properties.name_unit + '</strong><br>' +
+                'Property Rate: €' + feature.properties.avg_price_for_home
+              layer.bindTooltip(content, {
+                permanent: false,  // false means it shows on hover
+                direction: 'top',
+                offset: [0, -10]  // adjust tooltip position
+              });
+            }
+          });
+          legendControl = createLegend(geoJsonData.min, geoJsonData.max);
+        },
+        error: function (xhr, status, error) {
+          $('#loading-spinner').hide();
+          console.error('Error fetching data:', error);
+          $('#data-container').html('<p>Error fetching data. Please try again later.</p>');
+        }
+      });
+    }
+
+    // Function to handle the WMS GetFeatureInfo request and display a popup
+ 
+
+    function fetchProvAveragePrice() {
+      $('#loading-spinner').show();
+
+      $.ajax({
+        url: `${BASE_URL}/prov-average-price`, // Change to your API endpoint
+        method: 'GET',
+        dataType: 'json',
+        success: function (data) {
+          // Clear the previous data
+          $('#loading-spinner').hide();
+          if (geojson !== undefined) {
+            geojson.clearLayers();
+          }
+          geoJsonData = data;
+         
+          geojson = createGeoJsonLayer(geoJsonData, {
+            onEachFeature: function (feature, layer) {
+              const originalStyle = {
+                fillColor: getColorRange(RED_FILL, feature.properties.purchasing_price, geoJsonData.min, geoJsonData.max),
+                weight: 2,
+                color: RED_BORDER,
+                dashArray: '3',
+                fillOpacity: 0.7
+              };
+              layer.setStyle(originalStyle);
+              // Highlight on mouseover
+              layer.on('mouseover', function () {
+                layer.setStyle({
+                  fillOpacity: 0.9,
+                  weight: 3,
+                  color: RED_BORDER, // Gold color for highlighting
+                  fillOpacity: 0.9
+                });
+              });
+
+              // Reset on mouseout
+              layer.on('mouseout', function () {
+                layer.setStyle(originalStyle); // Reset to original style
+              });
+              layer.on({
+                click: function () {
+                  // Set the modal content
+                  var content = '<strong>' + feature.properties.name_unit + '</strong><br>' +
+                    'Property Rate: €' + feature.properties.purchasing_price;
+                //   document.getElementById('modalBody').innerHTML = content;
+                    regionModal = new ModalData(feature.properties.name_unit, feature.properties.purchasing_price);
+                    document.getElementById('infoModalLabel').innerHTML=regionModal.regiom_name;
+                  // Show the modal
+                  $('#infoModal').modal('show');
+                }
+              });
+              // layer.bindPopup(`${feature.properties.name}: Average Property Rate: ${feature.properties.average_rate}`);
+              var content = '<strong>' + feature.properties.name_unit + '</strong><br>' +
+                'Property Rate: €' + feature.properties.purchasing_price;
+              layer.bindTooltip(content, {
+                permanent: false,  // false means it shows on hover
+                direction: 'top',
+                offset: [0, -10]  // adjust tooltip position
+              });
+            }
+          });
+          
+          legendControl = createLegend(geoJsonData.min, geoJsonData.max);
+        },
+        error: function (xhr, status, error) {
+          $('#loading-spinner').hide();
+          console.error('Error fetching data:', error);
+          $('#data-container').html('<p>Error fetching data. Please try again later.</p>');
+        }
+      });
+    }
+
+    function fetchDistAveragePrice() {
+      $('#loading-spinner').show();
+      $.ajax({
+        url: `${BASE_URL}/dist-average-price`, // Change to your API endpoint
+        method: 'GET',
+        dataType: 'json',
+        success: function (data) {
+          // Clear the previous data
+          $('#loading-spinner').hide();
+          if (geojson !== undefined) {
+            geojson.clearLayers();
+          }
+          geoJsonData = data;
+
+          geojson = createGeoJsonLayer(geoJsonData, {
+            style: { color: 'red', weight: 1 },
+            onEachFeature: function (feature, layer) {
+              layer.on({
+                mouseover: highlightFeature,
+                mouseout: resetHighlight,
+              });
+              layer.bindPopup(`District name`);
+            }
+          });
+        },
+        error: function (xhr, status, error) {
+          $('#loading-spinner').hide();
+          console.error('Error fetching data:', error);
+          $('#data-container').html('<p>Error fetching data. Please try again later.</p>');
+        }
+      });
+    }
+
+    function fetchBarrioAveragePrice() {
+      $('#loading-spinner').show();
+      $.ajax({
+        url: `${BASE_URL}/barrio-average-price`, // Change to your API endpoint
+        method: 'GET',
+        dataType: 'json',
+        success: function (data) {
+          // Clear the previous data
+          $('#loading-spinner').hide();
+          if (geojson !== undefined) {
+            geojson.clearLayers();
+          }
+          geoJsonData = data;
+
+          geojson = createGeoJsonLayer(geoJsonData, {
+            style: { color: 'red', weight: 1 },
+            onEachFeature: function (feature, layer) {
+              layer.on({
+                mouseover: highlightFeature,
+                mouseout: resetHighlight,
+              });
+              layer.bindPopup(`Barrio name`);
+            }
+          });
+        },
+        error: function (xhr, status, error) {
+          $('#loading-spinner').hide();
+          console.error('Error fetching data:', error);
+          $('#data-container').html('<p>Error fetching data. Please try again later.</p>');
+        }
+      });
+    }
+
+    function fetchAskingGrowthPriceYOYProviance() {
+      $('#loading-spinner').show();
+      $.ajax({
+        url: `${BASE_URL}${ASKING_PRICE_GROWTH_YOY_PROVINCIA}`, // Change to your API endpoint
+        method: 'GET',
+        dataType: 'json',
+        success: function (data) {
+          // Clear the previous data
+          $('#loading-spinner').hide();
+          if (geojson !== undefined) {
+            geojson.clearLayers();
+          }
+          geoJsonData = data;
+         
+          geojson = createGeoJsonLayer(geoJsonData, {
+            onEachFeature: function (feature, layer) {
+              const originalStyle = {
+                fillColor: getColorRange(RED_FILL, feature.properties.asking_price_yoy, geoJsonData.min, geoJsonData.max),
+                weight: 2,
+                color: RED_BORDER,
+                dashArray: '3',
+                fillOpacity: 0.7
+              };
+              layer.setStyle(originalStyle);
+              // Highlight on mouseover
+              layer.on('mouseover', function () {
+                layer.setStyle({
+                  fillOpacity: 0.9,
+                  weight: 3,
+                  color: RED_BORDER, // Gold color for highlighting
+                  fillOpacity: 0.9
+                });
+              });
+
+              // Reset on mouseout
+              layer.on('mouseout', function () {
+                layer.setStyle(originalStyle); // Reset to original style
+              });
+              layer.on({
+                click: function () {
+                  // Set the modal content
+                  var content = '<strong>' + feature.properties.name_unit + '</strong><br>' +
+                    'Property Rate: €' + feature.properties.asking_price_yoy;
+                //   document.getElementById('modalBody').innerHTML = content;
+                    regionModal = new ModalData(feature.properties.name_unit, feature.properties.asking_price_yoy);
+                    document.getElementById('infoModalLabel').innerHTML=regionModal.regiom_name;
+                  // Show the modal
+                  $('#infoModal').modal('show');
+                }
+              });
+              // layer.bindPopup(`${feature.properties.name}: Average Property Rate: ${feature.properties.average_rate}`);
+              var content = '<strong>' + feature.properties.name_unit + '</strong><br>' +
+                'Property Rate: €' + feature.properties.asking_price_yoy;
+              layer.bindTooltip(content, {
+                permanent: false,  // false means it shows on hover
+                direction: 'top',
+                offset: [0, -10]  // adjust tooltip position
+              });
+            }
+          });
+          
+          legendControl = createLegend(geoJsonData.min, geoJsonData.max);
+        },
+        error: function (xhr, status, error) {
+          $('#loading-spinner').hide();
+          console.error('Error fetching data:', error);
+          $('#data-container').html('<p>Error fetching data. Please try again later.</p>');
+        }
+      });
+    }
+
+    $('#zipcode-searchbox').typeahead({
+        // data source
+        source: function (query, process){
+            $.ajax({
+				url: `${BASE_URL}/search`,
+                method: 'GET',
+				data:  { zipcode: query },
+				dataType: "json",
+				type: "get",
+				success: function(data) {
+					result($.map(data, function(item) {
+						return item;
+					}));
+				}
+			});
+        },
+
+        // how many items to display
+        items: 10,
+
+        // enable scrollbar
+        scrollBar: true,
+
+        // equalize the dropdown width
+        alignWidth: true,
+
+        // typeahead dropdown template
+        menu: '<ul class="typeahead dropdown-menu"></ul>',
+        item: '<li><a href="#"></a></li>',
+
+        // The object property that is returned when an item is selected.
+        valueField: 'id',
+
+        // The object property to match the query against and highlight in the results.
+        displayField: 'property_id',
+
+        // auto select
+        autoSelect: true,
+
+        // callback
+        onSelect: function () {
+        },
+
+        // ajax options
+        ajax: {
+        url: `${BASE_URL}/search?zipcode`,
+        timeout: 300,
+        method: 'get',
+        triggerLength: 1,
+        loadingClass: null,
+        preDispatch: null,
+        preProcess: null
+        }
+
+        });
+    </script>
+</body>
+
+</html>

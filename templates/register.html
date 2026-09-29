@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>Plateforme MRCC - Inscription</title>
+  <meta name="description" content="Formulaire d'inscription à la plateforme MRCC">
+  <meta name="keywords" content="MRCC, inscription, compte">
+
+  <!-- Favicons -->
+  <link href="{{ url_for('static', filename='img/favicon.png') }}" rel="icon">
+  <link href="{{ url_for('static', filename='img/apple-touch-icon.png') }}" rel="apple-touch-icon">
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
+
+  <!-- Vendor CSS Files -->
+  <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet">
+  <link href="{{ url_for('static', filename='vendor/bootstrap-icons/bootstrap-icons.css') }}" rel="stylesheet">
+  <link href="{{ url_for('static', filename='vendor/aos/aos.css') }}" rel="stylesheet">
+
+  <!-- Main CSS File -->
+  <link href="{{ url_for('static', filename='css/main.css') }}" rel="stylesheet">
+
+  <style>
+    :root {
+      --primary-color: #4361ee;
+      --secondary-color: #3f37c9;
+      --accent-color: #4cc9f0;
+      --light-color: #f8f9fa;
+      --dark-color: #212529;
+      --success-color: #4bb543;
+      --warning-color: #f0ad4e;
+      --danger-color: #d9534f;
+    }
+    
+    body {
+      background-color: #f5f7fb;
+      font-family: 'Inter', sans-serif;
+      color: var(--dark-color);
+      padding-top: 70px;
+    }
+    
+    /* Header Styles */
+    .header {
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      box-shadow: 0 2px 20px rgba(67, 97, 238, 0.2);
+      height: 70px;
+    }
+    
+    .header .logo h1 {
+      color: white;
+      font-weight: 700;
+      font-size: 1.5rem;
+    }
+    
+    .header .navmenu ul li a {
+      color: rgba(255, 255, 255, 0.8);
+      font-weight: 500;
+      transition: all 0.3s;
+    }
+    
+    .header .navmenu ul li a:hover,
+    .header .navmenu ul li a.active {
+      color: white;
+    }
+    
+    .user-menu {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+    
+    .username {
+      color: white;
+      font-weight: 500;
+      margin-right: 10px;
+    }
+    
+    .btn-custom {
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-weight: 500;
+      transition: 0.3s ease-in-out;
+    }
+    
+    .btn-primary-custom {
+      background: white;
+      color: var(--primary-color);
+      border: none;
+    }
+    
+    .btn-primary-custom:hover {
+      background: rgba(255, 255, 255, 0.9);
+    }
+    
+    .btn-secondary-custom {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid white;
+      color: white;
+    }
+    
+    .btn-secondary-custom:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+    
+    /* Registration Form Styles */
+    .registration-section {
+      min-height: calc(100vh - 70px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 0;
+      background: linear-gradient(135deg, rgba(67, 97, 238, 0.05) 0%, rgba(76, 201, 240, 0.05) 100%);
+    }
+    
+    .registration-card {
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+      padding: 2.5rem;
+      width: 100%;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    
+    .registration-title {
+      color: var(--primary-color);
+      font-weight: 700;
+      margin-bottom: 1.5rem;
+      font-family: 'Manrope', sans-serif;
+      position: relative;
+      padding-bottom: 0.5rem;
+      text-align: center;
+    }
+    
+    .registration-title::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 80px;
+      height: 3px;
+      background: var(--accent-color);
+    }
+    
+    .form-group {
+      margin-bottom: 1.5rem;
+      position: relative;
+    }
+    
+    .form-group label {
+      font-weight: 500;
+      color: #495057;
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+    
+    .form-control-custom {
+      width: 100%;
+      padding: 12px 15px 12px 40px;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      font-size: 15px;
+      transition: all 0.3s;
+      background-color: #f9f9f9;
+    }
+    
+    .form-control-custom:focus {
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+      background-color: white;
+    }
+    
+    .form-group i {
+      position: absolute;
+      left: 15px;
+      top: 40px;
+      color: var(--primary-color);
+    }
+    
+    .btn-register {
+      background: var(--primary-color);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 12px 25px;
+      font-weight: 500;
+      letter-spacing: 0.5px;
+      transition: all 0.3s;
+      font-size: 16px;
+      width: 100%;
+      margin-top: 1rem;
+    }
+    
+    .btn-register:hover {
+      background: var(--secondary-color);
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(67, 97, 238, 0.3);
+    }
+    
+    .login-link {
+      text-align: center;
+      margin-top: 1.5rem;
+      color: #6c757d;
+    }
+    
+    .login-link a {
+      color: var(--primary-color);
+      font-weight: 500;
+      text-decoration: none;
+    }
+    
+    .login-link a:hover {
+      text-decoration: underline;
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+      .registration-card {
+        padding: 1.5rem;
+      }
+      
+      .header .logo h1 {
+        font-size: 1.3rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header id="header" class="header d-flex align-items-center fixed-top">
+    <div class="container-fluid container-xl position-relative d-flex align-items-center">
+      <a href="{{ url_for('index') }}" class="logo d-flex align-items-center me-auto">
+        <img src="{{ url_for('static', filename='img/logo1.png') }}" alt="MRCC Logo">
+        <h1>MRCC</h1>
+      </a>
+
+      <nav id="navmenu" class="navmenu">
+        <ul>
+          <li><a href="{{ url_for('index') }}">Accueil</a></li>
+          <li><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
+          <li><a href="http://geoai-solutions.ddns.net:8888/MRCC/">Géoportail</a></li>
+          <li><a href="{{ url_for('marine') }}">Flotte maritime</a></li>
+          <li><a href="{{ url_for('moyens') }}">Moyens de secours</a></li>
+          <li><a href="{{ url_for('alerte') }}">Alertes</a></li>
+          <li><a href="{{ url_for('api') }}">API</a></li>
+        </ul>
+      </nav>
+
+      <div class="user-menu ms-auto">
+        {% if current_user.is_authenticated %}
+          <span class="username">{{ current_user.username }}</span>
+          <a href="{{ url_for('logout') }}" class="btn btn-sm btn-primary-custom">Déconnexion</a>
+        {% else %}
+          <a href="{{ url_for('login') }}" class="btn btn-sm btn-primary-custom">Connexion</a>
+          <a href="{{ url_for('register') }}" class="btn btn-sm btn-secondary-custom">Inscription</a>
+        {% endif %}
+      </div>
+
+      <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
+    </div>
+  </header>
+
+  <main>
+    <section class="registration-section">
+      <div class="container">
+        <div class="registration-card" data-aos="fade-up">
+          <h2 class="registration-title"><i class="fas fa-user-plus me-2"></i>Créer un compte</h2>
+          
+          <form method="POST" action="/register">
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="first_name">Prénom</label>
+                  <i class="fas fa-user"></i>
+                  <input type="text" class="form-control-custom" id="first_name" name="first_name" placeholder="Entrez votre prénom" required>
+                </div>
+                
+                <div class="form-group">
+                  <label for="last_name">Nom</label>
+                  <i class="fas fa-user"></i>
+                  <input type="text" class="form-control-custom" id="last_name" name="last_name" placeholder="Entrez votre nom" required>
+                </div>
+                
+                <div class="form-group">
+                  <label for="telephone">Téléphone</label>
+                  <i class="fas fa-phone"></i>
+                  <input type="text" class="form-control-custom" id="telephone" name="telephone" placeholder="Entrez votre numéro" required>
+                </div>
+                
+                <div class="form-group">
+                  <label for="fonction">Fonction</label>
+                  <i class="fas fa-briefcase"></i>
+                  <input type="text" class="form-control-custom" id="fonction" name="fonction" placeholder="Entrez votre fonction" required>
+                </div>
+              </div>
+              
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="organisme">Organisme</label>
+                  <i class="fas fa-building"></i>
+                  <select class="form-control-custom" id="organisme" name="organisme" required>
+                    <option value="">Sélectionnez un organisme</option>
+                    <option value="INRH">INRH</option>
+                    <option value="ANDA">ANDA</option>
+                    <option value="DPDPM">DPDPM</option>
+                    <option value="ANP">ANP</option>
+                    <option value="DGM">DGM</option>
+                    <option value="TMPA">TMPA</option>
+                    <option value="SGPTV">SGPTV</option>
+                    <option value="ANCFCC">ANCFCC</option>
+                    <option value="Direction de la géologie">Direction de la géologie</option>
+                    <option value="CRTS">CRTS</option>
+                    <option value="ISEM">ISEM</option>
+                    <option value="DHOC">DHOC</option>
+                    <option value="MEE/DSIN">MEE/DSIN</option>
+                  </select>
+                </div>
+                
+                <div class="form-group">
+                  <label for="type_organisme">Type d'organisme</label>
+                  <i class="fas fa-list"></i>
+                  <select class="form-control-custom" id="type_organisme" name="type_organisme" required>
+                    <option value="">Sélectionnez un type</option>
+                    <option value="Département ministériel">Département ministériel</option>
+                    <option value="Etablissement public">Etablissement public</option>
+                    <option value="Entreprise publique">Entreprise publique</option>
+                    <option value="Entreprise semi-publique">Entreprise semi-publique</option>
+                    <option value="Entreprise privée">Entreprise privée</option>
+                    <option value="Université/Institut de recherche">Université/Institut de recherche</option>
+                    <option value="ONG">ONG</option>
+                    <option value="Autre">Autre</option>
+                  </select>
+                </div>
+                
+                <div class="form-group">
+                  <label for="email">Email</label>
+                  <i class="fas fa-envelope"></i>
+                  <input type="email" class="form-control-custom" id="email" name="email" placeholder="exemple@mail.com" required>
+                </div>
+                
+                <div class="form-group">
+                  <label for="username">Nom d'utilisateur</label>
+                  <i class="fas fa-user-circle"></i>
+                  <input type="text" class="form-control-custom" id="username" name="username" placeholder="Choisissez un nom d'utilisateur" required>
+                </div>
+                
+                <div class="form-group">
+                  <label for="password">Mot de passe</label>
+                  <i class="fas fa-lock"></i>
+                  <input type="password" class="form-control-custom" id="password" name="password" placeholder="Créez un mot de passe" required>
+                </div>
+              </div>
+            </div>
+            
+            <button type="submit" class="btn-register"><i class="fas fa-user-check me-2"></i>S'inscrire</button>
+            
+            <div class="login-link">
+              Déjà un compte ? <a href="/login"><i class="fas fa-sign-in-alt me-1"></i>Connectez-vous</a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer id="footer" class="footer position-relative">
+    <div class="container copyright text-center mt-4">
+      <p>© <span>Copyright</span> <strong class="px-1">Plateforme MRCC</strong><span>Tous droits réservés</span></p>
+    </div>
+  </footer>
+
+  <!-- Vendor JS Files -->
+  <script src="{{ url_for('static', filename='vendor/aos/aos.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+
+  <script>
+    // Initialize AOS animations
+    AOS.init({
+      duration: 800,
+      easing: 'ease-in-out',
+      once: true
+    });
+  </script>
+</body>
+</html>

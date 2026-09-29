@@ -1,0 +1,366 @@
+
+
+
+{% extends "base.html" %}
+
+{% block title %}Recherche de Balises - Système Maritime{% endblock %}
+
+{% block extra_css %}
+<style>
+    .table td {
+        border: none;
+        padding: 0.5rem 0.75rem;
+    }
+    
+    .table tr {
+        border-bottom: 1px solid #dee2e6;
+    }
+    
+    .card-header {
+        border-bottom: 2px solid rgba(0,0,0,.125);
+    }
+    
+    .form-control:focus {
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+    }
+    
+    #debugStatus {
+        max-height: 200px;
+        overflow-y: auto;
+        background: #f8f9fa;
+        padding: 10px;
+        border-radius: 4px;
+        font-family: monospace;
+        font-size: 0.8rem;
+    }
+    </style>
+      {% endblock %}
+
+      {% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex align-items-center mb-4">
+                <img src="{{ url_for('static', filename='img/plb.jpg') }}" 
+                     alt="Logo PLB" 
+                     class="me-4 shadow-lg"
+                     style="height:900px; width:auto; border-radius:12px;">
+             
+            </div>
+            
+       
+            
+            <!-- Carte de recherche -->
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-search me-2"></i>
+                        Rechercher une Balise
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form id="rechercheForm">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="form-group">
+                                    <label for="codeRecherche" class="form-label">
+                                        <strong>Code de la Balise :</strong>
+                                    </label>
+                                    <input type="text" 
+                                           class="form-control form-control-lg" 
+                                           id="codeRecherche" 
+                                           placeholder="Entrez le numéro d'enregistrement, MMSI, UIN, numéro de série..."
+                                           autocomplete="off">
+                                    <div class="form-text">
+                                        Vous pouvez rechercher par : Numéro d'enregistrement, MMSI, UIN, Numéro de série, Nom de l'unité
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 d-flex align-items-end">
+                                <button type="submit" class="btn btn-primary btn-lg w-100">
+                                    <i class="fas fa-search me-2"></i>
+                                    Rechercher
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Résultats de recherche -->
+            <div id="resultats" class="mt-4" style="display: none;">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-info-circle me-2"></i>
+                            Informations de la Balise
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="loading" class="text-center" style="display: none;">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Chargement...</span>
+                            </div>
+                            <p class="mt-2">Recherche en cours...</p>
+                        </div>
+                        <div id="baliseInfo"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Message d'erreur -->
+            <div id="erreur" class="alert alert-danger mt-4" style="display: none;">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                <span id="messageErreur"></span>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Debug global
+window.debugMode = true;
+
+function debugLog(message, data = null) {
+    if (window.debugMode) {
+        console.log(`[DEBUG] ${message}`, data || '');
+        // Afficher aussi dans le debug status
+        const statusEl = document.getElementById('debugStatus');
+        if (statusEl) {
+            statusEl.innerHTML += `<div class="text-muted">${new Date().toLocaleTimeString()}: ${message}</div>`;
+            statusEl.scrollTop = statusEl.scrollHeight;
+        }
+    }
+}
+
+$(document).ready(function() {
+    debugLog("=== INIT RECHERCHE BALISES ===");
+    debugLog("jQuery version:", $.fn.jquery);
+    
+    // Test JavaScript
+    $('#testJs').on('click', function() {
+        debugLog("Test JavaScript...");
+        $('#debugStatus').html('<span class="text-info">✓ JavaScript fonctionne</span>');
+    });
+    
+    // Test API
+    $('#testApi').on('click', function() {
+        debugLog("Test API...");
+        $('#debugStatus').html('<span class="text-warning">Test API en cours...</span>');
+        
+        $.get('/api/test')
+            .done(function(data) {
+                debugLog("Test API réussi:", data);
+                $('#debugStatus').html('<span class="text-success">✓ API OK - ' + data.timestamp + '</span>');
+            })
+            .fail(function(xhr) {
+                debugLog("Test API échoué:", xhr);
+                $('#debugStatus').html('<span class="text-danger">✗ API Erreur: ' + xhr.status + ' - ' + xhr.statusText + '</span>');
+            });
+    });
+    
+    // Test DB
+    $('#testDb').on('click', function() {
+        debugLog("Test DB...");
+        $('#debugStatus').html('<span class="text-warning">Test DB en cours...</span>');
+        
+        $.get('/api/test-db')
+            .done(function(data) {
+                debugLog("Test DB réponse:", data);
+                if (data.status === 'success') {
+                    $('#debugStatus').html('<span class="text-success">✓ DB OK - ' + data.record_count + ' enregistrements</span>');
+                } else {
+                    $('#debugStatus').html('<span class="text-danger">✗ DB Erreur: ' + data.message + '</span>');
+                }
+            })
+            .fail(function(xhr) {
+                debugLog("Test DB échoué:", xhr);
+                $('#debugStatus').html('<span class="text-danger">✗ DB Erreur: ' + xhr.status + ' - ' + xhr.responseJSON?.message || xhr.statusText + '</span>');
+            });
+    });
+    
+    // Soumission du formulaire - VERSION SIMPLIFIEE
+    $('#rechercheForm').on('submit', function(e) {
+        e.preventDefault();
+        debugLog("=== DEBUT SOUMISSION FORMULAIRE ===");
+        
+        const code = $('#codeRecherche').val().trim();
+        debugLog("Code saisi:", code);
+        
+        if (!code) {
+            debugLog("Code vide - affichage erreur");
+            showError('Veuillez entrer un code de recherche');
+            return;
+        }
+        
+        // Reset affichage
+        $('#resultats').hide();
+        $('#erreur').hide();
+        $('#loading').show();
+        $('#baliseInfo').empty();
+        
+        debugLog("Préparation requête AJAX...");
+        
+        // REQUETE AJAX SIMPLIFIEE
+        $.ajax({
+            url: '/api/recherche-balise',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({ code: code }),
+            dataType: 'json',
+            timeout: 10000,
+            beforeSend: function() {
+                debugLog("Envoi requête AJAX...");
+            }
+        })
+        .done(function(data, textStatus, xhr) {
+            debugLog("Réponse AJAX reçue:", data);
+            $('#loading').hide();
+            
+            if (data.error) {
+                debugLog("Erreur dans réponse:", data.error);
+                showError(data.error);
+            } else {
+                debugLog("Données trouvées - affichage");
+                displayBaliseInfo(data);
+            }
+        })
+        .fail(function(xhr, textStatus, errorThrown) {
+            debugLog("Erreur AJAX:", {
+                status: xhr.status,
+                statusText: xhr.statusText,
+                textStatus: textStatus,
+                error: errorThrown,
+                responseText: xhr.responseText
+            });
+            
+            $('#loading').hide();
+            
+            let errorMessage = 'Erreur lors de la recherche';
+            if (xhr.status === 404) {
+                errorMessage = 'Aucune balise trouvée avec ce code';
+            } else if (xhr.status === 500) {
+                errorMessage = 'Erreur serveur - veuillez réessayer';
+            } else if (textStatus === 'timeout') {
+                errorMessage = 'Timeout - la requête a pris trop de temps';
+            } else if (textStatus === 'parsererror') {
+                errorMessage = 'Erreur de parsing de la réponse';
+            }
+            
+            showError(errorMessage);
+        })
+        .always(function() {
+            debugLog("Requête AJAX terminée");
+        });
+    });
+    
+    function displayBaliseInfo(data) {
+        debugLog("Affichage données balise");
+        
+        // Vérifier que les données sont valides
+        if (!data || typeof data !== 'object') {
+            debugLog("Données invalides:", data);
+            showError('Données invalides reçues');
+            return;
+        }
+        
+        const infoHtml = `
+            <div class="row">
+                <div class="col-md-6">
+                    <h6 class="border-bottom pb-2">Informations Générales</h6>
+                    <table class="table table-sm table-striped">
+                        <tr><td><strong>Numéro d'enregistrement:</strong></td><td>${escapeHtml(data.registration_number || 'N/A')}</td></tr>
+                        <tr><td><strong>Nom de l'unité:</strong></td><td>${escapeHtml(data.unit_name || 'N/A')}</td></tr>
+                        <tr><td><strong>Port:</strong></td><td>${escapeHtml(data.port || 'N/A')}</td></tr>
+                        <tr><td><strong>MMSI:</strong></td><td>${escapeHtml(data.mmsi || 'N/A')}</td></tr>
+                        <tr><td><strong>UIN:</strong></td><td>${escapeHtml(data.uin || 'N/A')}</td></tr>
+                    </table>
+                </div>
+                <div class="col-md-6">
+                    <h6 class="border-bottom pb-2">Caractéristiques Techniques</h6>
+                    <table class="table table-sm table-striped">
+                        <tr><td><strong>Type de balise:</strong></td><td>${escapeHtml(data.beacon_type || 'N/A')}</td></tr>
+                        <tr><td><strong>Fabricant:</strong></td><td>${escapeHtml(data.manufacturer || 'N/A')}</td></tr>
+                        <tr><td><strong>Modèle:</strong></td><td>${escapeHtml(data.model || 'N/A')}</td></tr>
+                        <tr><td><strong>Numéro série fabricant:</strong></td><td>${escapeHtml(data.serial_number_manufacturer || 'N/A')}</td></tr>
+                        <tr><td><strong>Numéro série SAR:</strong></td><td>${escapeHtml(data.serial_number_sar || 'N/A')}</td></tr>
+                    </table>
+                </div>
+            </div>
+            
+            <div class="row mt-3">
+                <div class="col-md-6">
+                    <h6 class="border-bottom pb-2">Dates Importantes</h6>
+                    <table class="table table-sm table-striped">
+                        <tr><td><strong>Date d'enregistrement:</strong></td><td>${escapeHtml(data.registration_date || 'N/A')}</td></tr>
+                        <tr><td><strong>Expiration batterie:</strong></td><td>${escapeHtml(data.battery_expiration_date || 'N/A')}</td></tr>
+                    </table>
+                </div>
+                <div class="col-md-6">
+                    <h6 class="border-bottom pb-2">Statut</h6>
+                    <table class="table table-sm table-striped">
+                        <tr><td><strong>Statut:</strong></td><td>${getStatusBadge(data.beacon_status)}</td></tr>
+                        <tr><td><strong>Type d'activité:</strong></td><td>${escapeHtml(data.activity_type || 'N/A')}</td></tr>
+                        <tr><td><strong>TAC:</strong></td><td>${escapeHtml(data.tac || 'N/A')}</td></tr>
+                    </table>
+                </div>
+            </div>
+            
+            <div class="row mt-3">
+                <div class="col-12">
+                    <h6 class="border-bottom pb-2">Informations Propriétaire</h6>
+                    <table class="table table-sm table-striped">
+                        <tr><td><strong>Propriétaire:</strong></td><td>${escapeHtml(data.owner || 'N/A')}</td></tr>
+                        <tr><td><strong>Email:</strong></td><td>${escapeHtml(data.email || 'N/A')}</td></tr>
+                        <tr><td><strong>Téléphone:</strong></td><td>${escapeHtml(data.phone_number || 'N/A')}</td></tr>
+                        <tr><td><strong>Adresse:</strong></td><td>${escapeHtml(data.address || 'N/A')}</td></tr>
+                    </table>
+                </div>
+            </div>
+        `;
+        
+        $('#baliseInfo').html(infoHtml);
+        $('#resultats').show();
+        debugLog("Affichage terminé");
+    }
+    
+    function getStatusBadge(status) {
+        if (!status) return '<span class="badge bg-secondary">N/A</span>';
+        
+        const statusLower = status.toLowerCase();
+        let badgeClass = 'secondary';
+        
+        if (statusLower.includes('actif') || statusLower.includes('active')) {
+            badgeClass = 'success';
+        } else if (statusLower.includes('inactif') || statusLower.includes('inactive')) {
+            badgeClass = 'warning';
+        } else if (statusLower.includes('expir') || statusLower.includes('expired')) {
+            badgeClass = 'danger';
+        }
+        
+        return `<span class="badge bg-${badgeClass}">${escapeHtml(status)}</span>`;
+    }
+    
+    function showError(message) {
+        debugLog("Affichage erreur:", message);
+        $('#messageErreur').text(message);
+        $('#erreur').show();
+    }
+    
+    function escapeHtml(unsafe) {
+        if (unsafe === null || unsafe === undefined) return 'N/A';
+        return unsafe.toString()
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+    }
+});
+</script>
+
+
+{% endblock %}

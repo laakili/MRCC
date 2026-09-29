@@ -1,0 +1,817 @@
+<!-- templates/derive_guide.html -->
+{% extends "base.html" %}
+
+{% block title %}Guide de Simulation de Dérive - MRCC Maroc{% endblock %}
+
+{% block extra_css %}
+<style>
+    .guide-container {
+        max-width: 1200px;
+        margin: 2rem auto;
+        padding: 0 2rem;
+    }
+    
+    .guide-header {
+        background: linear-gradient(135deg, #001F4D, #003366);
+        color: white;
+        padding: 3rem;
+        border-radius: 15px;
+        margin-bottom: 2rem;
+        text-align: center;
+    }
+    
+    .guide-section {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+        margin-bottom: 2rem;
+        overflow: hidden;
+    }
+    
+    .guide-section-header {
+        background: #f8f9fa;
+        padding: 1.5rem;
+        border-bottom: 3px solid #C9A94A;
+        cursor: pointer;
+        transition: background 0.3s;
+    }
+    
+    .guide-section-header:hover {
+        background: #e9ecef;
+    }
+    
+    .guide-section-header h2 {
+        margin: 0;
+        font-size: 1.5rem;
+        color: #001F4D;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+    
+    .guide-section-header i {
+        color: #C9A94A;
+        font-size: 1.8rem;
+    }
+    
+    .guide-section-content {
+        padding: 2rem;
+        display: none;
+        border-top: 1px solid #dee2e6;
+    }
+    
+    .guide-section-content.active {
+        display: block;
+    }
+    
+    .formula-card {
+        background: #f8f9fa;
+        border-left: 4px solid #C9A94A;
+        padding: 1.5rem;
+        margin: 1rem 0;
+        font-family: monospace;
+        font-size: 1.1rem;
+    }
+    
+    .data-source-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 1rem 0;
+    }
+    
+    .data-source-table th {
+        background: #001F4D;
+        color: white;
+        padding: 0.75rem;
+        text-align: left;
+    }
+    
+    .data-source-table td {
+        padding: 0.75rem;
+        border-bottom: 1px solid #dee2e6;
+    }
+    
+    .data-source-table tr:hover {
+        background: #f8f9fa;
+    }
+    
+    .coefficient-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 1rem 0;
+    }
+    
+    .coefficient-table th {
+        background: #C9A94A;
+        color: #001F4D;
+        padding: 0.75rem;
+        text-align: left;
+    }
+    
+    .coefficient-table td {
+        padding: 0.75rem;
+        border-bottom: 1px solid #dee2e6;
+    }
+    
+    .risk-matrix {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        margin: 1rem 0;
+    }
+    
+    .risk-level {
+        padding: 1rem;
+        border-radius: 8px;
+        text-align: center;
+    }
+    
+    .risk-critical {
+        background: #7b1fa2;
+        color: white;
+    }
+    
+    .risk-high {
+        background: #dc3545;
+        color: white;
+    }
+    
+    .risk-medium {
+        background: #ffc107;
+        color: black;
+    }
+    
+    .risk-low {
+        background: #28a745;
+        color: white;
+    }
+    
+    .methodology-steps {
+        counter-reset: step;
+        list-style: none;
+        padding: 0;
+    }
+    
+    .methodology-steps li {
+        counter-increment: step;
+        margin-bottom: 1.5rem;
+        padding-left: 3rem;
+        position: relative;
+    }
+    
+    .methodology-steps li::before {
+        content: counter(step);
+        background: #C9A94A;
+        color: #001F4D;
+        width: 2rem;
+        height: 2rem;
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        position: absolute;
+        left: 0;
+        top: 0;
+        font-weight: bold;
+    }
+    
+    .reference-badge {
+        background: #e9ecef;
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        font-size: 0.8rem;
+        font-family: monospace;
+    }
+    
+    .alert-info-custom {
+        background: #d1ecf1;
+        border-left: 4px solid #0c5460;
+        padding: 1rem;
+        margin: 1rem 0;
+        border-radius: 4px;
+    }
+    
+    .alert-warning-custom {
+        background: #fff3cd;
+        border-left: 4px solid #856404;
+        padding: 1rem;
+        margin: 1rem 0;
+        border-radius: 4px;
+    }
+    
+    .example-box {
+        background: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        padding: 1.5rem;
+        margin: 1rem 0;
+    }
+    
+    .example-title {
+        font-weight: bold;
+        color: #001F4D;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .math-equation {
+        background: #2d3748;
+        color: #fbbf24;
+        padding: 1rem;
+        border-radius: 8px;
+        font-family: monospace;
+        overflow-x: auto;
+        margin: 1rem 0;
+    }
+    
+    .glossary-term {
+        font-weight: bold;
+        color: #001F4D;
+        border-bottom: 1px dashed #C9A94A;
+        cursor: help;
+    }
+    
+    @media print {
+        .guide-section-header {
+            break-inside: avoid;
+        }
+        .guide-section-content {
+            display: block !important;
+            break-inside: avoid;
+        }
+        .no-print {
+            display: none;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="guide-container">
+    <!-- En-tête -->
+    <div class="guide-header">
+        <h1><i class="fas fa-life-ring me-3"></i>Guide de Simulation de Dérive</h1>
+        <p class="lead mt-3">MRCC Maroc - Méthodologie et Standards IAMSAR</p>
+        <div class="mt-3">
+            <span class="badge bg-light text-dark me-2">Version 2.0</span>
+            <span class="badge bg-light text-dark">Dernière mise à jour: Mars 2024</span>
+        </div>
+    </div>
+    
+    <!-- Table des matières -->
+    <div class="guide-section no-print">
+        <div class="guide-section-header" onclick="toggleSection(this)">
+            <h2><i class="fas fa-list"></i>Table des matières</h2>
+        </div>
+        <div class="guide-section-content active">
+            <div class="row">
+                <div class="col-md-4">
+                    <ul class="list-unstyled">
+                        <li><a href="#introduction" class="text-decoration-none">1. Introduction</a></li>
+                        <li><a href="#methodology" class="text-decoration-none">2. Méthodologie de calcul</a></li>
+                        <li><a href="#coefficients" class="text-decoration-none">3. Coefficients de dérive</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-4">
+                    <ul class="list-unstyled">
+                        <li><a href="#data-sources" class="text-decoration-none">4. Sources de données</a></li>
+                        <li><a href="#risk-analysis" class="text-decoration-none">5. Analyse des risques</a></li>
+                        <li><a href="#interpretation" class="text-decoration-none">6. Interprétation des résultats</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-4">
+                    <ul class="list-unstyled">
+                        <li><a href="#patterns" class="text-decoration-none">7. Motifs de recherche</a></li>
+                        <li><a href="#examples" class="text-decoration-none">8. Exemples pratiques</a></li>
+                        <li><a href="#references" class="text-decoration-none">9. Références</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Section 1: Introduction -->
+    <div class="guide-section" id="introduction">
+        <div class="guide-section-header" onclick="toggleSection(this)">
+            <h2><i class="fas fa-info-circle"></i>1. Introduction</h2>
+        </div>
+        <div class="guide-section-content">
+            <h3>Objectif du système</h3>
+            <p>Le système de simulation de dérive du MRCC Maroc a pour objectif de prédire la trajectoire d'objets ou de personnes en mer, en tenant compte des conditions environnementales, afin d'optimiser les opérations de recherche et de sauvetage (SAR).</p>
+            
+            <div class="alert-info-custom">
+                <i class="fas fa-graduation-cap me-2"></i>
+                <strong>Fondement théorique :</strong> La simulation est basée sur les standards internationaux de l'<strong>IAMSAR (International Aeronautical and Maritime Search and Rescue Manual)</strong>, Volume II - Coordination des opérations.
+            </div>
+            
+            <h3 class="mt-4">Principes fondamentaux</h3>
+            <p>La dérive d'un objet en mer est déterminée par trois facteurs principaux :</p>
+            <ul>
+                <li><strong>Le courant de surface</strong> - Contribution principale (60-80% de la dérive)</li>
+                <li><strong>Le vent</strong> - Effet direct sur la surface exposée (leeway)</li>
+                <li><strong>Les caractéristiques de l'objet</strong> - Coefficient de traînée, forme, flottabilité</li>
+            </ul>
+            
+            <div class="formula-card">
+                <strong>Équation fondamentale :</strong><br>
+                V<sub>totale</sub> = V<sub>courant</sub> + (V<sub>vent</sub> × C<sub>leeway</sub> × f<sub>mer</sub>)
+            </div>
+        </div>
+    </div>
+    
+    <!-- Section 2: Méthodologie de calcul -->
+    <div class="guide-section" id="methodology">
+        <div class="guide-section-header" onclick="toggleSection(this)">
+            <h2><i class="fas fa-calculator"></i>2. Méthodologie de calcul</h2>
+        </div>
+        <div class="guide-section-content">
+            <h3>2.1 Modèle mathématique</h3>
+            <p>Le système utilise un modèle vectoriel 2D pour calculer la trajectoire :</p>
+            
+            <div class="math-equation">
+                <strong>Composante du courant :</strong><br>
+                U<sub>c</sub> = V<sub>c</sub> × sin(θ<sub>c</sub>)<br>
+                V<sub>c</sub> = V<sub>c</sub> × cos(θ<sub>c</sub>)<br><br>
+                
+                <strong>Composante du vent (leeway) :</strong><br>
+                U<sub>w</sub> = (V<sub>w</sub> × C<sub>l</sub> × f<sub>s</sub>) × sin(θ<sub>w</sub> + α)<br>
+                V<sub>w</sub> = (V<sub>w</sub> × C<sub>l</sub> × f<sub>s</sub>) × cos(θ<sub>w</sub> + α)<br><br>
+                
+                <strong>Vitesse résultante :</strong><br>
+                V<sub>r</sub> = √[(U<sub>c</sub> + U<sub>w</sub>)² + (V<sub>c</sub> + V<sub>w</sub>)²]<br>
+                θ<sub>r</sub> = atan2(U<sub>c</sub> + U<sub>w</sub>, V<sub>c</sub> + V<sub>w</sub>)
+            </div>
+            
+            <p>Où :</p>
+            <ul>
+                <li><span class="glossary-term">V<sub>c</sub></span> : Vitesse du courant (nœuds)</li>
+                <li><span class="glossary-term">θ<sub>c</sub></span> : Direction du courant (degrés, 0° = Nord)</li>
+                <li><span class="glossary-term">V<sub>w</sub></span> : Vitesse du vent (nœuds)</li>
+                <li><span class="glossary-term">θ<sub>w</sub></span> : Direction du vent (degrés, 0° = Nord)</li>
+                <li><span class="glossary-term">C<sub>l</sub></span> : Coefficient de leeway (0.01 à 0.04 selon objet)</li>
+                <li><span class="glossary-term">f<sub>s</sub></span> : Facteur d'état de la mer (0.5 à 1.5)</li>
+                <li><span class="glossary-term">α</span> : Angle de dérive (degrés)</li>
+            </ul>
+            
+            <h3>2.2 Intégration temporelle</h3>
+            <p>La position à l'instant t est calculée par intégration numérique :</p>
+            
+            <div class="math-equation">
+                φ(t+Δt) = φ(t) + [V<sub>N</sub>(t) × Δt] / (111.32 × 1000)<br>
+                λ(t+Δt) = λ(t) + [V<sub>E</sub>(t) × Δt] / (111.32 × cos(φ) × 1000)
+            </div>
+            
+            <p>Où :</p>
+            <ul>
+                <li>φ : Latitude (degrés)</li>
+                <li>λ : Longitude (degrés)</li>
+                <li>V<sub>N</sub> : Composante Nord de la vitesse (m/s)</li>
+                <li>V<sub>E</sub> : Composante Est de la vitesse (m/s)</li>
+                <li>111.32 : Conversion degré → kilomètres (latitude)</li>
+            </ul>
+        </div>
+    </div>
+    
+    <!-- Section 3: Coefficients de dérive -->
+    <div class="guide-section" id="coefficients">
+        <div class="guide-section-header" onclick="toggleSection(this)">
+            <h2><i class="fas fa-chart-line"></i>3. Coefficients de dérive IAMSAR</h2>
+        </div>
+        <div class="guide-section-content">
+            <h3>3.1 Tableau des coefficients standards</h3>
+            <table class="coefficient-table">
+                <thead>
+                    <tr>
+                        <th>Type d'objet</th>
+                        <th>Coefficient vent (C<sub>l</sub>)</th>
+                        <th>Angle dérive (α)</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Personne en mer</strong></td>
+                        <td>0.03 (3%)</td>
+                        <td>2.0°</td>
+                        <td>Avec gilet de sauvetage, position verticale</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Radeau de sauvetage</strong></td>
+                        <td>0.04 (4%)</td>
+                        <td>1.5°</td>
+                        <td>Radeau gonflable, dérive plus rapide</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Canot de sauvetage</strong></td>
+                        <td>0.02 (2%)</td>
+                        <td>1.0°</td>
+                        <td>Canot rigide, plus stable</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Bateau de pêche</strong></td>
+                        <td>0.01 (1%)</td>
+                        <td>0.8°</td>
+                        <td>Navire &lt; 15 m, faible prise au vent</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Conteneur flottant</strong></td>
+                        <td>0.02 (2%)</td>
+                        <td>0.5°</td>
+                        <td>Partiellement immergé</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Voilier</strong></td>
+                        <td>0.025 (2.5%)</td>
+                        <td>1.2°</td>
+                        <td>Coque dérivante</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <h3>3.2 Facteur d'état de la mer (Échelle de Douglas)</h3>
+            <table class="data-source-table">
+                <thead>
+                    <tr>
+                        <th>État de mer</th>
+                        <th>Hauteur vagues (m)</th>
+                        <th>Facteur multiplicatif</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>1</td><td>&lt; 0.1</td><td>0.5</td><td>Calme</td></tr>
+                    <tr><td>2</td><td>0.1 - 0.5</td><td>0.75</td><td>Peu agitée</td></tr>
+                    <tr><td>3</td><td>0.5 - 1.25</td><td>1.0</td><td>Agitée</td></tr>
+                    <tr><td>4</td><td>1.25 - 2.5</td><td>1.25</td><td>Très agitée</td></tr>
+                    <tr><td>5</td><td>2.5 - 4.0</td><td>1.5</td><td>Grosse mer</td></tr>
+                    <tr><td>6</td><td>4.0 - 6.0</td><td>1.75</td><td>Forte mer</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <!-- Section 4: Sources de données -->
+    <div class="guide-section" id="data-sources">
+        <div class="guide-section-header" onclick="toggleSection(this)">
+            <h2><i class="fas fa-database"></i>4. Sources de données</h2>
+        </div>
+        <div class="guide-section-content">
+            <h3>4.1 Données météo-marines</h3>
+            <table class="data-source-table">
+                <thead>
+                    <tr>
+                        <th>Type de donnée</th>
+                        <th>Source</th>
+                        <th>Fréquence</th>
+                        <th>Précision</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Vent (surface)</td>
+                        <td>Météo France / Direction de la Météorologie Nationale (DMN)</td>
+                        <td>Horaire</td>
+                        <td>±1 nœud</td>
+                    </tr>
+                    <tr>
+                        <td>Courants de surface</td>
+                        <td>HYCOM / Mercator Ocean / Bouées MARNET</td>
+                        <td>6h</td>
+                        <td>±0.2 nœuds</td>
+                    </tr>
+                    <tr>
+                        <td>État de la mer</td>
+                        <td>Altimétrie satellite (Jason-3, Sentinel-6) / Bouées</td>
+                        <td>6h</td>
+                        <td>±0.25m</td>
+                    </tr>
+                    <tr>
+                        <td>Température eau</td>
+                        <td>SST satellite (NOAA, Copernicus)</td>
+                        <td>Quotidien</td>
+                        <td>±0.5°C</td>
+                    </tr>
+                    <tr>
+                        <td>Pression atmosphérique</td>
+                        <td>Stations météo côtières / GFS</td>
+                        <td>Horaire</td>
+                        <td>±1 hPa</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <h3>4.2 Sources nationales marocaines</h3>
+            <ul>
+                <li><strong>MARNET</strong> - Réseau national de bouées météo-marines (10 stations)</li>
+                <li><strong>ANP (Agence Nationale des Ports)</strong> - Données de trafic et courants portuaires</li>
+                <li><strong>DMN (Direction de la Météorologie Nationale)</strong> - Prévisions météo marines</li>
+                <li><strong>INRH (Institut National de Recherche Halieutique)</strong> - Données océanographiques</li>
+            </ul>
+            
+            <div class="alert-info-custom">
+                <i class="fas fa-satellite me-2"></i>
+                <strong>Données temps réel :</strong> Le système intègre automatiquement les données des bouées MARNET et les modèles HYCOM via API REST, avec une mise à jour toutes les 6 heures.
+            </div>
+        </div>
+    </div>
+    
+    <!-- Section 5: Analyse des risques -->
+    <div class="guide-section" id="risk-analysis">
+        <div class="guide-section-header" onclick="toggleSection(this)">
+            <h2><i class="fas fa-exclamation-triangle"></i>5. Analyse des risques</h2>
+        </div>
+        <div class="guide-section-content">
+            <h3>5.1 Matrice de risque</h3>
+            <div class="risk-matrix">
+                <div class="risk-level risk-critical">
+                    <strong>CRITIQUE (80-100)</strong><br>
+                    Intervention immédiate<br>
+                    Tous moyens disponibles
+                </div>
+                <div class="risk-level risk-high">
+                    <strong>ÉLEVÉ (60-80)</strong><br>
+                    Alerte régionale<br>
+                    Déploiement rapide
+                </div>
+                <div class="risk-level risk-medium">
+                    <strong>MODÉRÉ (40-60)</strong><br>
+                    Surveillance renforcée<br>
+                    Préparation des moyens
+                </div>
+                <div class="risk-level risk-low">
+                    <strong>FAIBLE (0-40)</strong><br>
+                    Surveillance standard<br>
+                    Mise à jour 4h
+                </div>
+            </div>
+            
+            <h3 class="mt-4">5.2 Facteurs de risque analysés</h3>
+            
+            <h4>Environnemental (pondération 25%)</h4>
+            <ul>
+                <li>Température de l'eau → Risque d'hypothermie</li>
+                <li>État de la mer → Difficultés de localisation</li>
+                <li>Visibilité → Efficacité de la recherche</li>
+                <li>Force du vent → Vitesse de dérive</li>
+            </ul>
+            
+            <h4>Opérationnel (pondération 30%)</h4>
+            <ul>
+                <li>Distance à la côte → Temps d'intervention</li>
+                <li>Temps écoulé depuis l'incident → Dérive cumulée</li>
+                <li>Moyens disponibles → Capacité de réponse</li>
+            </ul>
+            
+            <h4>Médical (pondération 30%)</h4>
+            <ul>
+                <li>Type d'incident → Gravité immédiate</li>
+                <li>Nombre de personnes → Logistique nécessaire</li>
+                <li>Équipement de survie → Temps de survie</li>
+            </ul>
+            
+            <h4>Navigation (pondération 15%)</h4>
+            <ul>
+                <li>Profondeur → Risque d'échouement</li>
+                <li>Trafic maritime → Dangers de collision</li>
+                <li>Obstacles naturels → Risques supplémentaires</li>
+            </ul>
+            
+            <h3>5.3 Calcul du temps de survie</h3>
+            <div class="formula-card">
+                <strong>Modèle de temps de survie :</strong><br>
+                T<sub>survie</sub> = T<sub>base</sub> × C<sub>équipement</sub> × C<sub>mer</sub> × C<sub>individu</sub><br><br>
+                
+                Où :<br>
+                T<sub>base</sub> = 12 heures (référence eau à 18°C)<br>
+                C<sub>équipement</sub> = 2.0 avec gilet, 1.0 sans<br>
+                C<sub>mer</sub> = f(état de la mer)<br>
+                C<sub>individu</sub> = 1.2 adulte en bonne santé, 0.8 enfant/personne âgée
+            </div>
+        </div>
+    </div>
+    
+    <!-- Section 6: Interprétation des résultats -->
+    <div class="guide-section" id="interpretation">
+        <div class="guide-section-header" onclick="toggleSection(this)">
+            <h2><i class="fas fa-chart-simple"></i>6. Interprétation des résultats</h2>
+        </div>
+        <div class="guide-section-content">
+            <h3>6.1 Métriques principales</h3>
+            
+            <h4>Distance totale</h4>
+            <p>Distance cumulative parcourue par l'objet. Une distance importante indique une dérive rapide nécessitant une action urgente.</p>
+            
+            <h4>Vitesse moyenne</h4>
+            <p>Vitesse de dérive moyenne sur la durée de simulation.</p>
+            <ul>
+                <li>< 1 nœud : Dérive très lente → Zone de recherche restreinte</li>
+                <li>1-2 nœuds : Dérive modérée → Recherche élargie</li>
+                <li>2-3 nœuds : Dérive rapide → Recherche extensive</li>
+                <li>> 3 nœuds : Dérive très rapide → Mobilisation aérienne recommandée</li>
+            </ul>
+            
+            <h4>Zone de recherche</h4>
+            <p>Ellipse de dispersion à 95% de probabilité. La zone de recherche réelle doit être élargie de 20-30% pour tenir compte des incertitudes.</p>
+            
+            <h3>6.2 Courbes de probabilité</h3>
+            <div class="example-box">
+                <div class="example-title">
+                    <i class="fas fa-chart-line"></i>
+                    <strong>Interprétation des cercles de probabilité</strong>
+                </div>
+                <ul>
+                    <li><strong>Cercle interne (50%)</strong> : Zone de probabilité maximale - priorité absolue</li>
+                    <li><strong>Cercle médian (75%)</strong> : Zone secondaire - recherche intensive</li>
+                    <li><strong>Cercle externe (95%)</strong> : Zone de confiance - recherche élargie</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Section 7: Motifs de recherche -->
+    <div class="guide-section" id="patterns">
+        <div class="guide-section-header" onclick="toggleSection(this)">
+            <h2><i class="fas fa-search"></i>7. Motifs de recherche IAMSAR</h2>
+        </div>
+        <div class="guide-section-content">
+            <h3>7.1 Motifs standardisés</h3>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <h4>Carré expansif (Expanding Square)</h4>
+                    <p>Idéal pour la recherche initiale autour d'un point de référence. Efficace lorsque la position est bien définie.</p>
+                    <ul>
+                        <li>Espacement : 0.5 nautiques</li>
+                        <li>Rayon maximal : 8 nautiques</li>
+                        <li>Durée : 2-4 heures</li>
+                    </ul>
+                </div>
+                <div class="col-md-6">
+                    <h4>Recherche sectorielle (Sector Search)</h4>
+                    <p>Recommandé pour les points de dernière position connue avec incertitude de direction.</p>
+                    <ul>
+                        <li>Rayon : 2 nautiques</li>
+                        <li>Secteurs : 8 (45° chacun)</li>
+                        <li>Durée : 1-2 heures</li>
+                    </ul>
+                </div>
+                <div class="col-md-6">
+                    <h4>Traces parallèles (Parallel Track)</h4>
+                    <p>Optimal pour de grandes zones de recherche, couverture systématique.</p>
+                    <ul>
+                        <li>Espacement : 0.3 nautiques</li>
+                        <li>Largeur de balayage : 0.5 nautiques</li>
+                        <li>Zone maximale : 100 km²</li>
+                    </ul>
+                </div>
+                <div class="col-md-6">
+                    <h4>Recherche côtière (Shoreline Search)</h4>
+                    <p>Pour les zones proches de la côte, en tenant compte des courants de marée.</p>
+                    <ul>
+                        <li>Distance au large : 1 nautique</li>
+                        <li>Motif : Zigzag adaptatif</li>
+                        <li>Coordination : Avec garde-côtes</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Section 8: Exemples pratiques -->
+    <div class="guide-section" id="examples">
+        <div class="guide-section-header" onclick="toggleSection(this)">
+            <h2><i class="fas fa-calculator"></i>8. Exemples pratiques</h2>
+        </div>
+        <div class="guide-section-content">
+            <h3>Exemple 1 : Personne en mer - Casablanca</h3>
+            <div class="example-box">
+                <div class="example-title">
+                    <i class="fas fa-person-swimming"></i>
+                    <strong>Scénario</strong>
+                </div>
+                <p><strong>Données d'entrée :</strong></p>
+                <ul>
+                    <li>Position : 33.5731°N, 7.5898°W (Port de Casablanca)</li>
+                    <li>Courant : 2.5 nœuds, direction 45°</li>
+                    <li>Vent : 15 nœuds, direction 90°</li>
+                    <li>État de mer : 3 (agitée)</li>
+                    <li>Équipement : Gilet de sauvetage</li>
+                </ul>
+                
+                <p><strong>Résultats simulation (24h) :</strong></p>
+                <ul>
+                    <li>Distance totale : 85.3 km</li>
+                    <li>Vitesse moyenne : 3.55 nœuds</li>
+                    <li>Zone de recherche : 156 km²</li>
+                    <li>Niveau de risque : ÉLEVÉ (72/100)</li>
+                    <li>Temps de survie estimé : 8-12 heures</li>
+                </ul>
+                
+                <p><strong>Recommandations :</strong></p>
+                <ul>
+                    <li>Déclencher alerte régionale</li>
+                    <li>Déployer hélicoptère SAR</li>
+                    <li>Mobiliser vedettes portuaires</li>
+                    <li>Utiliser motif carré expansif</li>
+                </ul>
+            </div>
+            
+            <h3>Exemple 2 : Radeau - Détroit de Gibraltar</h3>
+            <div class="example-box">
+                <div class="example-title">
+                    <i class="fas fa-ship"></i>
+                    <strong>Scénario</strong>
+                </div>
+                <p><strong>Données d'entrée :</strong></p>
+                <ul>
+                    <li>Position : 35.9017°N, 5.4833°W (Tanger Med)</li>
+                    <li>Courant : 3.0 nœuds, direction 60° (sortie Méditerranée)</li>
+                    <li>Vent : 20 nœuds, direction 45°</li>
+                    <li>État de mer : 4 (très agitée)</li>
+                    <li>Type : Radeau 6 places</li>
+                </ul>
+                
+                <p><strong>Résultats simulation (12h) :</strong></p>
+                <ul>
+                    <li>Distance totale : 62.1 km</li>
+                    <li>Vitesse moyenne : 5.18 nœuds</li>
+                    <li>Zone de recherche : 98 km²</li>
+                    <li>Niveau de risque : CRITIQUE (88/100)</li>
+                    <li>Position finale : 36.15°N, 5.85°W (approche Gibraltar)</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Section 9: Références -->
+    <div class="guide-section" id="references">
+        <div class="guide-section-header" onclick="toggleSection(this)">
+            <h2><i class="fas fa-book"></i>9. Références et normes</h2>
+        </div>
+        <div class="guide-section-content">
+            <h3>Normes internationales</h3>
+            <ul>
+                <li><strong>IAMSAR Manual</strong> - International Aeronautical and Maritime Search and Rescue Manual (IMO/ICAO)</li>
+                <li><strong>SOLAS</strong> - International Convention for the Safety of Life at Sea</li>
+                <li><strong>IMO MSC.1/Circ. 1460</strong> - Guidelines on the Use of Drift Models</li>
+                <li><strong>GMDSS</strong> - Global Maritime Distress and Safety System</li>
+            </ul>
+            
+            <h3>Références techniques</h3>
+            <ul>
+                <li>Allen, A. A., & Plourde, J. V. (1999). <em>Review of Leeway: Field Experiments and Implementation</em>. US Coast Guard Research and Development Center.</li>
+                <li>Breivik, Ø., & Allen, A. A. (2008). <em>An Operational Search and Rescue Model for the Norwegian Sea</em>. Journal of Marine Systems.</li>
+                <li>Davidson, F. J. M., & Allen, A. A. (2014). <em>Leeway Divergence and the Probability of Finding a Missing Person</em>. Canadian Coast Guard.</li>
+                <li>Daniel, T., & Allen, A. A. (2012). <em>Leeway Statistics for Search and Rescue Planning</em>. US Coast Guard.</li>
+            </ul>
+            
+            <h3>Ressources en ligne</h3>
+            <ul>
+                <li><a href="https://www.imo.org/en/OurWork/Safety/Pages/SAR.aspx" target="_blank">IMO Search and Rescue Page</a></li>
+                <li><a href="https://www.mercator-ocean.fr/" target="_blank">Mercator Ocean International</a></li>
+                <li><a href="https://marine.copernicus.eu/" target="_blank">Copernicus Marine Service</a></li>
+                <li><a href="https://www.aviso.altimetry.fr/" target="_blank">AVISO Altimetry</a></li>
+            </ul>
+            
+            <div class="alert-warning-custom mt-3">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                <strong>Note importante :</strong> Les résultats de simulation sont des estimations. La décision finale d'engagement des moyens revient au coordinateur SAR du MRCC, qui doit intégrer les informations terrain et les retours des unités déployées.
+            </div>
+        </div>
+    </div>
+    
+    <!-- Bouton d'impression -->
+    <div class="text-center mt-4 no-print">
+        <button class="btn btn-primary btn-lg" onclick="window.print()">
+            <i class="fas fa-print me-2"></i>Imprimer le guide
+        </button>
+        <a href="{{ url_for('simulate_derive') }}" class="btn btn-secondary btn-lg ms-3">
+            <i class="fas fa-arrow-left me-2"></i>Retour à la simulation
+        </a>
+    </div>
+</div>
+
+<script>
+function toggleSection(header) {
+    const content = header.nextElementSibling;
+    content.classList.toggle('active');
+    
+    const icon = header.querySelector('i:first-child');
+    if (content.classList.contains('active')) {
+        icon.style.transform = 'rotate(90deg)';
+    } else {
+        icon.style.transform = 'rotate(0deg)';
+    }
+}
+
+// Ouvrir la première section par défaut
+document.addEventListener('DOMContentLoaded', () => {
+    const firstSection = document.querySelector('.guide-section-content');
+    if (firstSection) {
+        firstSection.classList.add('active');
+    }
+});
+</script>
+{% endblock %}

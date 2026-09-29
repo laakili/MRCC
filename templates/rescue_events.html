@@ -1,0 +1,830 @@
+<!-- templates/rescue_events.html -->
+{% extends "base.html" %}
+
+{% block title %}Événements de Sauvetage - MRCC Maroc{% endblock %}
+
+{% block extra_css %}
+<style>
+    .event-card {
+        border: none;
+        border-radius: 12px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        margin-bottom: 20px;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+    
+    .event-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+    }
+    
+    .event-header {
+        padding: 15px 20px;
+        border-radius: 12px 12px 0 0;
+        color: white;
+    }
+    
+    .event-header.critical { background: linear-gradient(135deg, #7b1fa2, #9c27b0); }
+    .event-header.high { background: linear-gradient(135deg, #dc3545, #c82333); }
+    .event-header.normal { background: linear-gradient(135deg, #ffc107, #fd7e14); }
+    .event-header.low { background: linear-gradient(135deg, #28a745, #20c997); }
+    
+    .event-status {
+        display: inline-block;
+        padding: 3px 10px;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+    
+    .status-active { background: #ffc107; color: #856404; }
+    .status-resolved { background: #28a745; color: white; }
+    .status-cancelled { background: #6c757d; color: white; }
+    .status-archived { background: #17a2b8; color: white; }
+    
+    .stat-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        background: #f8f9fa;
+        padding: 5px 10px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+    }
+    
+    .filter-section {
+        background: #f8f9fa;
+        padding: 20px;
+        border-radius: 12px;
+        margin-bottom: 30px;
+    }
+    
+    .map-container {
+        height: 400px;
+        border-radius: 12px;
+        overflow: hidden;
+        margin-bottom: 30px;
+    }
+    
+    .event-stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
+        margin-bottom: 30px;
+    }
+    
+    .stat-card {
+        background: white;
+        border-radius: 12px;
+        padding: 20px;
+        text-align: center;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    
+    .stat-value {
+        font-size: 2rem;
+        font-weight: bold;
+        color: #001F4D;
+    }
+    
+    .stat-label {
+        color: #6c757d;
+        font-size: 0.9rem;
+    }
+    
+    .timeline-item {
+        position: relative;
+        padding-left: 30px;
+        margin-bottom: 20px;
+    }
+    
+    .timeline-item::before {
+        content: '';
+        position: absolute;
+        left: 8px;
+        top: 0;
+        bottom: 0;
+        width: 2px;
+        background: #dee2e6;
+    }
+    
+    .timeline-item::after {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 5px;
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: #C9A94A;
+        border: 2px solid white;
+    }
+    
+    .timeline-content {
+        background: #f8f9fa;
+        padding: 12px;
+        border-radius: 8px;
+    }
+    
+    @keyframes pulse {
+        0% { transform: scale(1); opacity: 1; }
+        50% { transform: scale(1.2); opacity: 0.7; }
+        100% { transform: scale(1); opacity: 1; }
+    }
+    
+    .live-badge {
+        animation: pulse 2s infinite;
+        background: #dc3545;
+        color: white;
+        padding: 2px 8px;
+        border-radius: 20px;
+        font-size: 0.7rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1>
+                    <i class="fas fa-life-ring me-2"></i>
+                    Événements de Sauvetage
+                </h1>
+                <div>
+                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createEventModal">
+                        <i class="fas fa-plus-circle me-2"></i>Nouvel événement
+                    </button>
+                    <button class="btn btn-success" onclick="exportEvents()">
+                        <i class="fas fa-download me-2"></i>Exporter
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Statistiques -->
+    <div class="event-stats" id="eventStats">
+        <div class="stat-card">
+            <div class="stat-value" id="totalEvents">0</div>
+            <div class="stat-label">Total événements</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value text-warning" id="activeEvents">0</div>
+            <div class="stat-label">Actifs</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value text-success" id="resolvedEvents">0</div>
+            <div class="stat-label">Résolus</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value text-danger" id="personsRescued">0</div>
+            <div class="stat-label">Personnes sauvées</div>
+        </div>
+    </div>
+    
+    <!-- Filtres -->
+    <div class="filter-section">
+        <div class="row g-3">
+            <div class="col-md-3">
+                <label class="form-label">Statut</label>
+                <select id="statusFilter" class="form-select">
+                    <option value="">Tous</option>
+                    <option value="active">Actif</option>
+                    <option value="resolved">Résolu</option>
+                    <option value="cancelled">Annulé</option>
+                    <option value="archived">Archivé</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Type d'incident</label>
+                <select id="typeFilter" class="form-select">
+                    <option value="">Tous</option>
+                    <option value="man_overboard">Homme à la mer</option>
+                    <option value="vessel_sinking">Navire qui coule</option>
+                    <option value="medical">Urgence médicale</option>
+                    <option value="fire">Incendie</option>
+                    <option value="collision">Collision</option>
+                    <option value="distress">Détresse</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Priorité</label>
+                <select id="priorityFilter" class="form-select">
+                    <option value="">Toutes</option>
+                    <option value="critical">Critique</option>
+                    <option value="high">Élevée</option>
+                    <option value="normal">Normale</option>
+                    <option value="low">Faible</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Recherche</label>
+                <input type="text" id="searchInput" class="form-control" placeholder="Numéro, navire, lieu...">
+            </div>
+            <div class="col-12">
+                <button class="btn btn-primary" onclick="loadEvents()">
+                    <i class="fas fa-search me-1"></i>Appliquer
+                </button>
+                <button class="btn btn-secondary" onclick="resetFilters()">
+                    <i class="fas fa-undo me-1"></i>Réinitialiser
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Carte des événements -->
+    <div class="map-container">
+        <div id="eventsMap" style="height: 100%;"></div>
+    </div>
+    
+    <!-- Liste des événements -->
+    <div id="eventsList">
+        <div class="text-center py-5">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Chargement...</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Créer un événement -->
+<div class="modal fade" id="createEventModal" tabindex="-1">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-plus-circle me-2"></i>Nouvel événement de sauvetage
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="createEventForm">
+                <div class="modal-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Type d'incident *</label>
+                            <select class="form-select" name="event_type" required>
+                                <option value="">Sélectionner...</option>
+                                <option value="man_overboard">Homme à la mer</option>
+                                <option value="vessel_sinking">Navire qui coule</option>
+                                <option value="medical">Urgence médicale</option>
+                                <option value="fire">Incendie à bord</option>
+                                <option value="collision">Collision</option>
+                                <option value="distress">Signal de détresse</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Priorité</label>
+                            <select class="form-select" name="priority">
+                                <option value="normal">Normale</option>
+                                <option value="high">Élevée</option>
+                                <option value="critical">Critique</option>
+                                <option value="low">Faible</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Latitude *</label>
+                            <input type="number" class="form-control" name="latitude" step="0.0001" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Longitude *</label>
+                            <input type="number" class="form-control" name="longitude" step="0.0001" required>
+                        </div>
+                        <div class="col-md-12">
+                            <label class="form-label">Lieu / Description</label>
+                            <input type="text" class="form-control" name="location_name">
+                        </div>
+                        <div class="col-md-12">
+                            <label class="form-label">Description de l'incident</label>
+                            <textarea class="form-control" name="description" rows="3"></textarea>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Nombre de personnes impliquées</label>
+                            <input type="number" class="form-control" name="persons_involved" value="1" min="1">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Heure de l'incident</label>
+                            <input type="datetime-local" class="form-control" name="incident_time">
+                        </div>
+                        <div class="col-md-12">
+                            <h5 class="mt-3">Informations navire (si applicable)</h5>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">Nom du navire</label>
+                                    <input type="text" class="form-control" name="vessel_name">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Type de navire</label>
+                                    <input type="text" class="form-control" name="vessel_type">
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">Pavillon</label>
+                                    <input type="text" class="form-control" name="vessel_flag">
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">IMO</label>
+                                    <input type="text" class="form-control" name="vessel_imo">
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">MMSI</label>
+                                    <input type="text" class="form-control" name="vessel_mmsi">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <h5 class="mt-3">Conditions environnementales</h5>
+                            <div class="row g-3">
+                                <div class="col-md-3">
+                                    <label class="form-label">Vent (nœuds)</label>
+                                    <input type="number" class="form-control" name="wind_speed" step="0.1">
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label">Direction vent (°)</label>
+                                    <input type="number" class="form-control" name="wind_direction">
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label">État de mer (1-9)</label>
+                                    <input type="number" class="form-control" name="sea_state" min="1" max="9">
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label">Visibilité (km)</label>
+                                    <input type="number" class="form-control" name="visibility_km" step="0.1">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <label class="form-label">Notes supplémentaires</label>
+                            <textarea class="form-control" name="notes" rows="2"></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="submit" class="btn btn-primary">Créer l'événement</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Détails de l'événement -->
+<div class="modal fade" id="eventDetailModal" tabindex="-1">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="eventDetailTitle">Détails de l'événement</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="eventDetailBody">
+                <!-- Rempli dynamiquement -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-warning" onclick="editCurrentEvent()">
+                    <i class="fas fa-edit me-1"></i>Modifier
+                </button>
+                <button type="button" class="btn btn-danger" onclick="closeCurrentEvent()">
+                    <i class="fas fa-check-circle me-1"></i>Clôturer
+                </button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+<script>
+let map;
+let markers = [];
+let currentEvents = [];
+let currentEventId = null;
+
+// Initialisation
+document.addEventListener('DOMContentLoaded', () => {
+    initMap();
+    loadEvents();
+    initForm();
+});
+
+function initMap() {
+    map = L.map('eventsMap').setView([31.7917, -7.0926], 6);
+    
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; CartoDB',
+        subdomains: 'abcd',
+        maxZoom: 19
+    }).addTo(map);
+}
+
+function loadEvents() {
+    const filters = {
+        status: document.getElementById('statusFilter').value,
+        event_type: document.getElementById('typeFilter').value,
+        priority: document.getElementById('priorityFilter').value,
+        search: document.getElementById('searchInput').value
+    };
+    
+    const params = new URLSearchParams(filters);
+    
+    fetch(`/api/rescue-events?${params}`)
+        .then(response => response.json())
+        .then(data => {
+            currentEvents = data.events;
+            updateStats(data.stats);
+            updateMap();
+            updateEventList();
+        })
+        .catch(error => {
+            console.error('Erreur:', error);
+            showToast('Erreur de chargement des événements', 'error');
+        });
+}
+
+function updateStats(stats) {
+    document.getElementById('totalEvents').textContent = stats.total || 0;
+    document.getElementById('activeEvents').textContent = stats.active || 0;
+    document.getElementById('resolvedEvents').textContent = stats.resolved || 0;
+    document.getElementById('personsRescued').textContent = stats.persons_rescued || 0;
+}
+
+function updateMap() {
+    markers.forEach(marker => map.removeLayer(marker));
+    markers = [];
+    
+    currentEvents.forEach(event => {
+        const priorityColors = {
+            critical: '#7b1fa2',
+            high: '#dc3545',
+            normal: '#ffc107',
+            low: '#28a745'
+        };
+        
+        const color = priorityColors[event.priority] || '#007bff';
+        
+        const marker = L.marker([event.latitude, event.longitude], {
+            icon: L.divIcon({
+                html: `
+                    <div style="background: ${color}; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.3);">
+                        <i class="fas ${getEventIcon(event.event_type)}" style="color: white; font-size: 14px;"></i>
+                    </div>
+                `,
+                className: 'event-marker',
+                iconSize: [30, 30],
+                iconAnchor: [15, 15]
+            })
+        }).bindPopup(`
+            <div style="min-width: 200px;">
+                <b>${event.event_number}</b><br>
+                <span class="badge ${event.status === 'active' ? 'bg-warning' : 'bg-success'}">${getStatusText(event.status)}</span><br>
+                <small>${event.event_type_display || event.event_type}</small><br>
+                <small>${event.location_name || ''}</small><br>
+                <small>👥 ${event.persons_involved} personnes</small><br>
+                <button class="btn btn-sm btn-primary mt-2" onclick="showEventDetails(${event.event_id})">
+                    Voir détails
+                </button>
+            </div>
+        `);
+        
+        markers.push(marker);
+        marker.addTo(map);
+    });
+    
+    if (markers.length > 0) {
+        const group = L.featureGroup(markers);
+        map.fitBounds(group.getBounds().pad(0.2));
+    }
+}
+
+function updateEventList() {
+    const container = document.getElementById('eventsList');
+    
+    if (currentEvents.length === 0) {
+        container.innerHTML = `
+            <div class="text-center py-5">
+                <i class="fas fa-life-ring display-1 text-muted"></i>
+                <p class="mt-3">Aucun événement trouvé</p>
+            </div>
+        `;
+        return;
+    }
+    
+    container.innerHTML = currentEvents.map(event => `
+        <div class="event-card">
+            <div class="event-header ${event.priority}">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="mb-0">
+                            <i class="fas ${getEventIcon(event.event_type)} me-2"></i>
+                            ${event.event_number}
+                        </h5>
+                        <small>${formatDateTime(event.incident_time || event.created_at)}</small>
+                    </div>
+                    <div>
+                        <span class="event-status status-${event.status}">
+                            ${getStatusText(event.status)}
+                        </span>
+                        <span class="ms-2 stat-badge">
+                            <i class="fas fa-flag-checkered"></i> ${getPriorityText(event.priority)}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="p-3">
+                <div class="row">
+                    <div class="col-md-8">
+                        <p class="mb-2">
+                            <strong>${event.event_type_display || event.event_type}</strong>
+                            ${event.location_name ? ` - ${event.location_name}` : ''}
+                        </p>
+                        <p class="text-muted small mb-2">${event.description || 'Aucune description'}</p>
+                        <div class="d-flex gap-3">
+                            <span class="stat-badge">
+                                <i class="fas fa-users"></i> ${event.persons_involved} personnes
+                            </span>
+                            <span class="stat-badge">
+                                <i class="fas fa-check-circle text-success"></i> ${event.persons_rescued} sauvées
+                            </span>
+                            ${event.vessel_name ? `
+                            <span class="stat-badge">
+                                <i class="fas fa-ship"></i> ${event.vessel_name}
+                            </span>
+                            ` : ''}
+                        </div>
+                    </div>
+                    <div class="col-md-4 text-end">
+                        <button class="btn btn-sm btn-primary" onclick="showEventDetails(${event.event_id})">
+                            <i class="fas fa-eye me-1"></i>Détails
+                        </button>
+                        ${event.status === 'active' ? `
+                        <button class="btn btn-sm btn-warning" onclick="updateEventStatus(${event.event_id})">
+                            <i class="fas fa-edit me-1"></i>Mettre à jour
+                        </button>
+                        ` : ''}
+                    </div>
+                </div>
+            </div>
+        </div>
+    `).join('');
+}
+
+function showEventDetails(eventId) {
+    fetch(`/api/rescue-events/${eventId}`)
+        .then(response => response.json())
+        .then(event => {
+            currentEventId = eventId;
+            const modalBody = document.getElementById('eventDetailBody');
+            document.getElementById('eventDetailTitle').textContent = `Événement ${event.event_number}`;
+            
+            modalBody.innerHTML = `
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6><i class="fas fa-info-circle"></i> Informations générales</h6>
+                        <table class="table table-sm">
+                            <tr><th>Type d'incident</th><td>${event.event_type_display || event.event_type}</td></tr>
+                            <tr><th>Priorité</th><td><span class="badge ${getPriorityClass(event.priority)}">${getPriorityText(event.priority)}</span></td></tr>
+                            <tr><th>Statut</th><td><span class="badge ${event.status === 'active' ? 'bg-warning' : 'bg-success'}">${getStatusText(event.status)}</span></td></tr>
+                            <tr><th>Date/Heure incident</th><td>${formatDateTime(event.incident_time || event.created_at)}</td></tr>
+                            <tr><th>Lieu</th><td>${event.location_name || `${event.latitude}, ${event.longitude}`}</td></tr>
+                        </table>
+                    </div>
+                    <div class="col-md-6">
+                        <h6><i class="fas fa-chart-line"></i> Statistiques</h6>
+                        <table class="table table-sm">
+                            <tr><th>Personnes impliquées</th><td>${event.persons_involved}</td></tr>
+                            <tr><th>Sauvées</th><td class="text-success">${event.persons_rescued}</td></tr>
+                            <tr><th>Décédées</th><td class="text-danger">${event.persons_deceased || 0}</td></tr>
+                            <tr><th>Disparues</th><td class="text-warning">${event.persons_missing || 0}</td></tr>
+                         </table>
+                    </div>
+                </div>
+                
+                ${event.description ? `
+                <div class="mt-3">
+                    <h6><i class="fas fa-align-left"></i> Description</h6>
+                    <p class="text-muted">${escapeHtml(event.description)}</p>
+                </div>
+                ` : ''}
+                
+                ${event.vessel_name ? `
+                <div class="mt-3">
+                    <h6><i class="fas fa-ship"></i> Informations navire</h6>
+                    <div class="row">
+                        <div class="col-md-3"><strong>Nom:</strong> ${event.vessel_name}</div>
+                        <div class="col-md-3"><strong>Type:</strong> ${event.vessel_type || 'N/A'}</div>
+                        <div class="col-md-3"><strong>Pavillon:</strong> ${event.vessel_flag || 'N/A'}</div>
+                        <div class="col-md-3"><strong>IMO:</strong> ${event.vessel_imo || 'N/A'}</div>
+                    </div>
+                </div>
+                ` : ''}
+                
+                <div class="mt-3">
+                    <h6><i class="fas fa-cloud-sun"></i> Conditions environnementales</h6>
+                    <div class="row">
+                        <div class="col-md-3"><strong>Vent:</strong> ${event.wind_speed || 'N/A'} nœuds</div>
+                        <div class="col-md-3"><strong>Direction:</strong> ${event.wind_direction || 'N/A'}°</div>
+                        <div class="col-md-3"><strong>État mer:</strong> ${event.sea_state || 'N/A'}/9</div>
+                        <div class="col-md-3"><strong>Visibilité:</strong> ${event.visibility_km || 'N/A'} km</div>
+                    </div>
+                </div>
+                
+                ${event.updates && event.updates.length ? `
+                <div class="mt-3">
+                    <h6><i class="fas fa-history"></i> Historique des mises à jour</h6>
+                    <div class="timeline">
+                        ${event.updates.map(update => `
+                            <div class="timeline-item">
+                                <div class="timeline-content">
+                                    <small class="text-muted">${formatDateTime(update.created_at)}</small>
+                                    <p class="mb-0">${escapeHtml(update.content)}</p>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+                ` : ''}
+                
+                ${event.notes ? `
+                <div class="mt-3">
+                    <h6><i class="fas fa-sticky-note"></i> Notes</h6>
+                    <p class="text-muted">${escapeHtml(event.notes)}</p>
+                </div>
+                ` : ''}
+            `;
+            
+            new bootstrap.Modal(document.getElementById('eventDetailModal')).show();
+        })
+        .catch(error => {
+            console.error('Erreur:', error);
+            showToast('Erreur de chargement des détails', 'error');
+        });
+}
+
+function updateEventStatus(eventId) {
+    const newStatus = prompt('Nouveau statut (active/resolved/cancelled):');
+    if (newStatus && ['active', 'resolved', 'cancelled'].includes(newStatus)) {
+        fetch(`/api/rescue-events/${eventId}/status`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ status: newStatus })
+        })
+        .then(response => response.json())
+        .then(() => {
+            loadEvents();
+            showToast('Statut mis à jour', 'success');
+        })
+        .catch(error => {
+            console.error('Erreur:', error);
+            showToast('Erreur de mise à jour', 'error');
+        });
+    }
+}
+
+function editCurrentEvent() {
+    // Redirection vers la page d'édition
+    window.location.href = `/rescue-events/${currentEventId}/edit`;
+}
+
+function closeCurrentEvent() {
+    if (confirm('Clôturer cet événement ?')) {
+        fetch(`/api/rescue-events/${currentEventId}/status`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ status: 'resolved' })
+        })
+        .then(response => response.json())
+        .then(() => {
+            bootstrap.Modal.getInstance(document.getElementById('eventDetailModal')).hide();
+            loadEvents();
+            showToast('Événement clôturé', 'success');
+        });
+    }
+}
+
+function initForm() {
+    document.getElementById('createEventForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(this);
+        const data = {};
+        formData.forEach((value, key) => {
+            if (value) data[key] = value;
+        });
+        
+        // Convertir les nombres
+        const numberFields = ['latitude', 'longitude', 'persons_involved', 'wind_speed', 
+                             'wind_direction', 'sea_state', 'visibility_km'];
+        numberFields.forEach(field => {
+            if (data[field]) data[field] = parseFloat(data[field]);
+        });
+        
+        fetch('/api/rescue-events', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        })
+        .then(response => response.json())
+        .then(() => {
+            bootstrap.Modal.getInstance(document.getElementById('createEventModal')).hide();
+            loadEvents();
+            this.reset();
+            showToast('Événement créé avec succès', 'success');
+        })
+        .catch(error => {
+            console.error('Erreur:', error);
+            showToast('Erreur de création', 'error');
+        });
+    });
+}
+
+function exportEvents() {
+    fetch('/api/rescue-events/export')
+        .then(response => response.blob())
+        .then(blob => {
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `rescue_events_${new Date().toISOString().slice(0,19)}.csv`;
+            a.click();
+            URL.revokeObjectURL(url);
+        });
+}
+
+function resetFilters() {
+    document.getElementById('statusFilter').value = '';
+    document.getElementById('typeFilter').value = '';
+    document.getElementById('priorityFilter').value = '';
+    document.getElementById('searchInput').value = '';
+    loadEvents();
+}
+
+function getEventIcon(type) {
+    const icons = {
+        'man_overboard': 'fa-person-falling',
+        'vessel_sinking': 'fa-ship',
+        'medical': 'fa-ambulance',
+        'fire': 'fa-fire',
+        'collision': 'fa-car-crash',
+        'distress': 'fa-bell'
+    };
+    return icons[type] || 'fa-life-ring';
+}
+
+function getStatusText(status) {
+    const texts = {
+        'active': 'Actif',
+        'resolved': 'Résolu',
+        'cancelled': 'Annulé',
+        'archived': 'Archivé'
+    };
+    return texts[status] || status;
+}
+
+function getPriorityText(priority) {
+    const texts = {
+        'critical': 'Critique',
+        'high': 'Élevée',
+        'normal': 'Normale',
+        'low': 'Faible'
+    };
+    return texts[priority] || priority;
+}
+
+function getPriorityClass(priority) {
+    const classes = {
+        'critical': 'bg-danger',
+        'high': 'bg-warning',
+        'normal': 'bg-info',
+        'low': 'bg-success'
+    };
+    return classes[priority] || 'bg-secondary';
+}
+
+function formatDateTime(dateStr) {
+    if (!dateStr) return 'N/A';
+    const date = new Date(dateStr);
+    return date.toLocaleString('fr-FR');
+}
+
+function escapeHtml(str) {
+    if (!str) return '';
+    return str.replace(/[&<>]/g, function(m) {
+        if (m === '&') return '&amp;';
+        if (m === '<') return '&lt;';
+        if (m === '>') return '&gt;';
+        return m;
+    });
+}
+
+function showToast(message, type) {
+    // Implémenter une notification toast
+    const toast = document.createElement('div');
+    toast.className = `alert alert-${type === 'success' ? 'success' : 'danger'} position-fixed bottom-0 end-0 m-3`;
+    toast.style.zIndex = '9999';
+    toast.innerHTML = message;
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 3000);
+}
+</script>
+{% endblock %}

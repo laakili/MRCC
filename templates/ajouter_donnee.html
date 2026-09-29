@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>MRCC - Gestion des métadonnées</title>
+  <meta name="description" content="Plateforme de gestion des métadonnées">
+  <meta name="keywords" content="métadonnées, données, gestion">
+
+  <!-- Favicons -->
+  <link href="{{ url_for('static', filename='img/favicon.png') }}" rel="icon">
+  <link href="{{ url_for('static', filename='img/apple-touch-icon.png') }}" rel="apple-touch-icon">
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
+
+  <!-- Vendor CSS Files -->
+  <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet">
+  <link href="{{ url_for('static', filename='vendor/bootstrap-icons/bootstrap-icons.css') }}" rel="stylesheet">
+  <link href="{{ url_for('static', filename='vendor/aos/aos.css') }}" rel="stylesheet">
+
+  <!-- Main CSS File -->
+  <link href="{{ url_for('static', filename='css/main.css') }}" rel="stylesheet">
+
+  <style>
+    :root {
+      --primary-color: #4361ee;
+      --secondary-color: #3f37c9;
+      --accent-color: #4cc9f0;
+      --light-color: #f8f9fa;
+      --dark-color: #212529;
+      --success-color: #4bb543;
+      --warning-color: #f0ad4e;
+      --danger-color: #d9534f;
+    }
+    
+    body {
+      background-color: #f5f7fb;
+      font-family: 'Inter', sans-serif;
+      color: var(--dark-color);
+      padding-top: 70px;
+    }
+    
+    /* Header Styles */
+    .header {
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      box-shadow: 0 2px 20px rgba(67, 97, 238, 0.2);
+      height: 70px;
+    }
+    
+    .header .logo h1 {
+      color: white;
+      font-weight: 700;
+      font-size: 1.8rem;
+    }
+    
+    .header .navmenu ul li a {
+      color: rgba(255, 255, 255, 0.8);
+      font-weight: 500;
+      transition: all 0.3s;
+    }
+    
+    .header .navmenu ul li a:hover,
+    .header .navmenu ul li a.active {
+      color: white;
+    }
+    
+    .user-menu {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+    
+    .username {
+      color: white;
+      font-weight: 500;
+    }
+    
+    /* Main Content */
+    .main-content {
+      padding: 3rem 0;
+    }
+    
+    /* Form Styles */
+    .form-container {
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+      padding: 2.5rem;
+      margin-bottom: 2rem;
+    }
+    
+    .form-title {
+      color: var(--primary-color);
+      font-weight: 700;
+      margin-bottom: 1.5rem;
+      font-family: 'Manrope', sans-serif;
+      position: relative;
+      padding-bottom: 0.5rem;
+    }
+    
+    .form-title::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 60px;
+      height: 3px;
+      background: var(--accent-color);
+    }
+    
+    .dialog-box {
+      background: rgba(76, 201, 240, 0.1);
+      border-left: 4px solid var(--accent-color);
+      padding: 1.5rem;
+      border-radius: 8px;
+      margin-bottom: 2rem;
+      font-weight: 500;
+      color: var(--dark-color);
+    }
+    
+    .dialog-box i {
+      color: var(--accent-color);
+      margin-right: 10px;
+    }
+    
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+    
+    .form-group label {
+      font-weight: 500;
+      color: #495057;
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+    
+    .form-control-custom {
+      width: 100%;
+      padding: 12px 15px;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      font-size: 15px;
+      transition: all 0.3s;
+      background-color: #f9f9f9;
+    }
+    
+    .form-control-custom:focus {
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+      background-color: white;
+    }
+    
+    textarea.form-control-custom {
+      min-height: 120px;
+      resize: vertical;
+    }
+    
+    .btn-submit {
+      background: var(--primary-color);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 12px 25px;
+      font-weight: 500;
+      letter-spacing: 0.5px;
+      transition: all 0.3s;
+      font-size: 16px;
+      width: 100%;
+    }
+    
+    .btn-submit:hover {
+      background: var(--secondary-color);
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(67, 97, 238, 0.3);
+    }
+    
+    /* Info Cards */
+    .info-card {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      transition: all 0.3s ease;
+      border: none;
+      height: 20%;
+    }
+    
+    .info-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    }
+    
+    .info-card-title {
+      color: var(--primary-color);
+      font-weight: 600;
+      margin-bottom: 0.75rem;
+      font-size: 1.1rem;
+    }
+    
+    .info-card-text {
+      color: #6c757d;
+      font-size: 0.9rem;
+    }
+    
+    .info-card-icon {
+      color: var(--accent-color);
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+      .form-container {
+        padding: 1.5rem;
+      }
+      
+      .header .logo h1 {
+        font-size: 1.5rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header id="header" class="header d-flex align-items-center fixed-top">
+    <div class="container-fluid container-xl position-relative d-flex align-items-center">
+      <a href="{{ url_for('index') }}" class="logo d-flex align-items-center me-auto">
+        <img src="{{ url_for('static', filename='img/logo1.png') }}" alt="MRCC Logo">
+        <h1>MRCC</h1>
+      </a>
+
+      <nav id="navmenu" class="navmenu">
+        <ul>
+          <li><a href="{{ url_for('index') }}">Accueil</a></li>
+          <li><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
+          <li><a href="http://geoai-solutions.ddns.net:8888/MRCC/">Géoportail</a></li>
+          <li><a href="{{ url_for('marine') }}">Flotte maritime</a></li>
+          <li><a href="{{ url_for('moyens') }}">Moyens de secours</a></li>
+          <li><a href="{{ url_for('alerte') }}">Alertes</a></li>
+          <li><a href="{{ url_for('api') }}">API</a></li>
+        </ul>
+      </nav>
+
+      <div class="user-menu ms-auto">
+        {% if current_user.is_authenticated %}
+          <span class="username">{{ current_user.first_name }} {{ current_user.last_name }}</span>
+          <a href="{{ url_for('logout') }}" class="btn btn-sm btn-outline-light">Déconnexion</a>
+        {% else %}
+          <a href="{{ url_for('login') }}" class="btn btn-sm btn-outline-light me-2">Connexion</a>
+          <a href="{{ url_for('register') }}" class="btn btn-sm btn-primary">Inscription</a>
+        {% endif %}
+      </div>
+
+      <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
+    </div>
+  </header>
+
+  <main class="main-content">
+    <div class="container">
+      <!-- Form Section -->
+      <div class="form-container" data-aos="fade-up">
+        <h2 class="form-title"><i class="fas fa-database me-2"></i>Ajouter une nouvelle métadonnée</h2>
+        
+        <div class="dialog-box">
+          <i class="fas fa-info-circle"></i> INTRODUIRE LES INFORMATIONS RELATIVES À LA COUCHE
+        </div>
+        
+        <form action="{{ url_for('ajouter_donnee') }}" method="POST">
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group">
+                <label><i class="fas fa-tag"></i> Nom de la donnée</label>
+                <input type="text" name="nom_donnee" class="form-control-custom" required>
+              </div>
+              
+              <div class="form-group">
+                <label><i class="fas fa-map-marker-alt"></i> Territoire concerné</label>
+                <input type="text" name="territoire" class="form-control-custom">
+              </div>
+              
+              <div class="form-group">
+                <label><i class="fas fa-align-left"></i> Descriptif</label>
+                <textarea name="descriptif" class="form-control-custom"></textarea>
+              </div>
+              
+              <div class="form-group">
+                <label><i class="fas fa-book"></i> Sommaire</label>
+                <textarea name="sommaire" class="form-control-custom"></textarea>
+              </div>
+              
+              <div class="form-group">
+                <label><i class="fas fa-database"></i> Type de donnée</label>
+                <input type="text" name="type_donnee" class="form-control-custom">
+              </div>
+            </div>
+            
+            <div class="col-md-6">
+              <div class="form-group">
+                <label><i class="fas fa-file-alt"></i> Format</label>
+                <input type="text" name="format_donnee" class="form-control-custom">
+              </div>
+              
+              <div class="form-group">
+                <label><i class="fas fa-weight"></i> Taille moyenne</label>
+                <input type="text" name="taille_moyenne" class="form-control-custom">
+              </div>
+              
+              <div class="form-group">
+                <label><i class="fas fa-industry"></i> Producteur / Source</label>
+                <input type="text" name="producteur" class="form-control-custom">
+              </div>
+              
+              <div class="form-group">
+                <label><i class="fas fa-users"></i> Users et cas d'usage</label>
+                <textarea name="users_cas_usage" class="form-control-custom"></textarea>
+              </div>
+              
+              <div class="form-group">
+                <label><i class="fas fa-check-circle"></i> Référence</label>
+                <select name="reference" class="form-control-custom">
+                  <option value="True">Oui</option>
+                  <option value="False">Non</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group">
+                <label><i class="fas fa-calendar-alt"></i> Période couverte</label>
+                <input type="text" name="periode_couverte" class="form-control-custom">
+              </div>
+            </div>
+            
+            <div class="col-md-6">
+              <div class="form-group">
+                <label><i class="fas fa-sync"></i> Fréquence de la donnée</label>
+                <input type="text" name="frequence_donnee" class="form-control-custom">
+              </div>
+            </div>
+          </div>
+          
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group">
+                <label><i class="fas fa-history"></i> Fréquence de MAJ</label>
+                <input type="text" name="frequence_maj" class="form-control-custom">
+              </div>
+            </div>
+            
+            <div class="col-md-6">
+              <div class="form-group">
+                <label><i class="fas fa-database"></i> Taille moyenne de l'historique</label>
+                <input type="text" name="taille_historique" class="form-control-custom">
+              </div>
+            </div>
+          </div>
+          
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group">
+                <label><i class="fas fa-lock"></i> Mode d'accès</label>
+                <input type="text" name="mode_acces" class="form-control-custom">
+              </div>
+            </div>
+            
+            <div class="col-md-6">
+              <div class="form-group">
+                <label><i class="fas fa-star"></i> Qualité</label>
+                <textarea name="qualite" class="form-control-custom"></textarea>
+              </div>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label><i class="fas fa-exclamation-triangle"></i> Contraintes / Observations</label>
+            <textarea name="contraintes_obs" class="form-control-custom"></textarea>
+          </div>
+          
+          <button type="submit" class="btn-submit"><i class="fas fa-check-circle me-2"></i> Ajouter</button>
+        </form>
+      </div>
+      
+      <!-- Info Section -->
+      <div class="row" data-aos="fade-up" data-aos-delay="100">
+        <div class="col-md-12">
+          <h2 class="form-title"><i class="fas fa-info-circle me-2"></i>Informations sur les Données</h2>
+        </div>
+        
+        <div class="col-md-6">
+          <div class="info-card">
+            <div class="info-card-icon">
+              <i class="fas fa-folder"></i>
+            </div>
+            <h5 class="info-card-title">Classe de données</h5>
+            <p class="info-card-text">Thématique</p>
+          </div>
+          
+          <div class="info-card">
+            <div class="info-card-icon">
+              <i class="fas fa-map"></i>
+            </div>
+            <h5 class="info-card-title">Territoire concerné</h5>
+            <p class="info-card-text">Nationale, mondiale, régionale...</p>
+          </div>
+          
+          <div class="info-card">
+            <div class="info-card-icon">
+              <i class="fas fa-file-alt"></i>
+            </div>
+            <h5 class="info-card-title">Descriptif</h5>
+            <p class="info-card-text">Comment la donnée est créée, sa qualité et sa vocation.</p>
+          </div>
+          
+          <div class="info-card">
+            <div class="info-card-icon">
+              <i class="fas fa-chart-bar"></i>
+            </div>
+            <h5 class="info-card-title">Type</h5>
+            <p class="info-card-text">Spatiale, attributaire, sémantique, document, carte, image…</p>
+          </div>
+        </div>
+        
+        <div class="col-md-6">
+          <div class="info-card">
+            <div class="info-card-icon">
+              <i class="fas fa-file-code"></i>
+            </div>
+            <h5 class="info-card-title">Format</h5>
+            <p class="info-card-text">shp, tif, xlsx, docx, dbf…</p>
+          </div>
+          
+          <div class="info-card">
+            <div class="info-card-icon">
+              <i class="fas fa-database"></i>
+            </div>
+            <h5 class="info-card-title">Taille moyenne de la donnée</h5>
+            <p class="info-card-text">Stockage en Mo, Go…</p>
+          </div>
+          
+          <div class="info-card">
+            <div class="info-card-icon">
+              <i class="fas fa-building"></i>
+            </div>
+            <h5 class="info-card-title">Producteur/source</h5>
+            <p class="info-card-text">Institution responsable de la donnée.</p>
+          </div>
+          
+          <div class="info-card">
+            <div class="info-card-icon">
+              <i class="fas fa-users"></i>
+            </div>
+            <h5 class="info-card-title">Users / cas d'usage</h5>
+            <p class="info-card-text">Consommateurs et usages potentiels.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+
+
+  <!-- Vendor JS Files -->
+  <script src="{{ url_for('static', filename='vendor/aos/aos.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+
+  <script>
+    // Initialize AOS animations
+    AOS.init({
+      duration: 800,
+      easing: 'ease-in-out',
+      once: true
+    });
+  </script>
+</body>
+</html>

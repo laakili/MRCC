@@ -1,0 +1,24 @@
+# Service systemd pour l'app Flask MRCC.
+# Installation sur le serveur cible :
+#   sudo cp mrcc.service /etc/systemd/system/mrcc.service
+#   sudo systemctl daemon-reload
+#   sudo systemctl enable --now mrcc
+#   sudo systemctl status mrcc
+#   sudo journalctl -u mrcc -f          # logs en direct
+
+[Unit]
+Description=MRCC Flask App
+After=network.target postgresql.service
+
+[Service]
+Type=simple
+User=www-data
+Group=www-data
+WorkingDirectory=/opt/mrcc
+Environment="PATH=/opt/mrcc/venv/bin"
+ExecStart=/opt/mrcc/venv/bin/gunicorn -k gevent -w 4 -b 0.0.0.0:5052 app:app
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

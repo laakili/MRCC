@@ -1,0 +1,253 @@
+{% extends "base.html" %}
+
+{% block title %}Titre de ma page - MRCC Maroc{% endblock %}
+
+{% block extra_css %}
+<style>
+
+
+.user-menu {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.username {
+  color: white;
+  font-weight: 500;
+  margin-right: 10px;
+}
+
+.btn-custom {
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-weight: 500;
+  transition: 0.3s ease-in-out;
+}
+
+.btn-primary-custom {
+  background: white;
+  color: var(--primary-color);
+  border: none;
+}
+
+.btn-primary-custom:hover {
+  background: rgba(255, 255, 255, 0.9);
+}
+
+.btn-secondary-custom {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid white;
+  color: white;
+}
+
+.btn-secondary-custom:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* Login Form Styles */
+.login-section {
+  min-height: calc(100vh - 70px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 0;
+  background: linear-gradient(135deg, rgba(67, 97, 238, 0.05) 0%, rgba(76, 201, 240, 0.05) 100%);
+}
+
+.login-card {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+  padding: 2.5rem;
+  width: 100%;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.login-title {
+  color: var(--primary-color);
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  font-family: 'Manrope', sans-serif;
+  position: relative;
+  padding-bottom: 0.5rem;
+  text-align: center;
+}
+
+.login-title i {
+  margin-right: 10px;
+}
+
+.login-title::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80px;
+  height: 3px;
+  background: var(--accent-color);
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+  position: relative;
+}
+
+.form-group label {
+  font-weight: 500;
+  color: #495057;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+.form-control-custom {
+  width: 100%;
+  padding: 12px 15px 12px 40px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 15px;
+  transition: all 0.3s;
+  background-color: #f9f9f9;
+}
+
+.form-control-custom:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+  background-color: white;
+}
+
+.form-group i {
+  position: absolute;
+  left: 15px;
+  top: 40px;
+  color: var(--primary-color);
+}
+
+.btn-login {
+  background: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 25px;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  transition: all 0.3s;
+  font-size: 16px;
+  width: 100%;
+  margin-top: 1rem;
+}
+
+.btn-login:hover {
+  background: var(--secondary-color);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(67, 97, 238, 0.3);
+}
+
+.login-links {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.login-links a {
+  color: var(--primary-color);
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.3s;
+  margin: 0.5rem 0;
+}
+
+.login-links a:hover {
+  color: var(--secondary-color);
+  text-decoration: underline;
+}
+
+.login-links a i {
+  margin-right: 5px;
+}
+
+.alert {
+  border-radius: 8px;
+  padding: 12px 15px;
+  margin-bottom: 1.5rem;
+}
+
+.alert-danger {
+  background-color: rgba(217, 83, 79, 0.1);
+  border-color: rgba(217, 83, 79, 0.3);
+  color: var(--danger-color);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .login-card {
+    padding: 1.5rem;
+  }
+  
+  .header .logo h1 {
+    font-size: 1.3rem;
+  }
+  
+  .login-links {
+    flex-direction: column;
+    align-items: center;
+  }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+  <main class="main">
+    <section class="login-section">
+      <div class="container">
+        <div class="login-card" data-aos="fade-up">
+          <h1 class="login-title"><i class="fas fa-sign-in-alt"></i> Connexion</h1>
+          
+          {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+              {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">
+                  {{ message }}
+                </div>
+              {% endfor %}
+            {% endif %}
+          {% endwith %}
+          
+          <form method="POST" action="/login">
+            <div class="form-group">
+              <label for="username">Nom d'utilisateur</label>
+              <i class="fas fa-user"></i>
+              <input type="text" id="username" name="username" class="form-control-custom" placeholder="Entrez votre nom d'utilisateur" required>
+            </div>
+            
+            <div class="form-group">
+              <label for="password">Mot de passe</label>
+              <i class="fas fa-lock"></i>
+              <input type="password" id="password" name="password" class="form-control-custom" placeholder="Entrez votre mot de passe" required>
+            </div>
+            
+            <button type="submit" class="btn-login">
+              <i class="fas fa-arrow-right"></i> Se connecter
+            </button>
+          </form>
+          
+          <div class="login-links">
+            <a href="{{ url_for('forgot_password') }}"><i class="fas fa-key"></i> Mot de passe oublié ?</a>
+            <a href="{{ url_for('register') }}"><i class="fas fa-user-plus"></i> Pas encore inscrit ?</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  {% endblock %}
+
+  {% block extra_js %}
+    <!-- Scripts JS spécifiques à cette page -->
+    <script>
+      console.log("Script spécifique à cette page");
+    </script>
+  {% endblock %}
