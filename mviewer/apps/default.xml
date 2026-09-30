@@ -1,0 +1,782 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<config>
+       <application id="print" 
+       title="Geoportal MRCC" 
+       mouseposition="true" logo="img/logo2.png" help="global_help1.html" exportpng="true" 
+       showhelp="false" coordinates="false" measuretools="true" togglealllayersfromtheme="true" 
+       geoloc="true" zoomtools="true" style="css/themes/theme_gouv.css" 
+       templaterightinfopanel="allintabs" templatebottominfopanel="accordion" 
+       home="http://geoai-solutions.ddns.net:9999/MSDI" addlayerstools="true" favicon="img/logo1.png"
+        titlehelp="Documentation et Aide" />
+
+
+
+       <mapoptions maxzoom="25" projection="EPSG:3857" center="-330750.13768758904,3400000.57790189" zoom="6" projextent="-1054102.879204, 3408576.175412, -166037.099019, 3397597.327197" scalebar="true" lang="en,fr" langfile="demo/demo.i18n.json" showhelp="false" />
+       <olscompletion url="" type="ban" attribution="La recherche est un service de Geocodage propre 
+                " />
+
+       <proxy url="" />
+
+       <searchparameters imgurl="img/map_marker.png" imgwidth="50px" svgcolor="orange" localities="true" features="true" bbox="false" querymaponclick="true" closeafterclick="false" animate="true" />
+       <baselayers style="gallery">
+
+
+              <baselayer type="OSM" id="esri_topo" label="esri_topo" title="ESRI Topo" tiled="true" thumbgallery="img/basemap/esriworldstreetmap.png" url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}" format="image/png" visible="false" attribution="ESRI Topo" />
+
+              <baselayer type="OSM" id="esri_world_imagery" label="esri_world_imagery" title="ESRI World Imagery" tiled="true" thumbgallery="img/basemap/esriworldimagery.png" url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}" format="image/png" visible="false" attribution="ESRI World Imagery" />
+
+              <baselayer 
+                     type="OSM" 
+                     id="google_imagery" 
+                     label="google_imagery" 
+                     title="Google Imagery" 
+                     tiled="true" 
+                     thumbgallery="img/basemap/baselayers-ArcGIS.Imagery_v1.png" 
+                     url="https://mt1.google.com/vt/lyrs=s&amp;x={x}&amp;y={y}&amp;z={z}" 
+                     format="image/png" 
+                     visible="false" 
+                     attribution="Google World Imagery" />
+
+              <baselayer type="OSM" id="google1_imagery" 
+                     label="google_terrain" title="Google Terrain" 
+                     tiled="true" thumbgallery="img/basemap/baselayers-ArcGIS.Imagery_v1.png" 
+                     url="http://mt0.google.com/vt/lyrs=t&amp;hl=en&amp;x={x}&amp;y={y}&amp;z={z}" 
+                     format="image/png" 
+                     visible="false" 
+                     attribution="Google World Imagery" />
+                     <!-- ESRI World Light Gray -->
+              <baselayer type="OSM" id="esri_world_light_gray" 
+                     label="esri_world_light_gray" 
+                     title="ESRI World Light Gray" 
+                     tiled="true" 
+                     thumbgallery="img/basemap/cartodb.png" 
+                     url="https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}" 
+                     format="image/png" 
+                     visible="true" 
+                     attribution="ESRI World Light Gray" />
+              
+              <baselayer 
+                     type="OSM" 
+                     id="World_Dark_Gray_Base" 
+                     label="World_Dark_Gray_Base" 
+                     title="ESRI World Dark Gray" 
+                     tiled="true" 
+                     thumbgallery="img/basemap/cartodbdark.png" 
+                     url="https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}" 
+                     format="image/png" 
+                     visible="false" 
+                     attribution="ESRI World Dark Gray" />
+              <baselayer type="WMS" 
+                     id="ESRI_World_Hillshade" 
+                     label="ESRI_World_Hillshade" 
+                     title="Carte Maritime" 
+                     tiled="true" 
+                     thumbgallery="img/basemap/esriworldshadedrelief.png" 
+                     url="{{fqdn}}/georisque/geodata/wms" 
+                     layers="ESRI_World_Hillshade" 
+                     format="image/png" 
+                     visible="false" 
+                     attribution="Carte Maritime" />
+              <baselayer 
+                     type="WMS" 
+                     id="navionics_basic" 
+                     label="Navionics Basic" 
+                     title="Navionics Basic" 
+                     tiled="true" 
+                     thumbgallery="img/basemap/CMapHBR.png" 
+                     url="http://geoai-solutions.ddns.net:8888/geomaritime/geodata/wms" 
+                     layers="navionics_basic" 
+                     format="image/png" 
+                     visible="false" 
+                     attribution="Navionics" />    
+              <baselayer 
+                     type="WMS" 
+                     id="Navionics_basic_HBR" 
+                     label="Navionics Basic HBR" 
+                     title="Navionics Basic HBR" 
+                     tiled="true" 
+                     thumbgallery="img/basemap/CMapHBR.png" 
+                     url="http://geoai-solutions.ddns.net:8888/geomaritime/geodata/wms" 
+                     layers="Navionics_basic_HBR" 
+                     format="image/png" 
+                     visible="false" 
+                     attribution="Navionics" />  
+              <baselayer 
+                     type="WMS" 
+                     id="C_Map_SeeFloor" 
+                     label="C_Map_SeeFloor" 
+                     title="C_Map_SeeFloor" 
+                     tiled="true" 
+                     thumbgallery="img/basemap/C_Map_SeeFloor.png" 
+                     url="http://geoai-solutions.ddns.net:8888/geomaritime/geodata/wms" 
+                     layers="C_Map_SeeFloor" 
+                     format="image/png" 
+                     visible="false" 
+                     attribution="Navionics" /> 
+              <baselayer 
+                     type="WMS" 
+                     id="osm" 
+                     label="Maroc FR" 
+                     title="Maroc FR" 
+                     tiled="true" 
+                     thumbgallery="img/basemap/C_Map_SeeFloor.png" 
+                     url="http://geoai-solutions.ddns.net:8888/osm_maroc/osm/wms" 
+                     layers="osm" 
+                     format="image/png" 
+                     visible="false" 
+                     attribution="osm" /> 
+              <baselayer 
+                     type="WMS" 
+                     id="osm_ar" 
+                     label="Maroc AR" 
+                     title="Maroc AR" 
+                     tiled="true" 
+                     thumbgallery="img/basemap/C_Map_SeeFloor.png" 
+                     url="http://geoai-solutions.ddns.net:8888/osm_maroc/osm_ar/wms" 
+                     layers="osm_ar" 
+                     format="image/png" 
+                     visible="false" 
+                     attribution="osm" /> 
+       </baselayers>
+
+<!--  FIN BASELAYERS   -->
+       
+       <proxy url="" />
+       <themes>
+   <theme name="ALERTS" id="fait-sei" icon="fas fa-thumbtack">
+                     
+                     <layer id="v_event_maritime_mrcc" 
+                            name="Maritime Distress" 
+                            visible="true" 
+                            STYLE= "v_event_maritime_current_ana"
+                            queryable="true" 
+                            url="{{fqdn}}/geomaritime/geodata/wms" 
+                            dynamiclegend="true" 
+                            infoformat="application/vnd.ogc.gml">
+                            <template url="templates/global.event.now.mst"></template>
+                     </layer>
+                     <layer id="v_event_maritime_pl" 
+                            name="MEDEVAC (Medical Evacuation)" 
+                            visible="true" 
+                            queryable="true" 
+                            url="{{fqdn}}/geomaritime/geodata/wms" 
+                            dynamiclegend="true" 
+                            infoformat="application/vnd.ogc.gml">
+                            <template url="templates/marine.mst"></template>
+                     </layer>
+                     
+              </theme>
+
+              <theme name="MRCC" id="mrcc" icon="fas fa-thumbtack">
+                     
+                     <layer id="mrcc" 
+                            name="MRCC" 
+                            visible="false" 
+                            queryable="true" 
+                            url="{{fqdn}}/geomaritime/geodata/wms" 
+                            dynamiclegend="true" 
+                            infoformat="application/vnd.ogc.gml">
+                            <template url="templates/mrcc.mst"></template>
+                     </layer>
+                     <layer id="geodata:mrcc_competence_regionale" 
+                            name="Regional SRR" 
+                            visible="false" 
+                            queryable="true" 
+                            url="{{fqdn}}/geomaritime/geodata/wms" 
+                            dynamiclegend="true" 
+                            infoformat="application/vnd.ogc.gml">
+                            <template url="templates/mrcc_limite.mst"></template>
+                     </layer>
+                     <layer id="geodata:mrcc_competence_local" 
+                            name="National SRR" 
+                            visible="false" 
+                            queryable="true" 
+                            url="{{fqdn}}/geomaritime/geodata/wms" 
+                            dynamiclegend="true" 
+                            infoformat="application/vnd.ogc.gml">
+                            <template url="templates/mrcc_limite.mst"></template>
+                     </layer>
+
+                     <layer id="geodata:mrcc_temple_plb_geom" 
+                            name="Beacon PLB" 
+                            visible="false" 
+                            queryable="true" 
+                            url="{{fqdn}}/geomaritime/geodata/wms" 
+                            dynamiclegend="true" 
+                            infoformat="application/vnd.ogc.gml">
+                           <template url="templates/mrcc_temple_plb_geom.mst"></template>
+                     </layer>
+
+
+                     
+              </theme>
+
+       <theme name="OCEANOGRAPHY" id="ocea" icon="fas fa-earth-oceania" >
+              <group name="BATHYMETRY" id="event-bath"  >
+                     <layer id="mean_multicolour"
+                            name="Mean depth in multi colour"
+                            visible="false"
+                            queryable="true"
+                            url="https://emodnet.ec.europa.eu/geoviewer/proxy//http://ows.emodnet-bathymetry.eu/wms"
+                            dynamiclegend="true"
+                            infoformat="application/vnd.ogc.gml">
+                     </layer>
+                     
+                     <layer id="bathymetrie"
+                            name="Bathymetry"
+                            visible="false"
+                            queryable="true"
+                            url="{{fqdn}}/geomaritime/geodata/wms"
+                            dynamiclegend="true"
+                            infoformat="application/vnd.ogc.gml">
+                     </layer>
+                    
+              </group>
+              
+              <group name="WIND" id="V_VENT" >
+                     <layer id="V_VENT_2021_11"
+                            name="WIND 2021"
+                            visible="false"
+                            queryable="true"
+                            url="{{fqdn}}/geomaritime/geodata/wms"
+                            dynamiclegend="true"
+                            infoformat="application/vnd.ogc.gml">
+                     </layer>
+                            <layer id="V_VENT_12_2020"
+                                   name="WIND 2020"
+                                   visible="false"
+                                   queryable="true"
+                                   url="{{fqdn}}/geomaritime/geodata/wms"
+                                   dynamiclegend="true"
+                                   infoformat="application/vnd.ogc.gml">
+                            </layer>
+              </group>
+        </theme>      
+         <theme name="COASTAL MAPPING" id="lit2" icon="fas  fa-water" >
+              <group name="Port Infrastructure and Equipment" id="BDPortuaire" >
+                     <layer id="Ports_Maroc"
+                            name="Ports"
+                            visible="false"
+                            queryable="true"
+                            url="{{fqdn}}/geomaritime/geodata/wms"
+                            dynamiclegend="true"
+                            infoformat="application/vnd.ogc.gml"
+                     >
+                     <template url="templates/port.mst"></template>
+                 </layer>
+
+                 
+                     <layer id="Signalisation_Maritime"
+                            name="Maritime Signaling"
+                            visible="false"
+                            queryable="true"
+                            url="{{fqdn}}/geomaritime/geodata/wms"
+                            dynamiclegend="true"
+                            infoformat="application/vnd.ogc.gml"
+                            
+                     >
+                     </layer>
+                     <layer id="v_inst_portuaire_p"
+                            name="Port Facility"
+                            styles="v_inst_portuaire_p_an"
+                            visible="false"
+                            queryable="true"
+                            url="{{fqdn}}/geomaritime/geodata/wms"
+                            dynamiclegend="true"
+                            infoformat="application/vnd.ogc.gml">
+                     <template url="templates/v_inst_portuaire_p.mst"></template>
+                     </layer>
+              
+                     <layer id="phare_agg"
+                            name="Lighthouses"
+                            visible="false"
+                            queryable="true"
+                            legendurl="img/legend/phare.svg" 
+                            url="{{fqdn}}/geocarte/geodata/wms"
+                            dynamiclegend="true"
+                            infoformat="application/vnd.ogc.gml"
+                     > <template url="templates/phare.mst"></template>
+                     </layer>
+              </group>
+              <group name="Coastal Mapping" id="CartographieCotiere" >
+                                                       
+                     <layer id="METEO_ARPEGE_R3000_MASCA025-MER"
+                            name="Mean Sea Level"
+                            visible="false"
+                            queryable="true"
+                            url="https://services.data.shom.fr/ncwms/wms"
+                            dynamiclegend="true"
+                            infoformat="application/vnd.ogc.gml"
+                            
+                     >
+                     </layer>
+
+
+                     <layer id="EMODnet_satellite_coastline_LAT"
+                            name="Lowest Astronomical Tide"
+                            visible="false"
+                            queryable="true"
+                            url="{{fqdn}}/geomaritime/geodata/wms"
+                            dynamiclegend="true"
+                            infoformat="application/vnd.ogc.gml"
+                            
+                     >
+                     </layer>
+                     
+              </group>
+              <group name="Meteorological Atlas" id="id1" >
+                     <layer id="climatic_data"
+                            name="Meteorological Atlas"
+                            visible="false"
+                            queryable="true"
+                            url="{{fqdn}}/geomaritime/geodata/wms"
+                            dynamiclegend="true"
+                            infoformat="application/vnd.ogc.gml"
+                                   
+                            >
+                     </layer>
+                            
+              </group>
+        </theme>
+            
+                          
+         
+        <theme name="NAUTICAL DOMAIN" id="nautique-ocea" icon="fas fa-solid fa-anchor-lock" >
+              <group name="Nautical Information" id="nav" >
+                     <layer id="zone_navigation_reglementaire"
+                            name="Regulatory Navigation Zone"
+                            visible="false"
+                            queryable="true"
+                            url="{{fqdn}}/geomaritime/geodata/wms"
+                            dynamiclegend="true"
+                            infoformat="application/vnd.ogc.gml">
+                            
+                     </layer>
+                     <layer id="v_limite_maritime_l"
+                            name="Maritime Boundaries"
+                            visible="false"
+                            queryable="true"
+                            url="{{fqdn}}/geomaritime/geodata/wms"
+                            dynamiclegend="true"
+                            infoformat="application/vnd.ogc.gml">
+                            <template url="templates/limites_maritimes.mst"></template>
+                     </layer>
+                    
+                     <layer id="navionics_basic_transp"
+                            name="Navionics Basic"
+                            visible="false"
+                            queryable="true"
+                            url="{{fqdn}}/geomaritime/geodata/wms"
+                            dynamiclegend="true"
+                            infoformat="application/vnd.ogc.gml">
+                            
+                     </layer>
+              </group>  
+
+              
+        
+        </theme> 
+        <theme name="MARITIME TRAFFIC" id="planif" icon="fas fa-plant-wilt" >
+              <group name="Maritime Traffic" id="traf" >
+                     <layer id="ships"
+                     name="Maritime Traffic"
+                     visible="false"
+                     queryable="true"
+                     url="{{fqdn}}/geomaritime/geodata/wms"
+                     dynamiclegend="true"
+                     infoformat="application/vnd.ogc.gml"
+                     
+                     ><template url="templates/trafic_maritime.mst"></template>
+                     </layer>
+              </group> 
+        </theme> 
+        <theme name="MARINE AND COASTAL RISKS" id="tsunami" icon="fas fa-solid fa-house-tsunami" >
+        <group name="Tsunami Risk" id="event-TSUNAMI"  >
+  
+                  <layer id="Trait_côte_RSK_crts_"
+                         name="Shoreline (Rabat)"
+                         visible="false"
+                         queryable="true"
+                         url="{{fqdn}}/geomaritime/geodata/wms"
+                         dynamiclegend="true"
+                         infoformat="application/vnd.ogc.gml"
+                      
+  
+                  ></layer>
+                
+                  <layer id="Z_Inondable_Sale"
+                         name="Flood Zone Sale"
+                         visible="false"
+                         queryable="true"
+                         url="{{fqdn}}/geomaritime/tsunami/wms"
+                         dynamiclegend="true"
+                         infoformat="application/vnd.ogc.gml"
+                         
+                         
+  
+                  ></layer>
+    <layer id="Zone_Ind_Rabat"
+                         name="Flood Zone Rabat"
+                         visible="false"
+                         queryable="true"
+                         url="{{fqdn}}/geomaritime/tsunami/wms"
+                         dynamiclegend="true"
+                         infoformat="application/vnd.ogc.gml"
+                         
+                         
+  
+                  ></layer>
+            
+  
+  
+                  <layer id="Bati_Damage_wgs"
+                         name="Building Damage Levels"
+                         visible="false"
+                         queryable="true"
+                         url="{{fqdn}}/geomaritime/tsunami/wms"
+                         dynamiclegend="true"
+                         infoformat="application/vnd.ogc.gml"
+                         
+  
+                  ></layer>
+                  
+                  <layer id="Bati_Vuln_wgs"
+                         name="Building Vulnerability Classes"
+                         visible="false"
+                         queryable="true"
+                         url="{{fqdn}}/geomaritime/tsunami/wms"
+                         dynamiclegend="true"
+                         infoformat="application/vnd.ogc.gml"
+                         
+  
+                  >
+                      
+                  </layer>
+                  
+                  <layer id="tsunami_buf2"
+                         name="Tsunami Buffer"
+                         visible="false"
+                         queryable="true"
+                         url="{{fqdn}}/geomaritime1/geodata/wms"
+                         dynamiclegend="true"
+                         infoformat="application/vnd.ogc.gml"
+                         
+                  >
+                  </layer>
+              </group>
+                  
+       </theme>
+       <theme name="INTERVENTION MEANS" id="moyen" icon="fas fa-solid fa-house-tsunami">
+                     <layer id="mrcc_moyens_mar_sauvetage"  
+                            name="Rescue Boat" 
+                            visible="false" 
+                            queryable="true" 
+                            fields="denomination,categorie,type,date_debut,date_fin,web,photo,image,alfresco,resume,detail,obs,synthese_gca,classification" aliases="Dénomination,Categorie,Type,Date Début,Date Fin,Web,Photo,Image,Alfresco,Résumé,Détail,Obs,Synthèse GCA,Classification" 
+                            url="{{fqdn}}/geomaritime/geodata/wms" 
+                            infoformat="application/vnd.ogc.gml" 
+                            attributefilter="true" 
+                            attributefield="competence,categorie,synthese_gca,classification,date_debut,date_fin" 
+                            attributevalues="GR,SN,--;Accident,Accident maritime,Activités proséparatistes,Aérien,Affaires judiciaires,Armement et munition,Assistance,Convoyage,Diplomatique,Dispositif de sécurité,Environnement,Forces de l'Ordre,Frontière,Immigration,Incendie,Intempérie,Intervention militaire,Manifestations,Militaire,Polution,Présence de garde civile espagnole,Préside,Sécurité,Séisme,Terrorisme,Tourisme,VIP;Oui,Non;Faible,Moyen,Important,ND,Phare;--;--" attributelabel="Compétence,Types,Synthése GCA,Classification,Date début,Date Fin" 
+       
+                            attributeinput="select,select,select,select,date,date" 
+                            attributeoperator="=,=,=,=,&gt;=,&lt;=" 
+                            dynamiclegend="true" isToRefresh="true" tiled="true" type="wms" 
+                            tooltipcontent="{{denomination}}" 
+                            searchableBBOX="true" 
+                            searchableFields="libelle" 
+                            contextMenu="true" 
+                            attributeTable="libelle,categorie,type,date_debut,date_fin,web,photo,image,alfresco,resume,detail,obs,synthese_gca,classification" aliasesAttributeTable="Libellé,Categorie,Type,Date Début,Date Fin,Web,Photo,Image,Alfresco,Résumé,Détail,Obs,Synthèse GCA,Classification" showTableAttribute="true">
+                            <template url="templates/moyens_sauvetage.mst"></template>
+                     </layer>
+                    
+                     <layer id="mrcc_moyens_mar_sauvetage_proche"  
+                            name="Lifeboats" 
+                            visible="false" 
+                            queryable="true"  
+                            url="{{fqdn}}/geomaritime/geodata/wms" 
+                            dynamiclegend="true" 
+                            infoformat="application/vnd.ogc.gml" >
+                            <template url="templates/moyens_sauvetage.mst"></template>
+                     </layer>
+
+                     <layer id="rescue_bases"  
+                            name="Bases" 
+                            visible="false" 
+                            queryable="true"  
+                            url="{{fqdn}}/geomaritime/geodata/wms" 
+                            dynamiclegend="true" 
+                            infoformat="application/vnd.ogc.gml" >
+                            <template url="templates/rescue_bases.mst"></template>
+                     </layer>
+
+              </theme>
+              <theme name="GMDSS SYSTEM" id="Sys_GMDSS" icon="fas fa-solid fa-person-military-rifle">
+
+                     
+                     <layer id="mrcc_station"  
+                            name="VHF Station" 
+                            visible="false" 
+                            queryable="true"  
+                            url="{{fqdn}}/geomaritime/geodata/wms" 
+                            dynamiclegend="true" 
+                            infoformat="application/vnd.ogc.gml" >
+                            <template url="templates/mrcc_station.mst"></template> 
+                     </layer>
+                     <layer id="semaphore"  
+                            name="Semaphore Stations" 
+                            visible="false" 
+                            queryable="true"  
+                            url="{{fqdn}}/geomaritime/geodata/wms" 
+                            dynamiclegend="true" 
+                            infoformat="application/vnd.ogc.gml" >
+                            <template url="templates/moy_pc.mst"></template>
+                     </layer>
+
+              </theme>
+
+              <theme name="MARITIME SAR ACTORS" id="inter" icon="fas fa-solid fa-person-military-rifle">
+                            <layer id="intervenant_unite"  
+                                   name="Maritime SAR Actors" 
+                                   visible="false" 
+                                   queryable="true" 
+                                   url="{{fqdn}}/geomaritime/geodata/wms" 
+                                   infoformat="application/vnd.ogc.gml" 
+                            ><template url="templates/intervenant.mst"></template>
+                            </layer>
+                    
+                     <group name="Other Actors" id="grp5">
+                            <layer id="v_autorite_civile"
+                                   name="Civil Authority"
+                                   visible="false"
+                                   tiled="false"
+                                   searchable="true"
+                                   queryable="true"
+                                   url="{{fqdn}}/geomaritime/geodata/wms"
+                                   infopanel="bottom-panel"
+                                   infoformat="application/vnd.ogc.gml"
+                                   >
+                                   <template url="templates/intervenant.mst"></template>
+                            </layer>
+                     </group>
+              </theme>
+              <theme name="REFERENCE DATA" id="territoire" icon="fas fa-globe">
+
+
+      <group name="Administrative Boundaries" id="grp3">
+     
+                <layer id="region_adm"
+                       name="Administrative Regions"
+                       visible="false"
+                       queryable="true"
+                       url="{{fqdn}}/geocarte/geodata/wms"
+                       infopanel="bottom-panel"
+                       dynamiclegend="true"
+                       infoformat="application/vnd.ogc.gml"
+                       featurecount="5">
+                    <template url="templates/construction.mst"></template>
+                </layer>
+
+                <layer id="province"
+                       name="Province"
+                       url="{{fqdn}}/geocarte/geodata/wms"
+                       queryable="true"
+                       visible="false"
+                       tiled="true"
+                       infoformat="application/vnd.ogc.gml"
+                />
+               
+                <layer id="commune"
+                       name="Municipalities"
+
+                       url="{{fqdn}}/geocarte/geodata/wms"
+
+                />
+
+            </group>
+
+             <group name="Telecommunications" id="grp95">
+
+                <layer id="ma_antenne_pt"
+                       name="GSM"
+                       visible="false"
+                       tiled="false"
+                       searchable="true"
+                       queryable="true"
+                       url="{{fqdn}}/geocarte/geodata/wms"
+                       infoformat="application/vnd.ogc.gml"
+                >
+                    <template url="templates/default.mst"></template>
+                </layer>
+               </group>
+
+
+            <group name="HOSPITAL STRUCTURES" id="grp28">
+                <layer id="v_sante_social_p"
+                       name="Hospitals"
+                       visible="false"
+                       queryable="true"
+                       url="{{fqdn}}/geocarte/geodata/wms"
+                       dynamiclegend="true"
+                       attributefilter="true"
+                       attributefield="type"
+                       attributevalues="HOPITAL MILITAIRE,POLYCLINIQUE,CENTRE REGIONAL DE TRANSFUSION SANGUINE,MORGUE,CENTRE REGIONAL D'ONCOLOGIE,CENTRE DADDICTOLOGIE,CENTRE DE CARDIOLOGIE,CENTRE DONCOLOGIE,LABORATOIRE MEDICAL,CENTRE DOPHTALMOLOGIE,CHU,CENTRE DE RADIOLOGIE,CENTRE MEDICAL,DIRECTION REGIONALE DE LA SANTE,CROISSANT ROUGE,DELEGATION DU MINISTERE DE LA SANTE ET DE LA PROTECTION SOCIALE,MATERNITE,CENTRE D'HEMODIALYSE,PHARMACIE,CABINET MEDICAL,CENTRE DONTAIRE,CLINIQUE,DISPENSAIRE,HOPITAL,CENTRE DE SANTE"
+                       attributeinput="select"
+                       attributeoperator="="
+                       infoformat="application/vnd.ogc.gml">
+                    <template url="templates/v_sante_social_p.mst"></template>
+                </layer>
+            </group>
+            <group name="Air Facility" id="grp27">
+                
+                <layer id="MA_AERONAUTIQUE"
+                       name="Air Facility"
+                       url="{{fqdn}}/geocarte/geodata/wms"
+                       legendurl="img/legend/aeroport.svg" 
+                       queryable="true"
+                       visible="false"
+                       tiled="true"
+                       infoformat="application/vnd.ogc.gml">
+                    <template url="templates/ma_aeronautique.mst"></template>
+                </layer>
+            </group>
+       <group name="Economy and Energy" id="grp32"> 
+                <layer id="t_enrg_gazoduc"
+                       name="Gas Pipeline"
+                       url="{{fqdn}}/geocarte/geodata/wms"
+                       queryable="true"
+                       visible="false"
+                       tiled="true"
+                       infoformat="application/vnd.ogc.gml">
+                </layer>     
+                <layer id="telecablesactual"
+                       name="Telecommunication Cables"
+                       url="https://emodnet.ec.europa.eu/geoviewer/proxy//https://ows.emodnet-humanactivities.eu/wms?SERVICE=WMS"
+                       queryable="true"
+                       visible="false"
+                       tiled="true"
+                       infoformat="application/vnd.ogc.gml">
+                </layer>
+              </group>
+
+              <group name="BEACHES" id="grp35">
+                     <layer id="v_plage_p" 
+                            name="Beaches" 
+                            url="{{fqdn}}/geomaritime/geodata/wms" 
+                            queryable="true" 
+                            visible="false" 
+                            tiled="true" 
+                            infoformat="application/vnd.ogc.gml">
+                            <template url="templates/default.mst"></template>
+                     </layer>
+              </group>
+       </theme>
+       <theme name="HUMAN ACTIVITIES" id="Human_Activities" icon="fas fa-cogs">
+              
+              <group name="Desalination Plant" id="eau"> 
+                     <layer id="station_dessalement"
+                            name="Desalination Plant"
+                            visible="false"
+                            queryable="true"
+                            url="{{fqdn}}/geocarte/geodata/wms"
+                            dynamiclegend="true"
+                            infoformat="application/vnd.ogc.gml"
+                            >
+                            <template url="templates/station_dessalemenet.mst"></template>
+                     </layer>
+              </group>
+              <group name="Maritime Routes" id="Route_Density">
+                    <layer id="routedensity_allavg"
+                            name="All Ships"
+                            url="https://emodnet.ec.europa.eu/geoviewer/proxy//https://ows.emodnet-humanactivities.eu/wms?SERVICE=WMS"
+                            queryable="true"
+                            visible="false"
+                            tiled="true"
+                            infoformat="application/vnd.ogc.gml">
+                     </layer>
+                     <layer id="routedensity_01"
+                            name="Cargo Ships"
+                            url="https://emodnet.ec.europa.eu/geoviewer/proxy//https://ows.emodnet-humanactivities.eu/wms?SERVICE=WMS"
+                            queryable="true"
+                            visible="false"
+                            tiled="true"
+                            infoformat="application/vnd.ogc.gml">
+                     </layer>
+                     <layer id="routedensity_02"
+                            name="Fishing Vessels"
+                            url="https://emodnet.ec.europa.eu/geoviewer/proxy//https://ows.emodnet-humanactivities.eu/wms?SERVICE=WMS"
+                            queryable="true"
+                            visible="false"
+                            tiled="true"
+                            infoformat="application/vnd.ogc.gml">
+                     </layer>
+                     <layer id="routedensity_03"
+                            name="Passenger Ships"
+                            url="https://emodnet.ec.europa.eu/geoviewer/proxy//https://ows.emodnet-humanactivities.eu/wms?SERVICE=WMS"
+                            queryable="true"
+                            visible="false"
+                            tiled="true"
+                            infoformat="application/vnd.ogc.gml">
+                     </layer>
+                     <layer id="routedensity_04"
+                            name="Tanker"
+                            url="https://emodnet.ec.europa.eu/geoviewer/proxy//https://ows.emodnet-humanactivities.eu/wms?SERVICE=WMS"
+                            queryable="true"
+                            visible="false"
+                            tiled="true"
+                            infoformat="application/vnd.ogc.gml">
+                     </layer>
+
+                     <layer id="routedensity_05"
+                            name="Other Vessels"
+                            url="https://emodnet.ec.europa.eu/geoviewer/proxy//https://ows.emodnet-humanactivities.eu/wms?SERVICE=WMS"
+                            queryable="true"
+                            visible="false"
+                            tiled="true"
+                            infoformat="application/vnd.ogc.gml">
+                     </layer>
+              </group>
+             
+       </theme>  
+
+        <theme name="TOOLS" id="profile" icon="fas fa-cogs">
+                     <layer type="import" 
+                            id="import_file" 
+                            name="Import External Files" 
+                            visible="false" legendurl="img/blank.gif" 
+                            queryable="true" vectorlegend="true" 
+                            geocoder="ban" 
+                            xfield="longitude" 
+                            yfield="latitude" 
+                            attribution="Dans cet exemple, l'utilisateur sélectionne un fichier csv depuis son poste. le fichier est ensuite géocodé après paramétrage du géocodage. Il n'y a pas de persistance du résultat. La recherche peut être activée en sélectionnant au moins un champ de recherche. exemple avec ce &lt;a href='https://raw.githubusercontent.com/geobretagne/mviewer/master/demo/demo.csv' target='_blank'>fichier &lt;/a>" 
+                            expanded="true">
+                            <projections>
+                                   <projection proj4js="'EPSG:3857','+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +wktext  +no_defs'" />
+                                   <projection proj4js="'EPSG:2154','+proj=lcc +lat_1=49 +lat_2=44 +lat_0=46.5 +lon_0=3 +x_0=700000 +y_0=6600000 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs'" />
+                            </projections>
+                     </layer>
+
+       </theme>
+</themes>
+       <extensions>
+              <extension type="component" id="print" path="demo/addons" />
+              <extension type="component" id="customSearch" path="demo/addons" />
+              <extension type="component" id="apis" path="demo/addons" />
+              <extension type="component" id="menuContext" path="demo/addons" />
+              <extension type="component" id="searchGPS" path="demo/addons" />
+              <extension type="component" id="fileimport" path="demo/addons" />
+              <extension type="component" id="layerfilter" path="demo/addons" />
+              <extension type="component" id="fullscreen" path="demo/addons" />
+              <extension type="component" id="filter" path="demo/addons" />
+              <extension type="component" id="styleinfo" path="demo/addons" />
+              <extension type="component" id="detailLayer" path="demo/addons" />
+              <extension type="component" id="managementEvent" path="demo/addons" />
+              <extension type="component" id="evolutionEvent" path="demo/addons" />
+              <extension type="component" id="modifyFeature" path="demo/addons" />
+              <extension type="component" id="exportReport" path="demo/addons" />
+              <extension type="component" id="notification" path="demo/addons" />
+<extension type="component" id="export-plugin" path="demo/addons" />
+
+              <extension type="javascript" src="js/dsfr.nomodule.min.js" />
+
+       </extensions>
+</config>

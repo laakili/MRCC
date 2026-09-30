@@ -1,0 +1,11 @@
+{
+"ogc":[
+    {"label":"Serveur local","url":"https://www.geo2france.fr/geoserver/hdf_common/ows"},
+    {"label":"Serveur distant","url":"https://qgisserver.hautsdefrance.fr/cgi-bin/qgis_mapserv.fcgi?MAP=/var/www/data/qgis/applications/sraddet_2020_08.qgz"},
+    {"label":"Autre serveur","url":"https://ogc.geo-ide.developpement-durable.gouv.fr/wxs?map=/opt/data/carto/geoide-catalogue/1.4/org_38148/cac35f5b-fa24-442f-8297-9e9495f06f36.internet.map"}
+],
+"csw":[ 
+    {"label":"Catalogue Local","url":"https://www.pigma.org/geonetwork/srv/eng/csw","defaultfilter":"protocol='OGC:WMS-1.1.1-http-get-map' OR protocol='OGC:WMS'"}
+    
+]
+}

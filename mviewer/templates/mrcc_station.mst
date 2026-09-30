@@ -1,0 +1,173 @@
+{{#features}}
+<li class="item feature-card" id="templateRight">
+  <div class="feature-header">
+    <h3 class="title-feature">
+      <i class="fas fa-lightbulb feature-icon"></i>
+      {{sites}} ({{gestionnaire}})
+    </h3>
+    <div id="select-features-list">
+      <span class="select-features tag-commune"><i class="fas fa-city"></i> {{commune}}</span>
+      <span class="select-features tag-position"><i class="fas fa-map-marker-alt"></i> {{latitude}}, {{longitude}}</span>
+      
+    </div>
+  </div>
+
+  <div class="feature-details">
+
+    <div class="detail-item">
+      <i class="fas fa-ruler-vertical detail-icon"></i>
+      <div>
+        <span class="detail-label">Elevations (m)</span>
+        <span class="detail-value">{{elevations}}</span>
+      </div>
+    </div>
+
+    <div class="detail-item">
+      <i class="fas fa-eye detail-icon"></i>
+      <div>
+        <span class="detail-label">Portée (milles)</span>
+        <span class="detail-value">{{portee_milles}}</span>
+      </div>
+    </div>
+
+
+  <div class="source-footer">
+    <i class="fas fa-lightbulb"></i>
+    <span class="source-text">Source : MRCC</span>
+  </div>
+  <div class="source-footer">
+    <i class="fas fa-lightbulb"></i>
+    <span class="source-text">Portées théoriques: A=2,5(√H(m)+√h(m) Milles </span>
+  </div>
+
+</li>
+{{/features}}
+
+<!-- Font Awesome Icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+<!-- STYLES -->
+<style>
+:root {
+  --primary-color: #161A30;
+  --secondary-color: #4D79B8;
+  --accent-color: #5DB0C3;
+  --light-bg: #F8F9FA;
+  --dark-text: #2D3748;
+  --light-text: #718096;
+  --border-radius: 12px;
+  --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --font-family: 'Inter', sans-serif;
+}
+
+.item.feature-card {
+  background-color: white;
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.feature-header {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid #e2e8f0;
+  padding-bottom: 12px;
+}
+
+.title-feature {
+  color: var(--primary-color);
+  font-family: var(--font-family);
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.feature-icon {
+  color: var(--secondary-color);
+  font-size: 1.2em;
+}
+
+#select-features-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.select-features {
+  background-color: var(--primary-color);
+  color: white;
+  padding: 6px 12px;
+  font-size: 1.5rem;
+  border-radius: 20px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.feature-details {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 15px;
+}
+
+.detail-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px;
+  background-color: var(--light-bg);
+  border-radius: var(--border-radius);
+}
+
+.detail-icon {
+  color: var(--secondary-color);
+  font-size: 1.2em;
+  background-color: rgba(77, 121, 184, 0.1);
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+
+.detail-label {
+  font-size: 1.2rem;
+  color: var(--light-text);
+}
+
+.detail-value {
+  font-size: 1.5rem;
+  color: var(--dark-text);
+  font-weight: 500;
+}
+
+.source-footer {
+  margin-top: 20px;
+  padding-top: 10px;
+  border-top: 1px solid #e2e8f0;
+  font-size: 1.2rem;
+  color: var(--light-text);
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.tag-commune {
+  background-color: #FF8C00;
+}
+
+.tag-position {
+  background-color: #20B2AA;
+}
+
+.tag-activite {
+  background-color: #5DB0C3;
+}
+</style>

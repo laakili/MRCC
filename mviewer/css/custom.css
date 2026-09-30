@@ -1,0 +1,149 @@
+.modal-title {
+    font-size: 25px;
+    font-family: "roboto_bold", Arial, Sans-serif;
+    color: #4D4D4D;
+}
+.custom-loader {
+    color: white;
+    font-family: 'Roboto', sans-serif;
+    font-size: 16px;
+    z-index: 10;
+    width: 100%;
+    height: 100%;
+    background-color: #2e5367 !important;
+    position: absolute;
+    display: none;
+    opacity: 0.8;
+    text-align: center;
+    padding-top: 25%;
+
+}
+#custom-loader-title{
+    margin-top: 20px;
+    z-index: 20;
+    background-color: transparent;
+}
+#custom-loader-subtitle {
+    margin-top: 5px;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+.single {
+    align-self: center;
+    display: inline-block;
+    z-index: 15;
+    /*position: absolute;*/
+    /*top: auto;*/
+    /*bottom: auto;*/
+    /*right: auto;*/
+    /*left: auto;*/
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    border: 6px solid #EEEEEE;
+    border-top-color: #BFBFBF;
+    border-bottom-color: #BFBFBF;
+    -webkit-animation: single 2.5s infinite ease-in-out;
+    animation: single 2.5s infinite ease-in-out;
+    z-index: 50;
+    background-color: transparent;
+}
+@-webkit-keyframes single {
+    0% {
+        -webkit-transform: rotate(0deg);
+        transform: rotate(0deg);
+    }
+    100% {
+        -webkit-transform: rotate(540deg);
+        transform: rotate(540deg);
+    }
+}
+
+@keyframes single {
+    0% {
+        -webkit-transform: rotate(0deg);
+        transform: rotate(0deg);
+    }
+    100% {
+        -webkit-transform: rotate(540deg);
+        transform: rotate(540deg);
+    }
+}
+
+
+#searchresults a.active {
+    font-family: "roboto_bold", Arial, Sans-serif;
+    color: white;
+    background-color:#4D4D4D;
+}
+
+.flagSpain::before{
+    content: '';
+    display: inline-block;
+    background: url("../img/spain.svg") no-repeat scroll;
+    margin-top: 9px;
+}
+.FlagAlger::before
+{
+    content: '';
+    display: inline-block;
+
+    background: url("../img/algeria.svg") no-repeat scroll;
+    /*background-size: 16px 16px;*/
+    margin-top: 9px;
+}
+.FlagMauaritanie::before
+{
+    content: '';
+    display: inline-block;
+    background: url("../img/mauritania.svg") no-repeat scroll;
+    /*background-size: 16px 16px;*/
+    margin-top: 9px;
+}
+.FlagMilitaire::before
+{
+    content: '';
+    display: inline-block;
+    background: url("../img/force.svg") no-repeat scroll;
+    /*background-size: 16px 16px;*/
+    margin-top: 9px;
+}
+.IconDispositif::before
+{
+    content: '';
+    display: inline-block;
+    background: url("../img/dispositif.svg") no-repeat scroll;
+    /*background-size: 16px 16px;*/
+    margin-top: 9px;
+}
+.IconMaroc::before
+{
+    content: '';
+    display: inline-block;
+    background: url("../img/maroc.svg") no-repeat scroll;
+    /*background-size: 16px 16px;*/
+    margin-top: 9px;
+}
+.IconPoliceCiel::before{
+    content: '';
+    display: inline-block;
+    background: url("../img/svg/avion-2.svg") no-repeat scroll;
+    /*background-size: 20px 20px;*/
+    margin-top: 9px;
+}
+.FlagMauaritanie::before, .FlagAlger::before, .flagSpain::before,.FlagMilitaire::before,.IconDispositif::before,.IconMaroc::before,.IconPoliceCiel::before
+{
+    height: 1.5em;
+    width: 1.5em;
+}
+/*.IconPoliceCiel::before{*/
+/*    height:1em;*/
+/*    width: 1em;*/
+/*}*/
+
+/*#ol-draw-line > span::before {*/
+/*    font-family: "Font Awesome 5 Brands";*/
+/*    content: "\f899";*/
+/*    font-weight: 400;*/
+/*}*/
+

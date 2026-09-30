@@ -1,0 +1,453 @@
+{{#features}}
+<br><br>
+
+<li class="item" style="padding-bottom:65px;">
+    <div class="titre">Moyens humains et matériels de la Protection Civile à déployer lors du « Simulex 2024 »                     
+    </div>
+
+    
+    <br><br><i style="font-size:20px" class="glyphicon glyphicon-calendar"></i> Moyens Humains: <span
+    class="text">81</span>
+<br><br><i style="font-size:20px" class="glyphicon glyphicon-time"></i> Moyens Matériels : <span class="text">
+    898</span>
+
+
+<br><br>
+
+    <div class="soustitre"> Moyens Humains</div>
+    <table class="table table-bordered">
+
+        <thead>
+        <tr>
+            <th class="title_table">Moyens Humains</th>
+            <th class="title_table">Nombre</th>
+            <th class="title_table">Affectation</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>Officiers</td>
+            <td>2</td>
+            <td>Commandant Régional TTAH</td>
+        </tr>
+        <tr>
+            <td>Officiers</td>
+            <td>1</td>
+            <td>Chef UMRI Tanger</td>
+        </tr>
+        <tr>
+            <td>Officiers</td>
+            <td>2</td>
+            <td>Commandement Provincial Fahs Anjra</td>
+        </tr>
+        <tr>
+            <td>Officiers</td>
+            <td>1</td>
+            <td>Commandant préfectoral Tanger Assiah</td>
+        </tr>
+        <tr>
+            <td>Officiers</td>
+            <td>2</td>
+            <td>CP Tanger Assilah</td>
+        </tr>
+        <tr>
+            <td>Officiers</td>
+            <td>1</td>
+            <td>Chef UMRI Hoceima</td>
+        </tr>
+        <tr>
+            <td>Officiers</td>
+            <td>1</td>
+            <td>Chef CS Kasr El Majaz</td>
+        </tr>
+        <tr>
+            <td>Officiers</td>
+            <td>1</td>
+            <td>Chef CS Fnideq</td>
+        </tr>
+        <tr>
+            <td>Officiers</td>
+            <td>1</td>
+            <td>Chef CS Oued Laou</td>
+        </tr>
+        <tr>
+            <td>Officiers</td>
+            <td>1</td>
+            <td>Chef CS Bouahmed</td>
+        </tr>
+        <tr>
+            <td>Médecins</td>
+            <td>1</td>
+            <td>Médecin Chef Régional TTAH</td>
+        </tr>
+        <tr>
+            <td>Médecins</td>
+            <td>1</td>
+            <td>CP Tanger Assilah</td>
+        </tr>
+        <tr>
+            <td>Infirmiers</td>
+            <td>1</td>
+            <td>CP Tanger Assilah</td>
+        </tr>
+        <tr>
+            <td>Infirmiers</td>
+            <td>1</td>
+            <td>CR TTAH</td>
+        </tr>
+        <tr>
+            <td>Infirmiers</td>
+            <td>1</td>
+            <td>CP Mediq Fnideq</td>
+        </tr>
+        <tr>
+            <td>Infirmiers</td>
+            <td>1</td>
+            <td>CP Tétouan</td>
+        </tr>
+ </tbody>
+</table>
+ <table class="table table-bordered">
+    <thead>
+   
+         <tr>
+            <th class="title_table">Moyens Humains</th>
+            <th class="title_table">Nombre</th>
+            <th class="title_table">Affectation</th>
+        </tr>
+    </thead>
+       <tbody>
+
+   
+        <tr>
+            <td>Sous officiers et agents de secours</td>
+            <td>10</td>
+            <td>Commandement Provincial Fahs Anjra</td>
+        </tr>
+        <tr>
+            <td>Sous officiers et agents de secours</td>
+            <td>5</td>
+            <td>Unité Tanger</td>
+        </tr>
+        <tr>
+            <td>Sous officiers et agents de secours</td>
+            <td>5</td>
+            <td>Centre de Secours Assilah</td>
+        </tr>
+        <tr>
+            <td>Sous officiers et agents de secours</td>
+            <td>5</td>
+            <td>Commandement Provincial Tétouan</td>
+        </tr>
+        <tr>
+            <td>Sous officiers et agents de secours</td>
+            <td>5</td>
+            <td>Commandement Préfectoral M’diq Fnideq</td>
+        </tr>
+        <tr>
+            <td>Sous officiers et agents de secours</td>
+            <td>5</td>
+            <td>Commandement Provincial Chefchaouen</td>
+        </tr>
+        <tr>
+            <td>Sous officiers et agents de secours</td>
+            <td>5</td>
+            <td>Commandement Provincial Hoceima</td>
+        </tr>
+        <tr>
+            <td>Sous officiers et agents de secours</td>
+            <td>5</td>
+            <td>Commandement Provincial Ouezzane</td>
+        </tr>
+        <tr>
+            <td>Sous officiers et agents de secours</td>
+            <td>5</td>
+            <td>UMRI Tanger</td>
+        </tr>
+        <tr>
+            <td>Sous officiers et agents de secours</td>
+            <td>5</td>
+            <td>UMRI Hoceima</td>
+        </tr>
+        <tr>
+            <td>Sous officiers et agents de secours</td>
+            <td>5</td>
+            <td>Commandement Provincial Larache</td>
+        </tr>
+
+
+
+        </tbody>
+    </table>
+
+
+
+
+
+    <div class="soustitre"> Moyens matériels </div>
+    <table class="table table-bordered">
+    <thead>
+        <tr>
+            <th class="title_table">Désignation du Matériel</th>
+            <th class="title_table">Nombre</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td class="title_table">Tentes</td>
+            <td>04</td>
+        </tr>
+        <tr>
+            <td class="title_table">Véhicule de transmission avec relais</td>
+            <td>01 avec 12 radios</td>
+        </tr>
+        <tr>
+            <td class="title_table">Module de plongée</td>
+            <td>01</td>
+        </tr>
+        <tr>
+            <td class="title_table">Embarcation pneumatique avec véhicule de tractage</td>
+            <td>02</td>
+        </tr>
+        <tr>
+            <td class="title_table">Moto marine avec véhicule de tractage</td>
+            <td>01</td>
+        </tr>
+        <tr>
+            <td class="title_table">Camion citerne feux de forêts</td>
+            <td>01</td>
+        </tr>
+        <tr>
+            <td class="title_table">Camion citerne ravitailleur</td>
+            <td>01</td>
+        </tr>
+        <tr>
+            <td class="title_table">Ambulance médicalisée</td>
+            <td>01</td>
+        </tr>
+        <tr>
+            <td class="title_table">Ambulance normale</td>
+            <td>01</td>
+        </tr>
+        <tr>
+            <td class="title_table">Camion de transport de matériels</td>
+            <td>01</td>
+        </tr>
+        <tr>
+            <td class="title_table">Minibus</td>
+            <td>02</td>
+        </tr>
+        <tr>
+            <td class="title_table">Mégaphone</td>
+            <td>02</td>
+        </tr>
+        <tr>
+            <td class="title_table">Groupe électrogène</td>
+            <td>02</td>
+        </tr>
+        <tr>
+            <td class="title_table">Bac d’eau repliable</td>
+            <td>02</td>
+        </tr>
+        <tr>
+            <td class="title_table">Lits de camp</td>
+            <td>60</td>
+        </tr>
+        <tr>
+            <td class="title_table">Couverture</td>
+            <td>60</td>
+        </tr>
+        <tr>
+            <td class="title_table">Autres matériels spécifiques</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td class="title_table">PMA</td>
+            <td>01</td>
+        </tr>
+        <tr>
+            <td class="title_table">Drone</td>
+            <td>01</td>
+        </tr>
+        <tr>
+            <td class="title_table">Tables</td>
+            <td>02</td>
+        </tr>
+        <tr>
+            <td class="title_table">Chaises</td>
+            <td>12</td>
+        </tr>
+        <tr>
+            <td class="title_table">Tableau avec trépied pour la SITAC</td>
+            <td>03</td>
+        </tr>
+        <tr>
+            <td class="title_table">Marqueur de différentes couleurs</td>
+            <td>15</td>
+        </tr>
+       
+    </tbody>
+</table>
+<div class="soustitre"> 
+Liste des moyens spécifiques de dépollution entreposés au niveau du dépôt du port de Mohammedia, à mettre à la disposition des Services de la Protection Civile
+</div>
+   <table class="table table-bordered">
+    <thead>
+        <tr>
+            <th class="title_table">Matériels</th>
+            <th class="title_table">Désignation</th>
+            <th class="title_table">Nombre</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td class="title_table" rowspan="11">Récupération</td>
+            <td>Pelle carre</td>
+            <td>40</td>
+        </tr>
+        <tr>
+            <td>Pelle à sable</td>
+            <td>40</td>
+        </tr>
+        <tr>
+            <td>Raclette caoutchouc</td>
+            <td>20</td>
+        </tr>
+        <tr>
+            <td>Râteau de jardinage</td>
+            <td>40</td>
+        </tr>
+        <tr>
+            <td>Ecrémeur avec 3 bouées</td>
+            <td>03</td>
+        </tr>
+        <tr>
+            <td>Pompe d’aspiration</td>
+            <td>03</td>
+        </tr>
+        <tr>
+            <td>Tuyaux d’aspiration de 6 m</td>
+            <td>03</td>
+        </tr>
+        <tr>
+            <td>Tuyau (manche) de refoulement de 20 m avec tête américaine de 70 mm</td>
+            <td>03</td>
+        </tr>
+        <tr>
+            <td>Seau en plastique de 20l</td>
+            <td>40</td>
+        </tr>
+        <tr>
+            <td>Poubelle en plastique</td>
+            <td>40</td>
+        </tr>
+        <tr>
+            <td>Sac en plastique</td>
+            <td>100</td>
+        </tr>
+        <tr>
+            <td class="title_table" rowspan="3">Nettoyage</td>
+            <td>Nettoyeur à haute pression avec tête de branchement en cuivre</td>
+            <td>03</td>
+        </tr>
+        <tr>
+            <td>Pompe à main</td>
+            <td>06</td>
+        </tr>
+        <tr>
+            <td>Brosse</td>
+            <td>30</td>
+        </tr>
+        <tr>
+            <td class="title_table" rowspan="3">Stockage</td>
+            <td>Bâche plastique pvc</td>
+            <td>03</td>
+        </tr>
+        <tr>
+            <td>Capacité de stockage 2m3</td>
+            <td>03</td>
+        </tr>
+        <tr>
+            <td>Piquet métallique</td>
+            <td>30</td>
+        </tr>
+        <tr>
+            <td class="title_table">Confinement</td>
+            <td>Barrage côtier + 5 ancres + 3 bouées + chaine + cordage + 2 têtes d’amarrage</td>
+            <td>300 Mètres</td>
+        </tr>
+        <tr>
+            <td class="title_table">Balisage</td>
+            <td>Ruban fluorescent bicolore</td>
+            <td>1500 Mètres</td>
+        </tr>
+        <tr>
+            <td class="title_table" rowspan="5">Protection Individuelle</td>
+            <td>Tenue verte</td>
+            <td>50</td>
+        </tr>
+        <tr>
+            <td>Casque plastique de chantier</td>
+            <td>50</td>
+        </tr>
+        <tr>
+            <td>Botte</td>
+            <td>50</td>
+        </tr>
+        <tr>
+            <td>Cuissard</td>
+            <td>50</td>
+        </tr>
+        <tr>
+            <td>Paire de gants de travail</td>
+            <td>50</td>
+        </tr>
+        <tr>
+            <td class="title_table" rowspan="1">Autre matériels</td>
+            <td>Lunettes de protection</td>
+            <td>50</td>
+        </tr>
+        <tr>
+            <td class="title_table" rowspan="1">Polluant</td>
+            <td>Département du Développement Durable</td>
+            <td></td>
+        </tr>
+    </tbody>
+</table>
+
+  
+</li>
+
+{{/features}}
+
+
+<style>
+    .text {
+        font-size: 14px;
+    }
+
+    .text2 {
+        font-size: 16px;
+    }
+
+    .titre {
+        font-size: 22px;
+        font-weight: 600;
+    }
+
+    .soustitre {
+        font-size: 16px;
+        padding-top: 10px;
+    }
+
+    .pan_title {
+        color: #32CD32;
+        font-weight: bold;
+    }
+
+    .title_table {
+        font-weight: bold;
+        background-color: var(--bf500);
+        color: white !important;
+    }
+</style>

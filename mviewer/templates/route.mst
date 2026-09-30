@@ -1,0 +1,297 @@
+<!-- Ajouter la bibliothèque Chart.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.0.2/chart.min.js"></script>
+
+{{#features}}
+	<li class="item" id ="templateRight" style="">
+		<!-- <h3 class="title-feature">IDE@L HOMES</h3> -->
+		<div id="select-features-list">
+			<span class="select-features">Routes bloquées</span>
+			
+			
+			
+			
+			<!-- Alerte: Chiffres de l'année en cours 
+			<p class="warning warning-info{{annee}}">The information displayed represents the current year</p>-->
+		</div>
+
+		<div id="user-{{divadmin}}">
+
+		    <!-- L'entité utilise le service -->
+			<div class="user-service-oui">
+				<div class="service-block-marches">
+					<div class="col1">
+						<div class="icon-block">
+							<img class="icon" src="img/home_b.svg">
+						</div>
+					</div>
+					<div class="service-block-info">
+						<p class="number-feature-marches">RN07</p>
+						<p class="text-feature"><span class="glyphicon glyphicon-ok" aria-hidden="true"></span> Routes bloquées</p>
+					</div>
+				</div>
+				<!-- Chiffres clés + graphique -->
+				
+				
+				
+            </div>
+			<div class="service-block-number row" style="padding: 0px 15px;">
+			<div class="block-grey1 ">
+
+		
+					
+                    
+</div>
+			
+
+</div>
+</div>
+<div class="acces-service-marches" style="">
+<div class="btn-link-user">
+<a href="http://localhost:8080/portal/?config=apps/seisme.xml#" target="_blank">
+Plus de détails</a>
+</div>
+</div>
+</div>
+
+</div>
+
+</li>
+
+<style>
+
+/* Définition des propriétés de style pour le service */
+:root {
+--mycolor:#161A30;
+--mycolortheme5:#514367;
+--myfont:'Inter', sans-serif;
+}
+/* */
+
+#templateRight {
+padding: 10px;
+}
+
+.title-feature {
+color: var(--mycolor);
+font-family: var(--myfont);
+font-size: 19px;
+line-height: 1.2;
+font-weight: 700;
+}
+
+.subtitle-feature {
+color: var(--mycolor);
+font-family:var(--myfont);
+font-size:18px;
+margin-top:7%;
+line-height:1;
+}
+
+.text-feature, p {
+font-family:var(--myfont);
+color:#555;
+font-size:13px;
+}
+
+.center{
+text-align:center;
+}
+
+.block-grey {
+border-radius: 10px;
+background-color: #e2e2e28f;
+height: 250px;
+}
+.block-grey1 {
+border-radius: 10px;
+background-color: #e2e2e28f;
+height: 180px;
+}
+.block-number{
+padding: 50px 10px;
+}
+
+.block-graph{
+padding: 25px 15px;
+}
+
+.block-greyy {
+border-radius: 10px;
+background-color: #e2e2e28f;
+height: 120px;
+}
+.block-greyy1 {
+border-radius: 10px;
+background-color: #e2e2e28f;
+height: 180px;
+}
+.block-numbery{
+padding: 20px 10px;
+}
+
+.block-graphy{
+padding: 25px 15px;
+}
+
+/* Critères de selection des entités */
+
+span.select-features {
+background-color: var(--mycolor);
+padding: 5px 10px;
+color: white;
+font-size: 11px;
+font-family: var(--myfont);
+border-radius: 12px;
+}
+
+/* Message d'alerte sur la validité des informations */
+
+p.warning {
+font-size: 11px!important;
+font-style: italic!important;
+font-weight: 500!important;
+margin: 10px 0px;
+}
+
+.warning-info2019, .warning-info2020 {
+display:none;
+}
+
+.warning-info2021{
+display:block;
+}
+
+/* Affichage du contenu selon usagers O/N */
+#user-OUI .user-service-non {
+display:none;
+}
+
+#user-NON .user-service-oui {
+display:none;
+}
+
+/* Mise en fome USER-OUI */
+
+.user-service-oui {
+padding: 30px 0px;
+}
+
+.service-block-marches {
+background-color: var(--mycolortheme5);
+padding: 5%;;
+border-radius: 10px;
+}
+
+.service-block-info {
+padding: 0px 0px 0px 90px;
+/* color: white!important; */
+}
+
+.user-service-oui .icon-block {
+width: 60px;
+padding: 12px;
+background-color: #ffffff33;
+border-radius: 15px;
+position: absolute;
+}
+
+.service-block-info p {
+color: white;
+}
+
+p.service-title {
+font-size: 14px;
+font-weight: 600;
+padding: 10px 0px 0px;
+margin: 0;
+}
+
+/* Numbers */
+
+.service-block-number {
+margin-top: 20px;
+}
+
+.number-feature-marches {
+font-size: 24px;
+font-weight: 600;
+color: var(--mycolortheme5);
+margin: 10px 0px 0px;
+}
+
+.title-number-feature-marches {
+font-weight: 600;
+color: var(--mycolortheme5);
+margin:0;
+}
+
+.subtitle-number-feature {
+font-size: 10px;
+font-style: italic;
+}
+
+/* Chart */
+
+p.title-chart-feature {
+font-size: 12px;
+font-weight: 600;
+margin: 0;
+}
+
+/* Bouton en savoir plus */
+
+.acces-service-marches {
+text-align: center;
+margin: 0 auto;
+}
+
+/* Mise en fome USER-NON */
+
+.user-service-non {
+text-align:center;
+padding: 50px;
+}
+
+.user-service-non .icon-block-marches {
+background-color: var(--mycolortheme5);
+opacity: 0.8;
+width: 60px;
+border-radius: 15px;
+padding: 12px;
+margin: 0 auto;
+}
+
+h2.user-title-feature-marches {
+font-weight: 600!important;
+color: var(--mycolortheme5);
+}
+
+.btn-link-user {
+margin:40px 0px;
+}
+
+.btn-link-user a{
+font-family: var(--myfont);
+border: solid 1px #161A30;
+color: #161A30;
+padding: 8px 12px;
+border-radius: 8px;
+margin: 40px 0px;
+}
+
+.btn-link-user a:hover {
+background-color: #161A30;
+color: white!important;
+-webkit-transition: background-color 0.5s ease-out;
+-moz-transition: background-color 0.5s ease-out;
+-o-transition: background-color 0.5s ease-out;
+transition: background-color 0.5s ease-out;
+}
+
+</style>
+
+
+
+
+
+{{/features}}

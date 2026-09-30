@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   id="a459ff35-890b-4c59-8b3d-d1f69b4690fb"
+   data-name="marche"
+   viewBox="0 0 100 100"
+   version="1.1"
+   sodipodi:docname="home_b.svg"
+   inkscape:version="1.2.2 (732a01da63, 2022-12-09)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <sodipodi:namedview
+     id="namedview253"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     showgrid="false"
+     inkscape:zoom="10.27"
+     inkscape:cx="49.659202"
+     inkscape:cy="53.067186"
+     inkscape:window-width="2560"
+     inkscape:window-height="1377"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="a459ff35-890b-4c59-8b3d-d1f69b4690fb" />
+  <defs
+     id="defs240">
+    <style
+       id="style238">.badb448f-379a-47a9-90a2-63378669908f{fill:#fff;}</style>
+  </defs>
+  <title
+     id="title242">marches</title>
+  <path
+     d="m 85.22899,45.576743 -31.436045,-33.607652 -0.06417,-0.06616 a 6.8083506,7.020739 0 0 0 -9.62437,0 L 12.618461,45.562044 a 4.0065896,4.1315762 0 0 0 0.103373,5.844487 4.0279771,4.1536309 0 0 0 4.34166,0.838083 v 26.34431 a 8.1985372,8.4542927 0 0 0 8.19854,8.45429 h 47.334072 a 8.1985372,8.4542927 0 0 0 8.198544,-8.45429 v -26.32961 a 3.9566855,4.0801153 0 0 0 1.55416,0.32347 v 0 a 4.0137187,4.1389278 0 0 0 2.88731,-7.006041 z M 72.752956,44.161572 v 34.427352 a 0.17109991,0.17643742 0 0 1 -0.16754,0.17276 H 25.25134 a 0.17109991,0.17643742 0 0 1 -0.167537,-0.17276 V 44.161572 L 48.923724,18.673714 Z"
+     style="fill:#ffffff;stroke-width:0.361975"
+     id="path4" />
+  <metadata
+     id="metadata448">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:title>marches</dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+</svg>

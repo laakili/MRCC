@@ -1,0 +1,34 @@
+{{#features}}
+	<li id="{{feature_ol_uid}}" class="item" style="width:238px;">
+		<h3 class="title-feature">{{denom_fr}}</h3>
+		<p class="text-feature">
+			<h4 class="sub-title">Caractéristiques</h4>		
+			<span style="font-family:'roboto_bold'"> Barrage :</span> {{denom_fr}}<br>
+				
+		</p>
+		{{#photo}}
+			<img src="img/gr.jpg" class="img-responsive" style="margin-top:5%;" />
+		{{/photo}}
+		
+	</li>
+{{/features}}
+
+<style>
+	.title-feature {
+		color: #032E46;
+		font-family:"roboto_bold";
+		font-size:23px;
+		margin-bottom:1%;
+		line-height:1;
+	}
+	.text-feature{
+		font-family:"roboto_regular";
+		color:#555;
+		font-size:13px;
+		margin-top:10%;
+	}
+	.sub-title{
+		color: #032E46;
+		font-family:"roboto_bold";
+	}
+</style>

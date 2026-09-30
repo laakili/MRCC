@@ -1,0 +1,1645 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="fr-fr" lang="fr-fr" dir="ltr">
+  <head>
+    <title>Géoprtail National</title>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="description" content="Visualiseur géographique" />
+    <link href="lib/ol-ext/dist/ol-ext.min.css" rel="stylesheet" type="text/css"/>
+    <link rel="icon" type="image/png" href="favicon.png" />
+    <link href="lib/flag-icons-4.1.4/css/flag-icons.css" rel="stylesheet" />
+    <link href="css/custom.css" rel="stylesheet" type="text/css"/>
+    <link href="css/mviewer.css" rel="stylesheet" type="text/css"/>
+    <link href="lib/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="lib/simple-slidebar/simple_slidebar.css" rel="stylesheet" />
+    <link
+      href="lib/bootstrap-datepicker-1.6.1/css/bootstrap-datepicker3.min.css"
+      rel="stylesheet" />
+    <link
+      rel="stylesheet"
+      href="lib/bootstrap-slider/9.1.3/css/bootstrap-slider.min.css" />
+    <link rel="stylesheet" href="lib/bootstrap-tagsinput-0.8.0/bootstrap-tagsinput.css" />
+    <link href="lib/font-awesome-5.13.0/css/all.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="lib/ol8.2/ol.css" type="text/css" />
+    <link rel="stylesheet" href="css/print.css" type="text/css" media="print" />
+    <link href="lib/ol-ext/dist/ol-ext.css" rel="stylesheet" type="text/css"/>
+    <link href="css/datatable.css" rel="stylesheet">
+    <link href="lib/select2/dist/css/select2.min.css" rel="stylesheet">
+
+    <link href="css/login.css" rel="stylesheet" type="text/css"/>
+    <link href="css/toast.css" rel="stylesheet" type="text/css"/>
+    <link href="lib/ol-contextmenu/ol-context.css" rel="stylesheet">
+    <style>
+      @import url("https://fonts.googleapis.com/css?family=Roboto");
+
+      div#loading-page {
+        color: #999;
+        font-family: "Roboto", sans-serif;
+        font-size: 16px;
+        text-align: center;
+        padding-top: 25%;
+      }
+
+      #loader-title {
+        margin-top: 20px;
+      }
+
+      #loader-subtitle {
+        margin-top: 5px;
+        font-weight: 700;
+        text-transform: uppercase;
+      }
+
+      .single4 {
+        display: inline-block;
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        border: 6px solid #eeeeee;
+        border-top-color: #bfbfbf;
+        border-bottom-color: #bfbfbf;
+        -webkit-animation: single4 2.5s infinite ease-in-out;
+        animation: single4 2.5s infinite ease-in-out;
+      }
+
+      @-webkit-keyframes single4 {
+        0% {
+          -webkit-transform: rotate(0deg);
+          transform: rotate(0deg);
+        }
+
+        100% {
+          -webkit-transform: rotate(540deg);
+          transform: rotate(540deg);
+        }
+      }
+
+      @keyframes single4 {
+        0% {
+          -webkit-transform: rotate(0deg);
+          transform: rotate(0deg);
+        }
+
+        100% {
+          -webkit-transform: rotate(540deg);
+          transform: rotate(540deg);
+        }
+      }
+      
+      /* Style pour le mode invité */
+      .guest-mode .admin,
+      .guest-mode .operator,
+      .guest-mode [onclick="deconnect()"] {
+        display: none !important;
+      }
+    </style>
+  </head>
+
+  <body class="guest-mode">
+    <div id="loading-page">
+      <div class="single4"></div>
+      <div id="loader-title" i18n="loader.text">Chargement de l'application ...</div>
+      <div id="loader-subtitle"></div>
+    </div>
+    <div id="error">
+      <h1></h1>
+    </div>
+    <div id="main" style="opacity: 0.01">
+      <!-- Ajax Loader -->
+      <div id="loading-indicator" style="display: none">
+        <div class="loader">Chargement...</div>
+      </div>
+      <!-- Authentification - MASQUÉ PAR DÉFAUT -->
+    <div class="container login" style="display: none">
+      <section id="formHolder">
+
+          <div class="row">
+
+              <!-- Brand Box -->
+              <div class="col-sm-6 brand">
+                  <a class="logo">GEOPORTAIL <span>.</span></a>
+
+                  <div class="heading">
+                      <img height="150" src="img/logo1.png">
+                      <p>Portail National</p>
+                  </div>
+
+                  <!--                <div class="success-msg">-->
+                  <!--                    <p>localhost d'Aide à la Décision</p>-->
+                  <!--                </div>-->
+              </div>
+
+
+              <!-- Form Box -->
+              <div class="col-sm-6 form">
+
+                  <!-- Login Form -->
+                  <div class="login form-peice ">
+                      <div class="alertClass">
+                          <div class=" alert-login-actif"
+                               style="display: none;background-color: orange;color: white;border-radius: 5px;padding-left: 2px">
+                              <strong>Échec de la connexion!</strong> Compte non actif.
+                          </div>
+                          <div class=" alert-login"
+                               style="display: none;background-color: red;color: white;border-radius: 5px;padding-left: 2px">
+                              <strong>Échec de la connexion!</strong> Veuillez vérifier vos informations
+                              d'identification et réessayer.
+                          </div>
+                      </div>
+                      <form class="login-form">
+                          <div class="form-group">
+                              <label class="username-label" for="username">Login</label>
+                              <input class="form-control" id="username" name="username" placeholder="Your username"
+                                     type="text"
+                              >
+                          </div>
+
+                          <div class="form-group">
+                              <label for="password">Password</label>
+                              <input class="form-control" id="password" name="password" placeholder="Your password"
+                                     type="password"
+                              >
+                          </div>
+
+                          <div class="CTA">
+                              <input onclick="connect()" type="button" value="Se Connecter">
+                              <a class="switch " onclick="onSwitch('.signup','.login')"
+                                 style="cursor: pointer; float: right;padding-top: 2px">Créer un compte</a>
+                          </div>
+                      </form>
+                  </div><!-- End Login Form -->
+
+
+                  <!-- Signup Form -->
+                  <div class="signup form-peice switched">
+                      <form class="signup-form">
+                          <div class="alert-login-exist"
+                               style="display: none;background-color: orange;color: white;border-radius: 5px;padding-left: 2px">
+                              <strong>Échec d'iscription !</strong> login existant.
+                          </div>
+                          <div class="alert-login-creation-error"
+                               style="display: none;background-color: red;color: white;border-radius: 5px;padding-left: 2px">
+                              <strong>Échec d'iscription !</strong> Erreur lors de la création du compte.
+                          </div>
+                          <div class="alert-login-creation-succes"
+                               style="display: none;background-color: green;color: white;border-radius: 5px;padding-left: 2px">
+                              <strong>Inscription avec Succès!</strong>.
+                          </div>
+                          <div class="form-group   required">
+                              <label for="login_inp_nom">Nom</label>
+                              <input class="form-control" id="login_inp_nom"
+                                     placeholder="Votre nom "
+                                     required="required" type="text"/>
+                          </div>
+                          <div class="form-group   required">
+                              <label for="login_inp_prenom">Prénom</label>
+                              <input class="form-control" id="login_inp_prenom"
+                                     placeholder="Votre prénom"
+                                     required="required" type="text"/>
+                          </div>
+                          <div class="form-group   required">
+                              <label for="login_inp_login">Login</label>
+                              <input class="form-control" id="login_inp_login"
+                                     placeholder="Votre Login"
+                                     required="required" type="text"/>
+                          </div>
+                          <div class="form-group   required">
+                              <label for="login_inp_password">Password</label>
+                              <input class="form-control" id="login_inp_password"
+                                     placeholder="Votre password"
+                                     required="required" type="password"/>
+                          </div>
+                          <br>
+
+                          <div class="form-group    required">
+                              <label for="login_inp_password_comf">Confirmation Password</label>
+                              <input class="form-control" id="login_inp_password_comf"
+                                     placeholder="Confirmer Votre password"
+                                     required="required" type="password"/>
+                              <i class="login_inp_password_comf_error" style="color: red;display: none">Password
+                                  erroné</i>
+                          </div>
+                          <div class="CTA">
+                              <input disabled="disabled" id="btn-signup" onclick="signup()" type="button"
+                                     value="S'Inscrire">
+                              <a class="switch" onclick="onSwitch('.login','.signup')"
+                                 style="cursor: pointer; float: right;padding-top: 2px">J'ai un compte</a>
+                          </div>
+                      </form>
+                  </div><!-- End Signup Form -->
+              </div>
+          </div>
+
+      </section>
+
+
+      <footer>
+          <p>
+              <strong>
+                  &copy;&nbsp;GEOPORTAIL NATIONAL GESTION DES RISQUES
+              </strong>
+          </p>
+      </footer>
+
+  </div>
+      <!-- NAVBAR - AFFICHÉE PAR DÉFAUT -->
+      <nav class="navbar navbar-default no-margin navbar-fixed-top" id="mv-navbar" style="display: block">
+        <div class="navbar-header fixed-brand">
+          <a
+            type="button"
+            class="navbar-brand menu-toggle"
+            href="#"
+            title="Afficher/masquer les thématiques"
+            i18n="navbar.toggle"
+            ><span class="glyphicon glyphicon-menu-hamburger"></span
+          ></a>
+          <a class="navbar-brand" href="#">
+            <img alt="Logo" src="img/logo/earth-globe.svg" class="mv-logo" />
+          </a>
+          <a class="navbar-brand mv-title" href="#">GEOPORTAIL</a>
+          <a
+            type="button"
+            class="navbar-toggle"
+            data-toggle="collapse"
+            data-target="#bs-example-navbar-collapse-1"
+            href="#">
+            <span class="glyphicon glyphicon-menu-hamburger"></span>
+          </a>
+        </div>
+
+ <div class="collapse navbar-collapse" id="main-navbar">
+          <ul class="nav navbar-nav main-menu">
+                <li><a href="http://geoai-solutions.ddns.net:6754" class="{% if request.path == '/index' %}active{% endif %}">Accueil</a></li>
+                <li><a href="http://geoai-solutions.ddns.net:8888/MRCC/" class="{% if request.path == '/geoportail' %}active{% endif %}">Géoportail</a></li>
+                <li><a href="http://geoai-solutions.ddns.net:6754/meteo" class="{% if request.path == '/meteo' %}active{% endif %}">Météo</a></li>
+                <li><a href="http://geoai-solutions.ddns.net:6754/marine" class="{% if request.path == '/marine' %}active{% endif %}">Flotte maritime</a></li>
+                <li><a href="http://geoai-solutions.ddns.net:6754/moyens" class="{% if request.path == '/moyens' %}active{% endif %}">Moyens de secours</a></li>
+                <li><a href="http://geoai-solutions.ddns.net:6754/simulate_derive" class="{% if request.path == '/simulate_derive' %}active{% endif %}">Dérives</a></li>
+                <li><a href="http://geoai-solutions.ddns.net:6754/alerte" class="{% if request.path == '/alerte' %}active{% endif %}">Alertes</a></li>
+          </ul>
+          <ul class="nav navbar-nav navbar-right">
+            <li>
+              <div id="login-box" class="navbar-form" style="display: none">
+                <span></span>
+                <a
+                  class="btn btn-default btn-raised"
+                  type="button"
+                  href="?login"
+                  id="login"
+                  title="Se connecter"
+                  tabindex="110"
+                  accesskey="10"
+                  i18n="tbar.right.login">
+                  <span class="fas fa-lock-open" aria-hidden="true"></span>
+                </a>
+              </div>
+            </li>
+            <li>
+              <div class="navbar-form" id="searchtool" role="search">
+                  <div class="form-group input-group">
+                      <!--                            <input class="form-control" i18n="navbar.search.placeholder" id="searchfield"-->
+                      <!--                                   placeholder="Rechercher" type="text">-->
+                      <input class="form-control" i18n="navbar.search.placeholder" id="searchfield-custom"
+                             placeholder="Rechercher" type="text">
+                      <div class="input-group-btn">
+                          <button aria-label="Help" class="btn btn-default" id="btn-search-validate"
+                                  i18n="search.panel.title" title="Rechercher"
+                                  type="button">
+                              <span class="glyphicon glyphicon-search"></span>
+                          </button>
+                          <button aria-label="Help" class="btn btn-default" data-target="#parameterspanel"
+                                  data-toggle="modal"
+                                  i18n="search.panel.title" title="Paramètres de recherche"
+                                  type="button">
+                              <span class="glyphicon glyphicon-option-vertical"></span>
+                          </button>
+                      </div>
+                  </div>
+              </div>
+          </li>
+          <li class="hidden-xs hidden-sm">
+            <div class="nav navbar-nav dropdown">
+                <button class="btn btn-default navbar-btn mv-navbar-btn dropdown-toggle" data-toggle="dropdown"
+                        id="btn-connexion"
+                        type="button"
+                ><span class="fa fa-user"></span></button>
+                <ul aria-labelledby="btn-connexion" class="dropdown-menu ">
+                    <li><a role="button"><i class="fas fa-user pl-1" id="auth_connected_user">Invité Utilisateur</i></a>
+                    </li>
+                    <li><a role="button" data-toggle="modal" data-target="#panel-update-password" style="display: none;"><i
+                            class="fas fa-edit pl-1" id="auth_update_password">&nbsp;Modifier
+                        Mot de Passe</i></a>
+                    </li>
+                    <li class="divider" role="separator" style="display: none;">Connexion</li>
+                    <!--                            <li><a role="button" data-toggle="modal" data-target="#auth-modal"><i-->
+                    <!--                                    class="fas fa-sign-in-alt pl-1">Connexion</i></a></li>-->
+                    <li><a onclick="deconnect()" role="button" style="display: none;"><i
+                            class="fas fa-sign-out-alt">&nbsp;Déconnexion</i></a></li>
+
+                </ul>
+            </div>
+        </li>
+        <li class="hidden-xs hidden-sm">
+            <div class="nav navbar-nav">
+                <button class="btn btn-default navbar-btn mv-navbar-btn" data-target="#help" data-toggle="modal"
+                        i18n="help.modal.doc" id="iconhelp" title="Lien vers la documentation"
+                        type="button"><span class="fas fa-question"></span></button>
+            </div>
+        </li>
+        <li class="hidden-xs hidden-sm">
+            <div class="nav navbar-nav">
+                <a href="javascript:window.top.location.reload(true)" class="btn btn-default navbar-btn mv-navbar-btn"
+                        i18n="help.modal.doc" id="icon" title="Lien vers la documentation"
+                        ><span class="glyphicon glyphicon-refresh"></span></a>
+            </div>
+        </li>
+            <!-- SEARCH RESULTS  -->
+            <div class="list-group" id="searchresults">
+              <div class="searchresults-title" i18n="search.result.title">Résultats
+                  <i id="total-resultat"></i>
+                  <button class="close" onclick="$('#searchfield-custom').val('')" type="button">&times;</button>
+              </div>
+          </div>
+          </ul>
+        </div>
+      </nav>
+      <!-- WRAPPER - AFFICHÉ PAR DÉFAUT -->
+      <div id="wrapper" style="display: block">
+        <!-- LEFT MENU SIDEBAR -->
+        <div id="sidebar-wrapper"></div>
+        <!-- Page Content -->
+        <div id="page-content-wrapper">
+          <div class="container-fluid xyz">
+            <!--  MAP  -->
+            <div class="row">
+              <div id="map"></div>
+              <div id="layers-container-box" class="">
+                <div id="legend" class="active">
+                  <div id="layers-container-box-header">
+                    <a
+                      onclick="mviewer.toggleLegend();"
+                      title="Afficher/masquer la légende"
+                      i18n="legend.title"
+                      href="#">
+                      <span class="glyphicon glyphicon-list"></span>
+                    </a>
+                    <a
+                      id="btn-remove-layers"
+                      onclick="mviewer.removeAllLayers();"
+                      title="Supprimer toutes les couches"
+                      i18n="legend.remove.all"
+                      href="#">
+                      <span class="glyphicon glyphicon-trash"></span>
+                    </a>
+                  </div>
+                  <ul id="layers-container" class="list-group"></ul>
+                </div>
+              </div>
+              <div id="feature-info"></div>
+              <!-- BOTTOM PANEL -->
+              <div id="bottom-panel">
+                <div id="bottom-panel-btn">
+                  <i
+                    class="mv-close fas fa-chevron-down"
+                    title="Fermer ce panneau"
+                    i18n="bottom.panel.close"
+                    onclick="$('#bottom-panel').toggleClass('active')"></i>
+                </div>
+                <div class="mv-header">
+                  <h5 i18n="bottom.panel.title">Informations</h5>
+                </div>
+                <div class="popup-content"></div>
+              </div>
+              <!-- RIGHT PANEL -->
+              <div id="right-panel">
+                <div class="mv-header">
+                  <h5 i18n="right.panel.title">Informations</h5>
+                  <a
+                    href="#"
+                    class="close"
+                    data-dismiss="alert"
+                    aria-label="close"
+                    onclick="$('#right-panel').toggleClass('active')"
+                    title="Fermer"
+                    i18n="right.panel.close"
+                    >×</a
+                  >
+                </div>
+                <div class="popup-content"></div>
+              </div>
+            </div>
+          </div>
+          <div id="mouse-position" class="container"></div>
+          <!-- MARKER USED BY SEARCH IN FEATURES FUNCTIONNALITY, TO LOCATE SELECTED FEATURE ON THE MAP-->
+          <img id="mv_marker" class="mv_marker_img" style="max-width: 50px" />
+          <svg
+            id="mv_marker"
+            class="mv_marker_svg"
+            xmlns="http://www.w3.org/2000/svg"
+            xmlns:xlink="http://www.w3.org/1999/xlink"
+            version="1.1"
+            x="0px"
+            y="0px"
+            viewBox="0 0 297 297"
+            style="enable-background: new 0 0 297 297"
+            xml:space="preserve"
+            width="30px"
+            height="30px">
+            <path
+              d="M148.5,0C85.646,0,34.511,51.136,34.511,113.989c0,25.11,8.008,48.926,23.157,68.873  c13.604,17.914,32.512,31.588,53.658,38.904l27.464,68.659c1.589,3.971,5.434,6.574,9.71,6.574c4.276,0,8.121-2.603,9.71-6.574  l27.464-68.659c21.146-7.316,40.054-20.99,53.658-38.904c15.149-19.947,23.157-43.763,23.157-68.873  C262.489,51.136,211.354,0,148.5,0z M148.5,72.682c22.777,0,41.308,18.53,41.308,41.308c0,22.777-18.53,41.309-41.308,41.309  c-22.777,0-41.308-18.531-41.308-41.309C107.192,91.212,125.723,72.682,148.5,72.682z"
+              fill="#F31541" />
+            <g></g>
+            <g></g>
+            <g></g>
+            <g></g>
+            <g></g>
+            <g></g>
+            <g></g>
+            <g></g>
+            <g></g>
+            <g></g>
+            <g></g>
+            <g></g>
+            <g></g>
+            <g></g>
+            <g></g>
+          </svg>
+            <div id="backgroundlayerstoolbar-gallery">
+              <div class="" onclick="mviewer.bgtoogle();"></div>
+              <ul id="basemapslist"></ul>
+          </div>
+          <!-- MVIEWER INFO AND VERSION  -->
+          <div id="mviewerinfosbar" class="hidden-xs">
+            <span id="powered" i18n="infos.powered">Propulsé par </span>
+            <a class="mviewer-link" href="https://www.crts.gov.ma/" target="_blank"
+              >GeoSIG</a
+            >
+          </div>
+       
+          <!-- SECOND VERTICAL RIGHT TOOLBAR -->
+          <div
+            id="toolstoolbar"
+            class="btn-group-vertical btn-group-sm"
+            role="group"
+            aria-label="true">
+            <button
+              data-toggle="modal"
+              data-target="#sharepanel"
+              onclick="mviewer.mapShare();"
+              id="sharebtn"
+              title="Partager cette carte"
+              i18n="tbar.right.share"
+              tabindex="111"
+              accesskey="11"
+              class="btn btn-default btn-raised">
+              <span class="glyphicon glyphicon-share-alt" aria-hidden="true"></span>
+            </button>
+            <button
+              id="geolocbtn"
+              type="button"
+              class="btn btn-default btn-raised"
+              onclick="mviewer.geoloc();"
+              title="Se localiser"
+              i18n="tbar.right.location"
+              tabindex="103"
+              accesskey="3">
+              <span class="glyphicon glyphicon-map-marker" aria-hidden="true"></span>
+            </button>
+            <button
+              id="northbtn"
+              type="button"
+              class="btn btn-default btn-raised"
+              onclick="mviewer.northRotate();"
+              title="Orienté au nord"
+              i18n="tbar.right.rotation"
+              tabindex="106"
+              accesskey="6">
+              <span class="glyphicon glyphicon-upload" aria-hidden="true"></span>
+            </button>
+            <button
+              id="studiolink"
+              type="button"
+              class="btn btn-default btn-raised"
+              onclick="mviewer.openStudio();"
+              title="Modifier la carte"
+              i18n="tbar.right.studio"
+              tabindex="106"
+              accesskey="6">
+              <span class="glyphicon glyphicon-wrench" aria-hidden="true"></span>
+            </button>
+            <button accesskey="7" class="btn btn-default btn-raised admin"
+                        i18n="tbar.right.studio" id="account-extension-btn"
+                        onclick="administration.openPanelAdministration()" style="display: none"
+                        tabindex="106" title="Administration GeoCAD" type="button">
+                    <span class="fa fa-cogs"></span>
+                </button>
+                <button accesskey="7" class="btn btn-default btn-raised" i18n="tbar.right.studio"
+                id="routing-extension-btn"
+                tabindex="106" title="Calculer un itinéraire" type="button">
+            <span class="fa fa-road"></span>
+        </button>
+            <a
+              href="#"
+              id="exportpng"
+              title="Exporter carte au format image"
+              i18n="tbar.right.png"
+              download="carte.png"
+              class="btn btn-default btn-raised"
+              tabindex="113"
+              accesskey="13"
+              style="display: none">
+              <span class="glyphicon glyphicon-picture" aria-hidden="true"></span>
+            </a>
+            <button
+              id="mapprint"
+              type="button"
+              class="btn btn-default btn-raised"
+              onclick="window.print();"
+              title="Imprimer la vue courante"
+              i18n="tbar.right.mapprint"
+              tabindex="106"
+              accesskey="6">
+              <span class="glyphicon glyphicon-print" aria-hidden="true"></span>
+            </button>
+          </div>
+          <div
+            id="backgroundlayerstoolbar-default"
+            class="btn-group-vertical btn-group-sm"
+            role="group"
+            aria-label="true">
+            <button
+              href="#"
+              onclick="mviewer.nextBackgroundLayer();"
+              id="backgroundlayersbtn"
+              title="Changer de fond de carte"
+              i18n="tbar.right.background"
+              tabindex="103"
+              accesskey="3"
+              class="btn-lg btn-default btn-raised">
+            </button>
+          </div>
+
+
+  <div aria-label="true" class="btn-group-vertical btn-group-sm" id="backgroundlayerstoolbar-default"
+       role="group">
+      <button accesskey="3" class="btn-lg btn-default btn-raised" href="#"
+              i18n="tbar.right.background" id="backgroundlayersbtn" onclick="mviewer.nextBackgroundLayer();"
+              tabindex="103"
+              title="Changer de fond de carte">
+      </button>
+
+  </div>
+</div>
+</div><!-- END WRAPPER -->
+<!-- THIRD VERTICAL RIGHT TOOLBAR -->
+<div aria-label="true" class="btn-group-vertical btn-group-sm " id="toolstoolbar-edition" role="group">
+
+  <button accesskey="7"  class="btn btn-default btn-raised admin operator"
+           id="apis-extension-btn" i18n="tbar.right.studio"
+          onclick="apis.setAvtivedModification()" style="display: none"
+          tabindex="106" title="Ajouter un èvenement" type="button">
+      <span class="fa fa-edit"></span>
+  </button>
+  <button accesskey="7"  disabled class="btn btn-default btn-raised admin operator  ol-edit btn-edit"
+          i18n="tbar.right.studio" id="ol-select"
+          style="display: none"
+          tabindex="106" title="Sélectionner" name="recap" type="button">
+      <span class="fa fa-mouse-pointer"></span>
+  </button>
+  <button accesskey="7"  disabled class="btn btn-default btn-raised admin operator  btn-edit"
+          i18n="tbar.right.studio" id="ol-delete"
+          style="display: none"
+          tabindex="106" title="Supprimer" name="Delete" type="button">
+      <span class="fa fa-trash"></span>
+  </button>
+  <button accesskey="7"  disabled class="btn btn-default btn-raised admin operator ol-edit btn-edit"
+          i18n="tbar.right.studio" id="ol-draw-point"
+           style="display: none"
+          tabindex="106" title="Point" name="DrawPoint" type="button">
+      <span class="fa fa-map-pin"></span>
+  </button>
+  <button accesskey="7"  disabled class="btn btn-default btn-raised admin operator ol-edit btn-edit"
+          i18n="tbar.right.studio" id="ol-draw-line"
+          style="display: none"
+          tabindex="106" title="Ligne" name="DrawLine" type="button">
+      <span class="fas fa-wave-square" ></span>
+  </button>
+  <button accesskey="7"  disabled class="btn btn-default btn-raised admin operator ol-edit btn-edit"
+          i18n="tbar.right.studio" id="ol-draw-polygon"
+          style="display: none"
+          tabindex="106" title="Polygone" name="DrawPolygon" type="button">
+      <span class="fa fa-draw-polygon" ></span>
+  </button>
+  <button accesskey="7" disabled  class="btn btn-default btn-raised admin operator  btn-edit"
+          i18n="tbar.right.studio" id="btn-recap"
+          style="display: none"
+          tabindex="106" title="Récapitulatif" name="recap" type="button">
+      <span class="fa fa-list"></span>
+  </button>
+
+</div>
+
+<div aria-label="true" class="btn-group-vertical btn-group-sm" id="backgroundlayerstoolbar-default"
+   role="group">
+  <button accesskey="3" class="btn-lg btn-default btn-raised" href="#"
+          i18n="tbar.right.background" id="backgroundlayersbtn" onclick="mviewer.nextBackgroundLayer();"
+          tabindex="103"
+          title="Changer de fond de carte">
+  </button>
+
+</div>
+</div>
+</div><!-- END WRAPPER -->
+<div id="snackbar">Toast..</div>
+<!--    popup de modification des événements;-->
+
+<div aria-hidden="true" aria-labelledby="modification" class="modal fade" id="up-modal" role="dialog" >
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button aria-label="Close" class="close btn-dismiss-modal" data-dismiss="modal" type="button">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h5 class="modal-title" id="modification">Modification de l'événement</h5>
+
+            </div>
+
+            <div class="modal-body">
+                <form class="row" id="update-event-form">
+                    <div class="form-group col-lg-12 col-12">
+                        <label for="select_update_event_type">Type</label>
+                        <select class="form-control" style="width: 100%" id="select_update_event_type">
+                            <option></option>
+                        </select>
+                    </div>
+              
+                    <div class="form-group col-lg-6 col-6">
+                        <label for="select_source">Source</label>
+                        <select class="form-control" id="select_source">
+                            <option></option>
+                        </select>
+                    </div>
+                    <div class="form-group col-lg-6 col-6">
+                        <label for="select_update_event_ponctuel">Théme</label>
+                        <select class="form-control" id="select_update_event_ponctuel">
+                            <option></option>
+                        </select>
+                    </div>
+                    <div class="form-group col-lg-6 col-6">
+                        <label for="select_update_event_classification">Classification</label>
+                        <select class="form-control" id="select_update_event_classification">
+                            <option></option>
+                        </select>
+                    </div>
+                    <div class="form-group   col-lg-6 col-6">
+                        <label for="event_update_date_debut">Date Début</label>
+                        <input class="form-control" id="event_update_date_debut"
+                               placeholder="Sélectionner la date de début "
+                               type="date"/>
+                    </div>
+                    <div class="form-group   col-lg-6 col-6">
+                        <label for="event_update_date_fin">Date Fin</label>
+                        <input class="form-control" id="event_update_date_fin"
+                               placeholder="Sélectionner la date de fin "
+                               type="date"/>
+                    </div>
+                    <div class="form-group   col-lg-6 col-6">
+                        <label for="event_update_date_debut">Heure Début</label>
+                        <input class="form-control" id="event_update_heure_debut"
+                               placeholder="Sélectionner l'heure de début "
+                               type="time"/>
+                    </div>
+                    <div class="form-group   col-lg-6 col-6">
+                        <label for="event_update_date_fin">Heure Fin</label>
+                        <input onchange="console.log(this.value)" class="form-control" id="event_update_heure_fin"
+                               placeholder="Sélectionner l'heure de fin "
+                               type="time"/>
+                    </div>
+                    <div class="form-group   col-lg-12 col-12 required">
+                        <label for="inp_update_event_name">Nom</label>
+                        <input class="form-control" id="inp_update_event_name"
+                               placeholder="Taper la dénomination de l'événement "
+                               required="required" type="text"/>
+                    </div>
+
+
+
+           
+                    <div class="form-group col-lg-12 col-12">
+                        <label for="simulationGroup">Simulation</label>
+
+                        <div class="d-flex d-inline-block" id="simulationGroup">
+                            <div class="d-inline-flex">
+                                <div class="form-check form-check-inline">
+                                    <input id="simulationYes" name="simulation" type="radio" value="Oui">
+                                    <label for="simulationYes" style="font-weight: normal !important;">Oui</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input id="simulationNo" name="simulation" type="radio" value="Non">
+                                    <label for="simulationNo" style="font-weight: normal !important;">Non</label>
+                                </div>
+                            </div>
+
+                            <input class="form-control" placeholder="Taper le Buffer (Km)"
+                               type="number" id="update_buffer_simulation"/>
+                        </div>
+
+
+                    </div>
+
+                    <div class="form-group  col-lg-4 col-12">
+                        <label for="update_event_localite">Localité</label>
+                        <input class="form-control" placeholder="Taper la dénomination de la localite"
+                               type="text" id="update_event_localite"/>
+                    </div>
+                    <div class="form-group  col-lg-4 col-12">
+                        <label for="update_event_lieu">Lieu</label>
+                        <input class="form-control" placeholder="Taper le lieu"
+                               type="text" id="update_event_lieu"/>
+                    </div>
+                    <div class="form-group col-lg-4 col-12">
+                        <label for="update_event_pays">Pays</label>
+                        <input class="form-control" placeholder="Taper le nom du pays"
+                               type="text" id="update_event_pays"/>
+                    </div>
+                    
+                    <div class="form-group   col-lg-6 col-6 ">
+                        <label for="inp_update_event_detail">Détail</label>
+                        <textarea class="form-control" id="inp_update_event_detail" placeholder="Taper le détail"
+                                  rows="3"
+                                  style="resize: vertical"></textarea>
+                    </div>
+                    <div class="form-group   col-lg-6 col-6 ">
+                        <label for="inp_update_event_resume">Résumé</label>
+                        <textarea class="form-control" id="inp_update_event_resume"
+                                  placeholder="Taper le résumé de l'événement"
+                                  rows="3"
+                                  style="resize: vertical"></textarea>
+                    </div>
+
+
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary btn-dismiss-modal" style="border-radius: 50rem !important;"
+                        data-dismiss="modal" type="button">
+                    Annuler
+                </button>
+                <button class="btn btn-success" style="border-radius: 50rem !important;" onclick="update()">
+                    <span class="fa fa-save"> Sauvegarder </span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!--    popup de bilan activité GR;-->
+<div aria-hidden="true" aria-labelledby="modification" class="modal fade" id="bilan-modal" role="dialog"
+     tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content" role="document">
+            <div class="modal-header">
+                <button aria-label="Close" class="close btn-dismiss-modal" data-dismiss="modal" type="button">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h5 class="modal-title" id="bilan-modal-title">Nouveau Bilan</h5>
+
+            </div>
+
+            <div class="modal-body">
+                <form id="bilan-modal-form">
+
+                    <fieldset class="form-group">
+                        <legend>Date</legend>
+                        <div class="form-group   col-lg-12 col-12">
+                            <label for="inp_date_bilan">Date</label>
+                            <input class="form-control" id="inp_date_bilan" placeholder="Sélectionner la date "
+                                   type="date"/>
+                        </div>
+                    </fieldset>
+                    <fieldset class="form-group">
+                        <legend>Accidents</legend>
+                        <div class="form-group   col-lg-12 col-12 required">
+                            <label for="inp_ac_total">Total Accident</label>
+                            <input class="form-control" id="inp_ac_total"
+                                   placeholder="Total accidents "
+                                   required="required" type="number"/>
+                        </div>
+                        <div class="form-group   col-lg-4 col-4 required">
+                            <label for="inp_ac_morts">Total Morts</label>
+                            <input class="form-control" id="inp_ac_morts"
+                                   placeholder="Total Morts "
+                                   required="required" type="number"/>
+                        </div>
+                        <div class="form-group   col-lg-4 col-4 required">
+                            <label for="inp_ac_BG">Total Blessés Graves</label>
+                            <input class="form-control" id="inp_ac_BG"
+                                   placeholder="Total Blessés Graves "
+                                   required="required" type="number"/>
+                        </div>
+                        <div class="form-group   col-lg-4 col-4 required">
+                            <label for="inp_BL">Total Blessés Légers</label>
+                            <input class="form-control" id="inp_BL"
+                                   placeholder="Total Blessés Légers "
+                                   required="required" type="number"/>
+                        </div>
+                    </fieldset>
+                    <fieldset class="form-group">
+                        <legend>PVs établis</legend>
+                        <div class="form-group   col-lg-12 col-12 required">
+                            <label for="inp_pv_total">Total Pvs</label>
+                            <input class="form-control" id="inp_pv_total"
+                                   placeholder="Total PVs "
+                                   required="required" type="number"/>
+                        </div>
+                        <div class="form-group   col-lg-6 col-6 required">
+                            <label for="inp_pv_arrestation">PVs avec arrestattion</label>
+                            <input class="form-control" id="inp_pv_arrestation"
+                                   placeholder="PVs avec arrestattion"
+                                   required="required" type="number"/>
+                        </div>
+                        <div class="form-group   col-lg-6 col-6 required">
+                            <label for="inp_pv_code_route">Pvs Code Route</label>
+                            <input class="form-control" id="inp_pv_code_route"
+                                   placeholder="Pvs Code Route "
+                                   required="required" type="number"/>
+                        </div>
+                    </fieldset>
+                    <fieldset class="form-group">
+                        <legend>COVID-19</legend>
+                        <div class="form-group   col-lg-6 col-6 required">
+                            <label for="inp_covide_pv_total">Total Pvs établis</label>
+                            <input class="form-control" id="inp_covide_pv_total"
+                                   placeholder="Total PVs "
+                                   required="required" type="number"/>
+                        </div>
+                        <div class="form-group   col-lg-6 col-6 required">
+                            <label for="inp_covid_cumul">Cumul Pvs depuis le 03.03.2021</label>
+                            <input class="form-control" id="inp_covid_cumul"
+                                   placeholder="Cumul Pvs COVID"
+                                   required="required" type="number"/>
+                        </div>
+
+                    </fieldset>
+
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary btn-dismiss-modal" data-dismiss="modal" type="button">
+                    Annuler
+                </button>
+                <button class="btn btn-success" onclick="addOrUpdateBilan()">
+                    <span class="fa fa-save"> Sauvegarder </span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--   PANEL UPDATE PASSWORD-->
+
+<div class="modal fade" role="dialog" id="panel-update-password"
+     tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content" role="document">
+            <div class="modal-header">
+                <button aria-label="Close" class="close " data-dismiss="modal" type="button">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" id="auth-modal-title">Modification Mot de Passe</h4>
+
+            </div>
+
+            <div class="modal-body">
+                <form class="auth-modal-form">
+                    <div class="form-group">
+                        <div class="input-group input col-lg-12 col-12">
+                                <span class="input-group-addon glyphicon glyphicon-lock" id="addon-1">
+
+                                </span>
+                            <input aria-labelledby="addon-1" class="form-control" id="old-password"
+                                   placeholder="Ancien Mot de Passe" required
+                                   type="password"/>
+                        </div>
+                        <i class="old-password-error" style="color: red;display: none">Ancien Mot de passe erroné
+                        </i>
+                        <hr>
+                        <div class="input-group col-lg-12 col-12">
+                                <span class="input-group-addon glyphicon glyphicon-lock" id="addon-2">
+                                </span>
+                            <input aria-labelledby="addon-2" class="form-control" id="new-password" required
+                                   placeholder="Nouveau Mot de passe"
+                                   type="password"/>
+                        </div>
+                        <br>
+                        <div class="input-group col-lg-12 col-12">
+                                <span class="input-group-addon glyphicon glyphicon-lock" id="addon-3">
+                                </span>
+                            <input aria-labelledby="addon-3" class="form-control" id="confirmation-new-password"
+                                   required
+                                   placeholder="Confirmer Nouveau mot de passe"
+                                   type="password"/>
+
+                        </div>
+                        <i class="new-password-comf-error" style="color: red;display: none">Mots de passe ne
+                            correspondent pas
+                        </i>
+                    </div>
+
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary btn-dismiss-modal" data-dismiss="modal" type="button">
+                    Annuler
+                </button>
+                <button class="btn btn-info" disabled="disabled" id="btn-update-password"
+                        onclick="updatePassword()" style="display: none;">
+                    <span class="fa fa-save"> Modifier </span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- SEARCH PARAMETERS PANEL -->
+<div class="modal fade" id="parameterspanel" role="dialog" tabindex="-1">
+    <div class="modal-dialog moda">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button class="close" data-dismiss="modal" i18n="search.panel.close" title="Fermer" type="button">
+                    &times;
+                </button>
+                <h5 class="modal-title" i18n="search.panel.title">Paramètres de recherche</h5>
+            </div>
+            <div class="modal-body">
+                <ul id="searchparameters">
+                    <li class="mv-param-item" onclick="searchExtent._toggleParameter(this)">
+                        <a href="#">
+                            <span class="state-icon far  mv-checked" id="param_search_bbox" style="color: black"></span>
+                            <div i18n="search.modal.extent.text" style="display:inline;color: black; border-left: 3px solid red">Rechercher dans les données chargées
+                            </div>
+                        </a>
+                    </li>
+                    <li class="mv-param-item" id="param_search_event" onclick="customSearch._toggleParameter(this)">
+                        <a href="#">
+                            <span class="state-icon far mv-checked" style="color: black"></span>
+                            <div i18n="search.modal.items.text" style="display:inline;color: black;border-left: 3px solid #0a6ebd">Rechercher des évènements
+                            </div>
+                        </a>
+                    </li>
+                    <li class="mv-param-item" id="param_search_geo_cad"
+                        onclick="customSearch._toggleParameter(this)">
+                        <a href="#">
+                            <span class="state-icon far mv-checked" style="color: black"></span>
+                            <div i18n="search.modal.items.text" style="display:inline;color:black ;border-left: 3px solid green">Rechercher dans milieu</div>
+                        </a>
+                    </li>
+                    <li class="mv-param-item" id="param_search_forces"
+                        onclick="customSearch._toggleParameter(this)">
+                        <a href="#">
+                            <span class="state-icon far mv-unchecked" style="color:black;"></span>
+                            <div i18n="search.modal.items.text" style="display:inline;color: black;border-left: 3px solid #ff700d">Rechercher les forces</div>
+                        </a>
+                    </li>
+
+                </ul>
+                <p id="adresse-attribution"></p>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- LAYER AUTHENTIFICATION PANEL -->
+<div class="modal fade" id="loginpanel" role="dialog" tabindex="-1">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button class="close" data-dismiss="modal" type="button">&times;</button>
+                <h5 class="modal-title" i18n="layer.authent.title" id="login-panel-title">Configurer l'accès au
+                    service</h5>
+                <span id="login-panel-service-url"><small><i
+                        i18n="layer.authent.title">URL du service</i></small></span>
+            </div>
+            <div class="modal-body">
+                <div class="loginmodal-container">
+                    <form>
+                        <input id="service-url" type="hidden">
+                        <input id="layer-id" type="hidden">
+                        <input i18n="layer.authent.login" id="user" placeholder="Login" type="text">
+                        <input i18n="layer.authent.password" id="pass" placeholder="Mot de passe" type="password">
+                        <input class="btn btn-light" i18n="layer.authent.valid" id="savelogin" title="valider"
+                               type="button" value="Valider">
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+      <!-- ADD LAYER PANEL -->
+      <div id="addLayerpanel" class="modal fade" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-lg">
+          <div class="modal-content" role="document">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal">&times;</button>
+              <h4 class="modal-title" i18n="addlayers.modal.title">
+                Ajouter des données
+              </h4>
+            </div>
+            <div class="modal-body">
+              <ul class="nav nav-tabs" role="tablist">
+                <li role="presentation" class="active">
+                  <a
+                    href="#add_ogc"
+                    aria-controls="profile"
+                    role="tab"
+                    data-toggle="tab"
+                    i18n="addlayers.modal.ogc"
+                    >OGC</a
+                  >
+                </li>
+                <li role="presentation">
+                  <a
+                    href="#add_csw"
+                    aria-controls="messages"
+                    role="tab"
+                    data-toggle="tab"
+                    i18n="addlayers.modal.csw"
+                    >CSW</a
+                  >
+                </li>
+              </ul>
+              <!-- Tab panes -->
+              <div class="tab-content" id="addlayers_tabs">
+                <div role="tabpanel" class="tab-pane active" id="add_ogc">
+                  <h4 i18n="addlayers.modal.ogc">
+                    Ajouter des données issue d'un service OGC
+                  </h4>
+                  <div class="container-fluid">
+                    <div class="row">
+                      <div class="col">
+                        Choisissez un serveur :
+                        <select
+                          id="addLayers_service_url_select"
+                          class="form-control form-control-sm addLayers_service_url_select">
+                          <option value=""></option></select
+                        ><br />
+                        ...ou saisissez l'url du service :
+                        <input type="text" id="addLayers_service_url" value="" />
+                        <button
+                          onclick="mviewer.tools.addlayers.connect();"
+                          type="button">
+                          Connexion&nbsp;<span
+                            class="glyphicon glyphicon-chevron-right"></span>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div role="tabpanel" class="tab-pane" id="add_csw">
+                  <h4 i18n="addlayers.modal.csw">
+                    Ajouter des données issue d'un service CSW
+                  </h4>
+                  Choisissez un serveur :
+                  <select
+                    id="addLayers_service_url_csw_select"
+                    class="form-control form-control-sm addLayers_service_url_select">
+                    <option value=""></option></select
+                  ><br />
+                  ...ou saisissez l'url du service :
+                  <input
+                    type="text"
+                    id="addLayers_service_url_csw"
+                    class="form-control"
+                    value="" /><br />
+                  Filter:<input
+                    type="text"
+                    id="addLayers_service_filter_csw"
+                    class="form-control csw_search"
+                    placeholder="Rechercher..." />
+
+                  <button onclick="mviewer.tools.addlayers.connectCsw();" type="button">
+                    Connexion&nbsp;<span class="glyphicon glyphicon-chevron-right"></span>
+                  </button>
+                </div>
+              </div>
+              <div class="container-fluid">
+                <div class="row" id="addlayers_results_loading" style="display: none">
+                  <div class="col-md-12 col-sm-12 col-xs-12 text-center center-block">
+                    <div class="loading_container">
+                      <div class="single4"></div>
+                      Chargement...
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-12 col-sm-12 col-xs-12" id="addlayers_results"></div>
+                </div>
+                <div class="row">
+                  <div
+                    class="col-md-12 col-sm-12 col-xs-12 text-center center-block"
+                    id="addlayers_results_pager"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- SHARE PANEL -->
+      <div id="sharepanel" class="modal fade" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-sm">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal">&times;</button>
+              <h4 class="modal-title">
+                <center i18n="share.panel.title">Partager cette carte</center>
+              </h4>
+            </div>
+            <div class="modal-body">
+              <h6 class="modal-share-title">
+                <strong i18n="share.modal.title">Mode d'affichage</strong>
+              </h6>
+              <div class="row">
+                <div class="col-md-12 col-sm-12 col-xs-12">
+                  <div class="form-group" id="mv-display-mode">
+                    <label class="radio-inline">
+                      <input
+                        type="radio"
+                        value="d"
+                        name="mv-display-mode"
+                        checked
+                        i18n="share.radio.normal" />
+                      <div style="display: inline" i18n="share.radio.normal">Normal</div>
+                    </label>
+                    <label class="radio-inline">
+                      <input type="radio" name="mv-display-mode" value="s" />
+                      <div style="display: inline" i18n="share.radio.simple">
+                        Simplifié
+                      </div>
+                    </label>
+                    <label class="radio-inline">
+                      <input type="radio" name="mv-display-mode" value="u" />
+                      <div style="display: inline" i18n="share.radio.minimal">
+                        Ultra simplifié
+                      </div>
+                    </label>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-6 col-sm-6 col-xs-6">
+                  <a
+                    type="button"
+                    class="btn btn-default"
+                    id="permalinklink"
+                    href="#"
+                    title="Lien permanent vers la carte"
+                    i18n="share.picture.permalink"
+                    ><img src="img/share/share_link.png" height="100px"
+                  /></a>
+                </div>
+                <div id="share" class="col-md-6 col-sm-6 col-xs-6">
+                  <img
+                    id="permaqr"
+                    src="img/blank.gif"
+                    title="QR code vers la carte"
+                    i18n="share.picture.qrcode"
+                    alt="QR code" />
+                </div>
+              </div>
+              <div class="row" id="shareToMapfish">
+                <div class="col-sm-10 form-inline">
+                  <button
+                    style="display: inline"
+                    id="shareToMapfishButton"
+                    type="button"
+                    class="btn btn-md btn-default"
+                    onclick="mviewer.sendToGeorchestra();">
+                    <span class="fas fa-share-square"></span>
+                    <div i18n="share.btn.mapfishapp">Afficher dans Mapfishapp</div>
+                  </button>
+                  <form
+                    id="georchestraForm"
+                    target="_blank"
+                    method="post"
+                    action="#"
+                    style="display: none">
+                    <input type="hidden" id="georchestraFormData" name="data" value="" />
+                    <input
+                      type="submit"
+                      data-role="button"
+                      data-mini="true"
+                      data-iconpos="right"
+                      value="geOrchestra" />
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- IMAGE POPUP -->
+      <div id="imagepopup" class="modal fade" tabindex="-1" role="dialog">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal">&times;</button>
+              <h4 class="modal-title"></h4>
+            </div>
+            <div class="modal-body">
+              <div class="row">
+                <div class="col-md-12">
+                  <img
+                    class="popphoto center-block"
+                    src="img/blank.gif"
+                    style="max-height: 512px"
+                    alt="image" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- LANG POPUP -->
+      <div id="lang-popup" class="modal fade" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-lg">
+          <div class="modal-content" role="document">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal">&times;</button>
+              <h4 class="modal-title" i18n="lang.modal.title">Langues</h4>
+            </div>
+            <div id="lang-body" class="modal-body">
+              <ul></ul>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- HELP POPUP -->
+      <div id="help" class="modal fade" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-lg">
+          <div class="modal-content" role="document">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal">&times;</button>
+              <h4 class="modal-title" i18n="help.modal.title">DOCUMENTATION</h4>
+            </div>
+            <div class="modal-body"></div>
+          </div>
+        </div>
+      </div>
+      <!-- THEMATIC POPUP -->
+      <div id="thematic-modal" class="modal fade" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-sm">
+          <div class="modal-content" role="document">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal">&times;</button>
+              <h4 class="modal-title" i18n="thematic.modal.title">Thématiques</h4>
+            </div>
+            <div class="modal-body"></div>
+          </div>
+        </div>
+      </div>
+      <!-- LEGEND POPUP -->
+      <div id="legend-modal" class="modal fade" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-sm">
+          <div class="modal-content" role="document">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal">&times;</button>
+              <h4 class="modal-title" i18n="legend.modal.title">Options d'affichage</h4>
+            </div>
+            <div class="modal-body"></div>
+          </div>
+        </div>
+      </div>
+      <!-- FEATUREINFO POPUP -->
+      <div id="modal-panel" class="modal fade" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-md">
+          <div class="modal-content" role="document">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal">&times;</button>
+              <h4 class="modal-title" i18n="featureinfo.modal.title">Informations</h4>
+            </div>
+            <div class="modal-body">
+              <div class="popup-content"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!--ALERTS AREA -->
+      <div id="alerts-zone"></div>
+    </div>
+    <script src="lib/mustache-2.3.0/mustache.min.js"></script>
+    <script type="text/javascript" src="lib/proj4js/2.3.6/proj4.js"></script>
+    <script
+      type="text/javascript"
+      src="lib/jquery/base/1.10.2/jquery-1.10.2.min.js"></script>
+      <script src="lib/select2/dist/js/select2.min.js" type="text/javascript"></script>
+
+    <script type="text/javascript" src="lib/geotiff/geotiff.js"></script>
+    <script type="text/javascript" src="lib/ol8.2/ol.js"></script>
+    <script src="lib/ol-ext/dist/ol-ext.js" type="text/javascript"></script>
+    <script
+      type="text/javascript"
+      src="lib/jquery/base/plugins/xml2json/jquery.xml2json.js"></script>
+    <script type="text/javascript" src="lib/Sortable/1.4.2/Sortable.min.js"></script>
+    <script type="text/javascript" src="lib/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+    <script
+      type="text/javascript"
+      src="lib/bootstrap-datepicker-1.6.1/js/bootstrap-datepicker.min.js"></script>
+    <script
+      type="text/javascript"
+      src="lib/bootstrap-datepicker-1.6.1/locales/bootstrap-datepicker.fr.min.js"></script>
+    <script
+      type="text/javascript"
+      src="lib/bootstrap-slider/9.1.3/bootstrap-slider.min.js"></script>
+    <script type="text/javascript" src="lib/typeahead/typeahead.bundle.min.js"></script>
+    <script src="lib/ol-contextmenu/ol-contextMenu.js" type="text/javascript"></script>
+    <script
+      type="text/javascript"
+      src="lib/bootstrap-typeahead/bootstrap3-typeahead.min.js"></script>
+      <script src="lib/jspdf.min.js_1.5.3/jspdf.min.js" type="text/javascript"></script>
+      <script src="js/jspdf.plugin.autotable.js" type="application/javascript"></script>
+    <script src="lib/bootstrap-tagsinput-0.8.0/bootstrap-tagsinput.min.js"></script>
+    <script type="text/javascript" src="lib/fuse/fuse.min.js"></script>
+    <script type="text/javascript" src="js/extend.js"></script>
+    <script type="text/javascript" src="js/utils.js"></script>
+    <script type="text/javascript" src="js/ogcutils.js"></script>
+    <script type="text/javascript" src="js/configuration.js"></script>
+    <script type="text/javascript" src="js/zoom.js"></script>
+    <script type="text/javascript" src="js/measure.js"></script>
+    <script type="text/javascript" src="js/addlayers.js"></script>
+    <script type="text/javascript" src="js/info.js"></script>
+    <script type="text/javascript" src="js/search.js"></script>
+    <script type="text/javascript" src="js/mviewer.js"></script>
+    <script type="text/javascript" src="js/templates.js"></script>
+    <script type="text/javascript" src="js/featurestyles.js"></script>
+    <script type="text/javascript" src="js/custom.js"></script>
+    <script type="text/javascript" src="lib/i18njs/i18n.js"></script>
+    <script type="text/javascript" src="lib/moment/moment.js"></script>
+    <script type="text/javascript" src="lib/lodash-4.17.21/lodash.min.js"></script>
+    <script src="js/customUtils.js" type="text/javascript"></script>
+
+    <script>
+      if (
+        typeof mviewer == "undefined" ||
+        typeof configuration == "undefined" ||
+        typeof info == "undefined"
+      ) {
+        document.location.href = "pages/error_incompatibility.html";
+      }
+    </script>
+    <script type="text/javascript" src="lib/olms/8.2.1/olms.js"></script>
+
+    <script type="text/javascript">
+      var API = {};
+      $(document).ready(function () {
+        "use strict";
+        if (window.location.search) {
+          $.extend(
+            API,
+            $.parseJSON(
+              '{"' +
+                decodeURIComponent(
+                  window.location.search
+                    .substring(1)
+                    .replace(/&/g, '","')
+                    .replace(/=/g, '":"')
+                ) +
+                '"}'
+            )
+          );
+        }
+
+        // Search for a config param
+        var configFile = API.config;
+        var defaultEnvFile = API.env || "apps/settings.json";
+
+        // If no config param, search for a fragment (#)
+        if (!API.config) {
+          var fragment = window.location.hash.split("#")[1];
+          if (fragment) {
+            configFile = fragment;
+            if (!configFile.startsWith("/")) {
+              configFile = "/".concat(configFile);
+            }
+            configFile = "apps".concat(configFile);
+          }
+          if (configFile) {
+            if (!configFile.endsWith(".xml")) {
+              configFile = configFile.concat(".xml");
+            }
+          }
+        }
+
+        // If no config param nor fragment then use the default config file
+        if (!configFile) {
+          configFile = "apps/default.xml";
+        }
+
+        // Save the config file path in the API object
+        API.config = configFile;
+
+        var theme = API.theme ? API.theme : null;
+
+        $.ajax({
+          url: configFile + "?_dc=" + new Date().getTime(),
+          dataType: "xml",
+          success: function (xml) {
+            $(document).on("layersLoaded", function (e) {
+              mviewer.overLayersReady();
+              mviewer.showLayersByAttrOrder(mviewer.getLayersAttribute("rank"));
+              mviewer.orderLayerByIndex();
+            });
+            //load conf
+            $(document).on("configurationCompleted", function (e, eData) {
+              // load env var
+              configuration.getEnvData(
+                configFile.replace(".xml", ".json"),
+                defaultEnvFile
+              );
+              // load config on env var available
+              document.addEventListener("environementInfosAvailable", (r) => {
+                // set mviewer en from environment file
+                mviewer.env = { ...r.detail };
+                //get JSON conf from xml;
+                var _conf = configuration.parseXML(eData.xml);
+                var style = "css/themes/default.css";
+                if (
+                  !theme &&
+                  _conf.application.style &&
+                  _conf.application.style.match("css")
+                ) {
+                  style = _conf.application.style;
+                } else if (theme) {
+                  style = "css/themes/" + theme + ".css";
+                }
+                $("head").prepend(
+                  '<link rel="stylesheet" href="' + style + '" type="text/css" />'
+                );
+                var title = "";
+                if (_conf.application.title) {
+                  title = _conf.application.title;
+                  $("#loader-subtitle").empty();
+                  $("#loader-subtitle").append(title);
+                }
+                if (_conf.application.favicon) {
+                  let ico = _conf.application.favicon;
+                  let favicon = document.querySelector('link[rel="icon"]');
+                  favicon.attributes.href.value = ico;
+                }
+                configuration.load(_conf);
+                $(document).trigger("ready-for-component");
+                setTimeout(function () {
+                  $("#loading-page").hide();
+                  $("#main").css("opacity", 1).hide();
+                  $("#main").fadeIn(1500);
+                  mviewer.getMap().updateSize();
+                  mviewer.initToolTip();
+                }, 2000);
+              });
+              $("#map").focus();
+            });
+            $(document).on("applicationExtended", function (e, eData) {
+              configuration.complete(eData.xml);
+            });
+            configuration.getExtensions(xml);
+          }, // fin success config
+          error: function (request, status, error) {
+            if (request.statusCode().status === 404) {
+              $("#error h1").text(`Erreur ${request.statusCode().status} : ${error}`);
+              document.location.href = "pages/error_404.html?xml=" + configFile;
+            } else if (status === "parsererror") {
+              document.location.href = "pages/error_400.html?xml=" + configFile;
+            }
+            $("#error").show();
+            $("#loading-page").hide();
+          },
+        });
+
+        Sortable.create(document.getElementById("layers-container"), {
+          handle: ".layerdisplay-title",
+          draggable: ".draggable",
+          filter: ".toplayer",
+          onUpdate: function (evt) {
+            var actionMove = {
+              layerName: $(evt.item).attr("data-layerid"),
+              layerRef: "",
+              action: "",
+            };
+            var itemsList = $(evt.from).find(".list-group-item");
+            //New position in the list
+            var newPos = evt.newIndex;
+            if (newPos < itemsList.length - 1) {
+              //Get the under layer name
+              actionMove.layerRef = $(itemsList[newPos + 1]).attr("data-layerid");
+              actionMove.action = "up";
+            } else {
+              //Get the over layer name
+              actionMove.layerRef = $(itemsList[newPos - 1]).attr("data-layerid");
+              actionMove.action = "down";
+            }
+            mviewer.orderLayer(actionMove);
+          },
+        });
+        $("#right-panel .close,#bottom-panel .mv-close").click(function () {
+          mviewer.hideLocation();
+        });
+      });
+    </script>
+    <script type="text/javascript" src="lib/simple-slidebar/slidebar_menu.js"></script>
+    <script src="_config.js" type="application/javascript"></script>
+    <script src="lib/CryptoJS/rollups/md5.js" type="application/javascript"></script>
+<script src="lib/CryptoJS/rollups/aes.js" type="application/javascript"></script>
+<script src="js/datatable.js" type="application/javascript"></script>
+
+<script src="js/auth.js" type="application/javascript"></script>
+<script src="js/index.js" type="application/javascript"></script>
+
+<script src="js/templates.js" type="text/javascript"></script>
+
+<!-- SCRIPT DE DÉSACTIVATION COMPLÈTE DE L'AUTHENTIFICATION -->
+<script>
+(function() {
+    // Désactiver complètement l'authentification
+    console.log('Mode invité activé - Authentification désactivée');
+    
+    // S'assurer que le DOM est chargé
+    $(document).ready(function() {
+        // Masquer définitivement le conteneur de login
+        $('.container.login').hide();
+        
+        // Afficher la navbar et le wrapper
+        $('#mv-navbar').show();
+        $('#wrapper').show();
+        
+        // Masquer les éléments liés à l'authentification
+        $('#btn-update-password').hide();
+        $('.admin, .operator').hide();
+        $('[onclick="deconnect()"]').hide();
+        $('#auth_update_password').closest('li').hide();
+        
+        // Créer un utilisateur invité
+        window.currentUser = {
+            nom: 'Invité',
+            prenom: 'Utilisateur',
+            login: 'guest',
+            role: 'guest',
+            isGuest: true
+        };
+        
+        // Mettre à jour l'affichage du nom d'utilisateur
+        $('#auth_connected_user').text('Invité Utilisateur');
+        
+        // Déclencher l'événement de connexion pour les composants qui l'écoutent
+        $(document).trigger('userConnected', [window.currentUser]);
+    });
+    
+    // Remplacer les fonctions d'authentification
+    window.authenticate = function() {
+        console.log('Authentification désactivée - Mode invité');
+        return Promise.resolve(window.currentUser || { nom: 'Invité', prenom: 'Utilisateur', login: 'guest' });
+    };
+    
+    window.isAuthenticated = function() {
+        return true;
+    };
+    
+    window.checkAuth = function() {
+        return true;
+    };
+    
+    window.connect = function() {
+        console.log('Fonction connect désactivée - Mode invité');
+        return true;
+    };
+    
+    window.deconnect = function() {
+        console.log('Déconnexion désactivée - Mode invité');
+        return false;
+    };
+    
+    window.signup = function() {
+        console.log('Inscription désactivée - Mode invité');
+        return false;
+    };
+    
+    window.updatePassword = function() {
+        console.log('Modification mot de passe désactivée - Mode invité');
+        return false;
+    };
+    
+    window.onSwitch = function() {
+        console.log('Switch de formulaire désactivé - Mode invité');
+        return false;
+    };
+    
+    // Si la fonction setConnectedUser existe, l'utiliser
+    if (typeof setConnectedUser === 'function') {
+        setTimeout(function() {
+            setConnectedUser(window.currentUser || { nom: 'Invité', prenom: 'Utilisateur', login: 'guest' });
+        }, 500);
+    }
+})();
+</script>
+</body>
+</html>

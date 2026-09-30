@@ -1,0 +1,134 @@
+{{#features}}
+<li class="item ship-card">
+  <div class="ship-header">
+    <h3 class="ship-name">
+      <i class="fas fa-ship ship-icon"></i>
+      <a href="https://www.marinetraffic.com/en/ais/details/ships/shipid:{{id_ship}}" target="_blank">
+        {{shipname}} ({{flag}})
+      </a>
+    </h3>
+    <div class="ship-tags">
+      <span class="ship-tag tag-destination"><i class="fas fa-route"></i> {{destination}}</span>
+      <span class="ship-tag tag-type"><i class="fas fa-layer-group"></i> {{type_name}}</span>
+      <span class="ship-tag tag-status"><i class="fas fa-traffic-light"></i> {{status_name}}</span>
+      <span class="ship-tag tag-update"><i class="fas fa-clock"></i> {{last_update}}</span>
+    </div>
+    <div class="ship-tags">
+      <span class="ship-tag tag-destination"><i class="fas fa-route"></i> {{lat}}</span>
+      <span class="ship-tag tag-type"><i class="fas fa-layer-group"></i> {{lon}}</span>
+    </div>
+  </div>
+
+  <div class="ship-details">
+
+    <div class="detail-item"><i class="fas fa-tachometer-alt detail-icon"></i><div><span class="detail-label">Vitesse (kn)</span><span class="detail-value"> {{speed}}</span></div></div>
+    <div class="detail-item"><i class="fas fa-compass detail-icon"></i><div><span class="detail-label">Cap</span><span class="detail-value"> {{course}}</span></div></div>
+    <div class="detail-item"><i class="fas fa-directions detail-icon"></i><div><span class="detail-label">Heading</span><span class="detail-value"> {{heading}}</span></div></div>
+    <div class="detail-item"><i class="fas fa-hourglass detail-icon"></i><div><span class="detail-label">Temps écoulé (min)</span><span class="detail-value"> {{elapsed}}</span></div></div>
+    <div class="detail-item"><i class="fas fa-ruler-horizontal detail-icon"></i><div><span class="detail-label">Longueur (m)</span><span class="detail-value"> {{length}}</span></div></div>
+    <div class="detail-item"><i class="fas fa-ruler-vertical detail-icon"></i><div><span class="detail-label">Largeur (m)</span><span class="detail-value"> {{width}}</span></div></div>
+    <div class="detail-item"><i class="fas fa-sync-alt detail-icon"></i><div><span class="detail-label">ROT</span><span class="detail-value"> {{rot}}</span></div></div>
+    <div class="detail-item"><i class="fas fa-long-arrow-alt-up detail-icon"></i><div><span class="detail-label">L avant</span><span class="detail-value"> {{l_fore}}</span></div></div>
+    <div class="detail-item"><i class="fas fa-long-arrow-alt-left detail-icon"></i><div><span class="detail-label">L gauche</span><span class="detail-value"> {{w_left}}</span></div></div>
+    <div class="detail-item"><i class="fas fa-weight detail-icon"></i><div><span class="detail-label">DWT (t)</span><span class="detail-value"> {{dwt}}</span></div></div>
+    <div class="detail-item"><i class="fas fa-ship detail-icon"></i><div><span class="detail-label">Type navire</span><span class="detail-value"> {{shiptype}} / {{gt_shiptype}}</span></div></div>
+    <div class="detail-item" style="grid-column: span 2;">
+      <i class="fas fa-link detail-icon"></i>
+      <div>
+        <span class="detail-label">Lien direct vers </span>
+        <span class="detail-value">
+          <a href="https://www.marinetraffic.com/en/ais/details/ships/shipid:{{id_ship}}" target="_blank">
+            {{shipname}}
+          </a>
+        </span>
+      </div>
+    </div>
+  </div>
+</li>
+{{/features}}
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+<style>
+.ship-card {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  margin: 1em 0;
+  padding: 1.2em;
+  font-family: 'Inter', sans-serif;
+}
+
+.ship-header {
+  border-bottom: 1px solid #eee;
+  margin-bottom: 1em;
+  padding-bottom: 0.5em;
+}
+
+.ship-name {
+  font-size: 1.25rem;
+  color: #1e3a8a;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.ship-name a {
+  color: #0ea5e9;
+  text-decoration: none;
+}
+
+.ship-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.ship-tag {
+  background: #0ea5e9;
+  color: #fff;
+  padding: 5px 10px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+}
+
+.ship-details {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 15px;
+}
+
+.detail-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #f1f5f9;
+  border-radius: 10px;
+  padding: 10px;
+}
+
+.detail-icon {
+  background: #dbeafe;
+  color: #2563eb;
+  padding: 8px;
+  border-radius: 50%;
+}
+
+.detail-label {
+  font-size: 0.75rem;
+  color: #64748b;
+}
+
+.detail-value {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: #1e293b;
+}
+
+.detail-value a {
+  color: #0284c7;
+  text-decoration: underline;
+}
+</style>

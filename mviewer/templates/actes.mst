@@ -1,0 +1,530 @@
+{{#features}}
+	<li class="item" id ="templateRight" style="">
+		<h3 class="title-feature">{{Nom}}</h3>
+		<div id="select-features-list">
+			<span class="select-features">Sous Classe:{{SousClasse}}</span>
+			<span class="select-features">Classe:{{Classe}}</span>
+			<span class="select-features">Vocation : {{Vocation}}</span>
+			<span class="select-features">Commune : {{Commune}}</span>
+			<span class="select-features">Province : {{Province}}</span>
+			<span class="select-features">Region : {{Region}}</span>
+			<!-- Alerte: Chiffres de l'année en cours -->
+			
+		</div>
+
+		<div id="user-{{service_actes}}">
+
+		    <!-- L'entité utilise le service -->
+			<div class="user-service-oui">
+				<div class="service-block-actes">
+					<div class="col1">
+						<div class="icon-block">
+							<img class="icon" src="https://geobretagne.fr/apps/megalis-services/img/flux_actes.svg">
+						</div>
+					</div>
+					<div class="service-block-info">
+						<p class="service-title">Communes touchées</p>
+						<p class="text-feature"><span class="glyphicon glyphicon-ok" aria-hidden="true"></span>  Dégâts humaines et matérielspar commune</p>
+					</div>
+				</div>
+				<div class="service-block-number row" style="padding: 0px 15px;">
+				
+					<div class="block-grey block-graph">
+						
+						<p class="number-feature-marches"><b>Région :</b> {{region_adms}}</p>
+						<p class="number-feature-marches"><b>province :</b>  {{province}}</p>
+						
+						<p class="number-feature-marches"><b>Commune :</b>  {{Commune}}</p>
+						<p class="number-feature-marches"><b>Caidat :</b>  {{Caidat}}</p>
+						<p class="number-feature-marches"><b>cercle :</b>  {{cercle}}</p>
+					
+					</div>
+				</div>
+				<div class="service-block-number row" style="padding: 0px 15px;">
+					<div class="block-grey block-graph">
+					<p class="text-feature">
+							<p class="title-number-feature-marches">Détail</p>
+							<span style="font-family:'roboto_bold'"> <img src="img/152746.svg" width="30px"/>  Population:</span> <h3>{{Population}}</h3><br/>
+							<span style="font-family:'roboto_bold'"> <img src="img/158348.svg" width="30px"/>  Superficie:</span> <h3>{{superficie}}</h3><br/>
+							<span style="font-family:'roboto_bold'"> <img src="img/29308.svg" width="30px"/>  Morts:</span><h3>{{mort}}</h3><br/>
+							<span style="font-family:'roboto_bold'"> <img src="img/1551670.svg" width="30px"/>  Blessés :</span> <h3>320</h3><br/>
+							<br/>
+							
+						</p>
+						
+						<p class="title-chart-feature">Source : Autorité locale</p>
+					
+						
+						 
+					</div>
+					</div>
+				<div class="row" style="margin-top: 20px;">
+					<div class="col-sm-12">
+						<div class="block-grey block-graph center">
+							<div id="idChart">
+								<canvas class="chart" id="ChartActesN_{{siren}}" data-codegeo="{{siren}}" data-a1="{{nb_acte_reg}}" data-a2="{{nb_acte_budg_fin}}" data-a3="{{nb_acte_deliberation}}" data-a4="{{nb_acte_autre}}" data-a5="{{nb_acte_contrat_conv}}" data-a6="{{nb_acte_indiv}}" style="height:170px;width: content-box;"></canvas>
+							</div>
+							<p class="title-chart-feature">Répartition des dégâts selon la nature</p>
+								<p class="subtitle-number-feature">pour l'entité sélectionnée</p>
+						</div>
+					</div>
+				</div>
+				<div class="acces-service-actes" style="">
+					<div class="btn-link-user">
+						<a href="https://services.megalis.bretagne.bzh/service/teletransmission-des-actes-en-prefecture/" target="_blank">En savoir plus</a>
+					</div>
+				</div>
+			</div>
+
+		</div>
+
+	</li>
+
+<style>
+
+	/* Définition des propriétés de style pour le service */
+	:root {
+		--mycolor:#161A30;
+		--mycolortheme3:#4D79B8;
+		--myfont:'Inter', sans-serif;
+	}
+	/* */
+
+	#templateRight {
+		padding: 10px;
+	}
+
+	.title-feature {
+		color: var(--mycolor);
+	    font-family: var(--myfont);
+	    font-size: 19px;
+	    line-height: 1.2;
+		font-weight: 700;
+	}
+
+	.subtitle-feature {
+		color: var(--mycolor);
+		font-family:var(--myfont);
+		font-size:18px;
+		margin-top:7%;
+		line-height:1;
+	}
+
+	.text-feature, p {
+		font-family:var(--myfont);
+		color:#555;
+		font-size:13px;
+	}
+
+	.center{
+		text-align:center;
+	}
+
+
+	.block-grey {
+		border-radius: 10px;
+		background-color: #e2e2e28f;
+		height: 250px;
+		}
+	.block-number{
+		padding: 50px 10px;
+	}
+
+	.block-graph{
+		padding: 25px 15px;
+	}
+
+	/* Critères de selection des entités */
+
+	span.select-features {
+		background-color: var(--mycolor);
+		padding: 5px 10px;
+		color: white;
+		font-size: 11px;
+		font-family: var(--myfont);
+		border-radius: 12px;
+	}
+
+	/* Message d'alerte sur la validité des informations */
+
+	p.warning {
+		font-size: 11px!important;
+		font-style: italic!important;
+		font-weight: 500!important;
+		margin: 10px 0px;
+	}
+
+	.warning-info2019, .warning-info2020 {
+		display:none;
+	}
+
+	.warning-info2021{
+		display:block;
+	}
+
+	/* Affichage du contenu selon usagers O/N */
+	#user-OUI .user-service-non {
+		display:none;
+	}
+
+	#user-NON .user-service-oui {
+		display:none;
+	}
+
+	/* --- Mise en fome USER-OUI --- */
+
+	.user-service-oui {
+		padding: 20px 0px;
+	}
+
+	.service-block-actes {
+		background-color: var(--mycolortheme3);
+		padding: 5%;;
+    	border-radius: 20px;
+	}
+
+	.service-block-info {
+		padding: 0px 0px 0px 90px;
+		/* color: white!important; */
+	}
+
+	.user-service-oui .icon-block {
+		width: 60px;
+		padding: 12px;
+		background-color: #ffffff33;
+		border-radius: 15px;
+		position: absolute;
+	}
+
+	.service-block-info p {
+		color: white;
+	}
+
+	p.service-title {
+		font-size: 14px;
+		font-weight: 600;
+		padding: 10px 0px 0px;
+		margin: 0;
+	}
+
+	/* Numbers */
+
+	.service-block-number {
+		margin-top: 20px;
+	}
+
+	.number-feature-actes {
+		font-size: 24px;
+		font-weight: 600;
+		color: var(--mycolortheme3);
+		margin: 10px 0px 0px;
+	}
+
+	.title-number-feature-actes {
+		font-weight: 600;
+		color: var(--mycolortheme3);
+		margin:0;
+	}
+
+	.subtitle-number-feature {
+		font-size: 10px;
+		font-style: italic;
+	}
+
+	/* Chart */
+
+	p.title-chart-feature {
+		font-size: 12px;
+		font-weight: 600;
+		margin: 0;
+	}
+
+	/* Bouton en savoir plus */
+
+	.acces-service-actes {
+		text-align: center;
+   		margin: 0 auto;
+	}
+
+	/* --- Mise en fome USER-NON --- */
+
+	.user-service-non {
+		text-align:center;
+		padding: 50px;
+	}
+
+	.user-service-non .icon-block-actes {
+		background-color: var(--mycolortheme3);
+		opacity: 0.8;
+		width: 60px;
+		border-radius: 15px;
+		padding: 12px;
+		margin: 0 auto;
+	}
+
+	h2.user-title-feature-actes {
+		font-weight: 600!important;
+		color: var(--mycolortheme3);
+	}
+
+	.btn-link-user {
+		margin:40px 0px;
+	}
+
+	.btn-link-user a{
+		font-family: var(--myfont);
+		border: solid 1px #161A30;
+		color: #161A30;
+		padding: 8px 12px;
+		border-radius: 8px;
+		margin: 40px 0px;
+	}
+
+	.btn-link-user a:hover {
+		background-color: #161A30;
+		color: white!important;
+		-webkit-transition: background-color 0.5s ease-out;
+		-moz-transition: background-color 0.5s ease-out;
+		-o-transition: background-color 0.5s ease-out;
+		transition: background-color 0.5s ease-out;
+	}
+
+</style>
+
+<script language="javascript">
+
+  // Récupération du code_geo de l'entité selectionnée
+  var c_geo = [];
+            c_geo.push('Abrera');
+
+  // Définition d'une fonction get_wfsdata
+  function get_wfsdata(url, args, callback) {
+        var qs = {
+            "service" : "WFS",
+            "version" : "2.0.0",
+            "request" : "GetFeature",
+            "outputFormat" : "application/json"
+        };
+        $.getJSON(url + $.param($.extend(qs, args)), callback);
+    }
+
+
+
+  // CHART 1 - Création d'un graphique de l'évolution des flux PES
+
+  get_wfsdata("https://4d8d-196-65-217-49.ngrok-free.app/saasGeo/geodata/wfs?",
+        {
+            "typeNames" : "HOME_SCRAPER_GRAPH",
+            "propertyName" : "annee,AvgSurface",
+			"CQL_FILTER" : "municipio=Abrera"
+        },
+        function (data) {
+
+          /* Fonction pour ranger les données dans l'ordre croissant selon les années */
+          function sortByKey(array, key) {
+            return array.sort(function(a, b) {
+                var x = a[key]; var y = b[key];
+                return ((x < y) ? -1 : ((x > y) ? 1 : 0));
+            });
+            }
+
+          /* Transformation de la donnée JSON */
+
+          var dataActes = data;
+
+
+          var features = [];
+          features = dataActes.features;
+
+          var jproperties = dataActes.features.map(function (el) {
+            return el.properties;
+          });
+
+          // Tri croissant des données selon l'année
+          var dataOrderbyYear = [];
+          dataOrderbyYear = sortByKey(jproperties,'annee');
+          console.log(dataOrderbyYear);
+
+          // Définition des variables pour le graphique
+          var labels = jproperties.map(function(obj) {
+            return obj.annee;
+          });
+          var dataNactes = jproperties.map(function(obj) {
+            return obj.AvgSurface;
+          });;
+
+          // CRéation du graphique
+          var graph_evo_actes = {};
+
+          graph_evo_actes.getData = function () {
+            var data = {chart_actes: {labels:labels, data: {datasets:[dataNactes]}}};
+            console.log(data);
+            graph_evo_actes.drawChart(data);
+          };
+
+          graph_evo_actes.drawChart = function (data) {
+          var ctx = document.getElementById("ChartActes_Abrera");
+          var ChartActes_Abrera = new Chart(ctx, {
+                  type: 'bar',
+                  data: {
+                      labels: data.chart_actes.labels,
+                      datasets: [{
+                          label: "Nombre d'actes",
+                          backgroundColor: "rgba(77,121,184,0.9)",
+                          borderColor: "rgba(77,121,184,0.9)",
+                          borderWidth: 0,
+						  borderRadius: 20,
+						  borderSkipped: false,
+						  barThickness: 10,
+      					  maxBarThickness: 20,
+                          hoverBackgroundColor: "rgba(77,121,184,1)",
+                          hoverBorderColor: "rgba(77,121,184,1)",
+                          data: data.chart_actes.data.datasets[0]
+                      }]
+                  },
+                  options: {
+                    maintainAspectRatio: false,
+    				responsive:true,
+					scales: {
+						x: {
+							ticks: {
+								font: {
+									family: 'Inter',
+									size: 12,
+									lineHeight: 2,
+								}
+							},
+							grid: {
+								display:false
+							}
+						},
+						y: {
+							ticks: {
+								font: {
+									family: 'Inter',
+									size: 12
+								}
+							}
+						}
+					},
+					plugins: {
+						legend: {
+							labels: {
+								font: {
+									family: 'Inter',
+									size: 11
+								}
+							}
+						},
+						tooltip: {
+							titleFont: {
+									family: 'Inter'
+							},
+							bodyFont: {
+									family: 'Inter',
+									size: 11
+							},
+							callbacks: {
+							}
+						}
+					}
+                  }
+              });
+            };
+            if  (typeof Chart === 'function') {
+              graph_evo_actes.getData();
+          } else {
+              $.get('https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.0.2/chart.min.js', function() {
+                graph_evo_actes.getData();
+
+              });
+          }
+        }
+    );
+
+	// CHART  - Camembert des procédures selon la nature
+
+	var graph_actes_cat = {};
+
+graph_actes_cat.getData = function () {
+    var data = {
+        chart_actes: {
+            labels: ["Morts", "Bléssés Légers", "Bléssés graves", "Routes bloquées", "Constructions endommagées partiellements", "Constructions endommagées totalement"],
+            data: {
+                datasets: [[10, 20, 5, 15, 8, 12]] // Remplacer ces valeurs par vos données statiques
+            }
+        }
+    };
+    console.log(data);
+    graph_actes_cat.drawChart(data);
+};
+
+graph_actes_cat.drawChart = function (data) {
+    var ctx = document.getElementById("ChartActesN_{{name}}");
+    var ChartActes_{{name}} = new Chart(ctx, {
+        type: 'pie',
+        data: {
+            labels: data.chart_actes.labels,
+            datasets: [{
+                label: "actes",
+                data: data.chart_actes.data.datasets[0],
+                backgroundColor: [
+                    "rgba(31,32,37,0.9)",
+                    "rgba(105,93,127,0.9)",
+                    "rgba(77,121,184,0.9)",
+                    "rgba(91,177,216,0.9)",
+                    "rgba(95,192,195,0.9)",
+                    "rgba(190,190,190,0.9)"
+                ],
+                hoverBackgroundColor: [
+                    "rgba(31,32,37,1)",
+                    "rgba(105,93,127,1)",
+                    "rgba(77,121,184,1)",
+                    "rgba(91,177,216,1)",
+                    "rgba(95,192,195,1)",
+                    "rgba(190,190,190,1)"
+                ],
+                borderWidth: 0
+            }]
+        },
+        options: {
+            maintainAspectRatio: false,
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'right',
+                    labels: {
+                        font: {
+                            family: 'Inter',
+                            size: 11
+                        }
+                    }
+                },
+                tooltip: {
+                    titleFont: {
+                        family: 'Inter'
+                    },
+                    bodyFont: {
+                        family: 'Inter',
+                        size: 11
+                    },
+                    callbacks: {}
+                }
+            }
+        }
+    });
+};
+
+		if  (typeof Chart === 'function') {
+		graph_actes_cat.getData();
+	} else {
+		$.get('https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.0.2/chart.min.js', function() {
+			graph_actes_cat.getData();
+		});
+	}
+
+
+
+</script>
+
+{{/features}}

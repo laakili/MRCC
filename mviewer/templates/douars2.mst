@@ -1,0 +1,197 @@
+{{#features}}
+	<li class="item" id="{{feature_ol_uid}}">
+		<!-- NameDim-->
+        <div class="name-dim-eco">
+			<h4>- Récapitulatif Dispositif Sécurité -</h4>			
+		</div>
+		<!-- ./NameDim-->
+		<!-- SelectFeature-->
+
+		<div class="select-feature">
+			<h3><span class="glyphicon glyphicon-map-marker" aria-hidden="true"><span class="TitleFeature" id="event-denomination"> {{name}}</span></h3>
+		</div>
+
+        <p class="text-feature">
+			
+			<h4 class="sub-title">Données générales</h4>	
+			<span style="font-family:'roboto_bold'"> Superficie :</span> {{superficie}}<br/>
+			<span style="font-family:'roboto_bold'"> Population totale :</span> {{population_tot}}<br/>
+			
+				<span style="font-family:'roboto_bold'"> Nbre Electeurs :</span> {{nbr_electeurs}}<br/>
+				<span style="font-family:'roboto_bold'"> Nbre Sièges Parlement :</span> {{nb_sieg_deputes}}<br/>
+			<span style="font-family:'roboto_bold'"> Nbre Sièges Rég :</span> {{nb_sieg_conseilles_region}}<br/>
+			<span style="font-family:'roboto_bold'"> Nbre Sièges Rég :</span> {{nb_sieg_conseilles_commun}}<br/>
+			<span style="font-family:'roboto_bold'"> Nombre BV (DGSN) :</span> {{nbr_bv_cmp_dgsn}}<br/>
+			<span style="font-family:'roboto_bold'"> Nombre BV (GR) :</span> {{nbr_bv_cmp_gr}}<br/>
+            <span style="font-family:'roboto_bold'"> Total BV :</span> {{total_bv}}<br/>
+
+			<span style="font-family:'roboto_bold'"> Nombre BC (GR):</span> {{nbr_bc_cmp_gr}}<br/>
+			<span style="font-family:'roboto_bold'"> Nombre BC (DGSN) :</span> {{nbr_bc_cmp_dgsn}}<br/>
+			<span style="font-family:'roboto_bold'"> Total BC :</span> {{total_bc}}<br/>
+			<span style="font-family:'roboto_bold'"> Nbre Points Chauds :</span> {{nbr_points_chaud}}<br/>
+
+			<hr class="divider-unite">
+
+			<h4 class="sub-title">Dispositif de sécurité</h4>
+			<span style="font-family:'roboto_bold'"> Eff Théorique Région :</span> {{eff_theorique_reg}}<br/>
+			<span style="font-family:'roboto_bold'"> Eff déployé :</span> {{pers_dep}}<br/>
+			<span style="font-family:'roboto_bold'" id='pourcentage'></span></span> Pourcentage (%) :</span> <br/>
+
+			<h3 class="sub-title">Surveillance BV</h3>
+			<span style="font-family:'roboto_bold'"> Nombre Fixe:</span> {{sur_dis_fix_bv_eff}}<br/>
+			<span style="font-family:'roboto_bold'"> Eff Fixe :</span> {{sur_dis_fix_bv_nbr}}<br/>
+			<span style="font-family:'roboto_bold'"> Moy Trans fixe :</span> {{sur_dis_fix_bv_moy_trnsp}}<br/>
+			
+			<span style="font-family:'roboto_bold'"> Nombre Mobile :</span> {{sur_dis_mobile_bv_eff}}<br/>
+			<span style="font-family:'roboto_bold'"> Eff Mobile :</span> {{sur_dis_mobile_bv_nbr}}<br/>
+			<span style="font-family:'roboto_bold'"> Moy Trans Mobile :</span> {{sur_dis_mobile_bv_moy_trnsp}}<br/>
+		
+			<h3 class="sub-title">Contrôle Routier</h3>
+			<span style="font-family:'roboto_bold'"> Eff fixe :</span> {{control_dis_fix_bv_eff}}<br/>
+			<span style="font-family:'roboto_bold'"> Moy Trans fixe  :</span> {{controle_dis_fix_bv_moy_trnsp}}<br/>
+			<span style="font-family:'roboto_bold'"> Eff Mobile :</span> {{control_dis_mobile_bv_eff}}<br/>
+			<span style="font-family:'roboto_bold'"> Moy Trans Mobile :</span> {{controle_dis_mobile_bv_moy_trnsp}}<br/>
+
+		<hr class="divider-unite">
+			<h4 class="sub-title">Réserves</h4>
+			<span style="font-family:'roboto_bold'"> Cie/Gpt :</span> {{reserve_cie_grpt}}<br/>
+			<span style="font-family:'roboto_bold'"> Réserve MO EMR :</span> {{eff_resrv_emr}}<br/>
+			<span style="font-family:'roboto_bold'"> Réserves MO Cie :</span> {{eff_resrv_cie_grpt}}<br/>
+			<span style="font-family:'roboto_bold'"> Nbre piquets :</span> {{nbr_piquets}}<br/>
+			<span style="font-family:'roboto_bold'"> Eff piquets :</span> {{eff_piquets}}<br/>	
+			<span style="font-family:'roboto_bold'"> Obs Réserve :</span> {{reserve_obs}}<br/>
+
+				<hr class="divider-unite">
+			<h4 class="sub-title">Renfort</h4>
+			<span style="font-family:'roboto_bold'"> Moyens Aériens :</span>{{moyen}} <br/>
+				<span style="font-family:'roboto_bold'"> Détails Moyens Aériens :</span>{{remarques}} <br/>
+			<span style="font-family:'roboto_bold'"> Esc MO (CMDT) :</span> {{esc_mo}}<br/>
+			<span style="font-family:'roboto_bold'"> Motos pompes :</span> {{moto_pompe}}<br/>
+			<span style="font-family:'roboto_bold'"> FA :</span> {{pers_fa}}<br/>
+			
+			
+		
+		
+			
+		</p>
+	
+	
+
+	</li>
+
+{{/features}}
+
+<style>
+	.divider-unite{
+            border: 1px dotted lightgrey;
+     }
+	.panel-body{
+		padding:10px;
+	}
+	.panel-default{
+		border-radius: 2px;
+    	box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.1);
+    	border: 1px solid #eee!important;
+	}
+	.name-dim-eco{
+		background-color: #FFC939;
+    	padding: 1px;
+    	text-align: center;
+    	text-transform: uppercase;
+	}
+	.btn-update{
+        	padding: 1px;
+        	text-align: center;
+        	text-transform: uppercase;
+	}
+	.name-dim-eco h4{
+		color: white;
+		font-size: 14px;
+		font-family:"roboto_bold";
+		letter-spacing: 1px;
+	}
+	.select-feature{
+		color: #2D4059;
+		font-size:18px;
+		margin-bottom: 10px;
+    	margin-top: 10px;
+    	text-align:center;
+	}
+	.TitleFeature {
+		color: #2D4059;
+		font-family:"roboto_bold";
+		font-size:20px;
+		margin-bottom:1%;
+		line-height:1;
+		text-transform:uppercase;
+	}
+	.Title{
+	  text-align: center;
+	  font-size: 18px;
+	  margin-top: 10.5px;
+      margin-bottom: 10.5px;
+      color: #2D4059;
+      font-family: Roboto,"Helvetica Neue",Helvetica,Arial,sans-serif;
+      font-weight: 400;
+      line-height: 1.1;
+	}
+	.ChartLabel{
+	  text-align: left;
+	  font-size: 12px;
+      color: #555;
+	}
+	.SubText{
+	  text-align: center;
+	  font-size: 13px;
+      color: #555;
+	}
+	.SubTextJustify{
+	  text-align: justify;
+	  font-size: 13px;
+      color: #555;
+	}
+	.iconCat{
+		text-align: center;
+	}
+	.NameCatEco{
+		color:#FFC939;
+		font-family: Roboto,"Helvetica Neue",Helvetica,Arial,sans-serif;
+		text-align: center;		
+      	font-weight: 500;
+      	margin: 5px 0px 5px 0px;
+	}
+	#name-cat-Important:after{
+		content:"Evènement Important";
+	}
+	#name-cat-Moyen:after{
+		content:"Evènement Moyen";
+	}
+	#name-cat-Faible:after{
+		content:"Evènement Faible";
+	}
+	#cat-Rouge:after{
+		content:"Les évenements importans représentent les évenements à risque élevé";
+	}
+	#cat-Orange:after{
+		content:"Les évenements moyens représentent les évenements à risque moyen";
+	}
+	#cat-Jaune:after{
+		content:"Les évenements faibles représentent les évenements à risque faible";
+	}
+	.chart{
+		margin-bottom:15px;
+	}
+	#idChart{
+		margin-bottom:100px;
+	}
+
+</style>
+<script>
+	{{#features}}
+		$('#pourcentage').text({{pers_dep}}/{{eff_theorique_reg}}*100)
+	{{/features}}
+
+
+</script>
+
+

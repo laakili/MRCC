@@ -1,0 +1,295 @@
+{{#features}}
+	<li class="item feature-card" id="templateRight">
+    <div class="feature-header">
+        <h3 class="title-feature">
+            <i class="fas fa-map-marker-alt feature-icon"></i>
+            {{libelle}}
+        </h3>
+        <div id="select-features-list">
+            <span class="select-features"><i class="fas fa-tag"></i> {{lieu}}</span>
+            <span class="select-features"><i class="fas fa-layer-group"></i> {{categorie}}</span>
+        </div>
+    </div>
+    <div class="detail-item">
+        <i class="fas fa-globe-americas detail-icon"></i>
+        <div>
+            <span class="detail-label">Start time</span>
+            <span class="detail-value">{{heure_debut}}</span>
+        </div>
+    </div>
+
+    <div class="feature-details">
+        <div class="detail-item">
+            <i class="fas fa-tag detail-icon"></i>
+            <div>
+                <span class="detail-label">Location</span>
+                <span class="detail-value">{{lieu}}</span>
+            </div>
+        </div>
+        
+        <div class="detail-item">
+            <i class="fas fa-layer-group detail-icon"></i>
+            <div>
+                <span class="detail-label">Details</span>
+                <span class="detail-value">{{detail}}</span>
+            </div>
+        </div>
+
+        <div class="detail-item">
+            <i class="fas fa-calendar detail-icon"></i>
+            <div>
+                <span class="detail-label">Start date</span>
+                <span class="detail-value">{{date_debut}}</span>
+            </div>
+        </div>
+
+        <div class="detail-item">
+            <i class="fas fa-flag detail-icon"></i>
+            <div>
+                <span class="detail-label">Country</span>
+                <span class="detail-value">{{pays}}</span>
+            </div>
+        </div>
+
+        <div class="detail-item">
+            <i class="fas fa-map-marked detail-icon"></i>
+            <div>
+                <span class="detail-label">Province</span>
+                <span class="detail-value">{{province}}</span>
+            </div>
+        </div>
+
+        <div class="detail-item">
+            <i class="fas fa-exclamation-triangle detail-icon"></i>
+            <div>
+                <span class="detail-label">Circumstances</span>
+                <span class="detail-value">{{circonstance}}</span>
+            </div>
+        </div>
+
+        <div class="detail-item">
+            <i class="fas fa-search detail-icon"></i>
+            <div>
+                <span class="detail-label">Cause</span>
+                <span class="detail-value">{{cause}}</span>
+            </div>
+        </div>
+
+        <div class="detail-item">
+            <i class="fas fa-chart-bar detail-icon"></i>
+            <div>
+                <span class="detail-label">Synthesis</span>
+                <span class="detail-value">{{synthese_gca}}</span>
+            </div>
+        </div>
+
+        <div class="detail-item">
+            <i class="fas fa-bullseye detail-icon"></i>
+            <div>
+                <span class="detail-label">Buffer radius</span>
+                <span class="detail-value">{{rayon_buffer}} m</span>
+            </div>
+        </div>
+
+        <div class="detail-item">
+            <i class="fas fa-theater-masks detail-icon"></i>
+            <div>
+                <span class="detail-label">Simulation</span>
+                <span class="detail-value">{{simulation}}</span>
+            </div>
+        </div>
+
+        <div class="detail-item">
+            <i class="fas fa-tags detail-icon"></i>
+            <div>
+                <span class="detail-label">Type</span>
+                <span class="detail-value">{{type}}</span>
+            </div>
+        </div>
+
+        <div class="detail-item">
+            <i class="fas fa-sitemap detail-icon"></i>
+            <div>
+                <span class="detail-label">Sector</span>
+                <span class="detail-value">{{secteur}}</span>
+            </div>
+        </div>
+
+        <div class="detail-item">
+            <i class="fas fa-palette detail-icon"></i>
+            <div>
+                <span class="detail-label">Theme</span>
+                <span class="detail-value">{{theme}}</span>
+            </div>
+        </div>
+
+        <div class="detail-item">
+            <i class="fas fa-signal detail-icon"></i>
+            <div>
+                <span class="detail-label">Classification</span>
+                <span class="detail-value">{{classification}}</span>
+            </div>
+        </div>
+
+        <div class="source-footer">
+            <i class="fas fa-camera"></i>
+            <span class="source-text">Source: Marine OpenDATA</span>
+        </div>
+    </div>
+</li>
+
+<style>
+	/* Définition des variables CSS */
+	:root {
+		--primary-color: #161A30;
+		--secondary-color: #4D79B8;
+		--accent-color: #5DB0C3;
+		--light-bg: #F8F9FA;
+		--dark-text: #2D3748;
+		--light-text: #718096;
+		--border-radius: 12px;
+		--box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+		--font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+	}
+
+	/* Style général */
+	.item.feature-card {
+		background-color: white;
+		border-radius: var(--border-radius);
+		box-shadow: var(--box-shadow);
+		padding: 20px;
+		margin-bottom: 20px;
+		transition: transform 0.3s ease, box-shadow 0.3s ease;
+	}
+
+	.item.feature-card:hover {
+		transform: translateY(-2px);
+		box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+	}
+
+	.feature-header {
+		display: flex;
+		flex-direction: column;
+		gap: 12px;
+		margin-bottom: 20px;
+		padding-bottom: 15px;
+		border-bottom: 1px solid #e2e8f0;
+	}
+
+	.title-feature {
+		color: var(--primary-color);
+		font-family: var(--font-family);
+		font-size: 1.25rem;
+		font-weight: 700;
+		margin: 0;
+		display: flex;
+		align-items: center;
+		gap: 10px;
+	}
+
+	.feature-icon {
+		color: var(--secondary-color);
+		font-size: 1.1em;
+	}
+
+	#select-features-list {
+		display: flex;
+		gap: 8px;
+		flex-wrap: wrap;
+	}
+
+	.select-features {
+		background-color: var(--primary-color);
+		padding: 6px 12px;
+		color: white;
+		font-size: 1rem;
+		font-family: var(--font-family);
+		border-radius: 20px;
+		display: inline-flex;
+		align-items: center;
+		gap: 5px;
+	}
+
+	.select-features i {
+		font-size: 1em;
+	}
+
+	.feature-details {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+		gap: 15px;
+	}
+
+	.detail-item {
+		display: flex;
+		align-items: center;
+		gap: 12px;
+		padding: 10px;
+		background-color: var(--light-bg);
+		border-radius: var(--border-radius);
+	}
+
+	.detail-icon {
+		color: var(--secondary-color);
+		font-size: 1.2em;
+		width: 30px;
+		height: 30px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		background-color: rgba(77, 121, 184, 0.1);
+		border-radius: 50%;
+	}
+
+	.detail-label {
+		display: block;
+		font-family: var(--font-family);
+		font-size: 1.2rem;
+		color: var(--light-text);
+		margin-bottom: 2px;
+	}
+
+	.detail-value {
+		display: block;
+		font-family: var(--font-family);
+		font-size: 1.2rem;
+		color: var(--dark-text);
+		font-weight: 500;
+	}
+
+	/* Responsive */
+	@media (max-width: 768px) {
+		.feature-details {
+			grid-template-columns: 1fr;
+		}
+	}
+
+	/* Ajout des animations */
+	@keyframes fadeIn {
+		from { opacity: 0; transform: translateY(10px); }
+		to { opacity: 1; transform: translateY(0); }
+	}
+
+	.feature-card {
+		animation: fadeIn 0.4s ease-out forwards;
+	}
+	.source-footer {
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 1px solid #e2e8f0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 1rem;
+    color: var(--light-text);
+}
+
+.source-footer i {
+    color: var(--secondary-color);
+}
+</style>
+
+<!-- Inclure Font Awesome pour les icônes -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+{{/features}}

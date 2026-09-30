@@ -1,0 +1,170 @@
+{{#features}}
+<li class="item feature-card" id="templateRight">
+  <div class="feature-header">
+    <h3 class="title-feature">
+      <i class="fas fa-life-ring feature-icon"></i>
+      {{nom}} (Base de sauvetage)
+    </h3>
+    <div id="select-features-list">
+      <span class="select-features tag-location"><i class="fas fa-map-marker-alt"></i> {{location}}</span>
+      <span class="select-features tag-status"><i class="fas fa-circle"></i> {{#is_active}}Active{{/is_active}}{{^is_active}}Inactive{{/is_active}}</span>
+    </div>
+  </div>
+
+  <div class="feature-details">
+    <div class="detail-item">
+      <i class="fas fa-phone-alt detail-icon"></i>
+      <div>
+        <span class="detail-label">Téléphone</span><br>
+        <span class="detail-value">{{contact_phone}}</span>
+      </div>
+    </div>
+
+    <div class="detail-item">
+      <i class="fas fa-envelope detail-icon"></i>
+      <div>
+        <span class="detail-label">Email</span><br>
+        <span class="detail-value">{{contact_email}}</span>
+      </div>
+    </div>
+
+    <div class="detail-item">
+      <i class="fas fa-building detail-icon"></i>
+      <div>
+        <span class="detail-label">ID Base</span><br>
+        <span class="detail-value">{{Mviewerid}}</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="source-footer">
+    <i class="fas fa-database"></i>
+    <span class="source-text">Source : MRCC</span>
+  </div>
+</li>
+{{/features}}
+
+<!-- Font Awesome Icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+<!-- STYLES -->
+<style>
+:root {
+  --primary-color: #161A30;
+  --secondary-color: #4D79B8;
+  --accent-color: #5DB0C3;
+  --light-bg: #F8F9FA;
+  --dark-text: #2D3748;
+  --light-text: #718096;
+  --border-radius: 12px;
+  --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --font-family: 'Inter', sans-serif;
+}
+
+.item.feature-card {
+  background-color: white;
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
+  padding: 20px;
+  margin-bottom: 20px;
+  font-family: var(--font-family);
+}
+
+.feature-header {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid #e2e8f0;
+  padding-bottom: 12px;
+}
+
+.title-feature {
+  color: var(--primary-color);
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.feature-icon {
+  color: var(--secondary-color);
+  font-size: 1.2em;
+}
+
+#select-features-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.select-features {
+  background-color: var(--primary-color);
+  color: white;
+  padding: 6px 12px;
+  font-size: 1rem;
+  border-radius: 20px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.feature-details {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 15px;
+}
+
+.detail-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px;
+  background-color: var(--light-bg);
+  border-radius: var(--border-radius);
+}
+
+.detail-icon {
+  color: var(--secondary-color);
+  font-size: 1.2em;
+  background-color: rgba(77, 121, 184, 0.1);
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+
+.detail-label {
+  font-size: 1rem;
+  color: var(--light-text);
+}
+
+.detail-value {
+  font-size: 1.2rem;
+  color: var(--dark-text);
+  font-weight: 500;
+}
+
+.source-footer {
+  margin-top: 20px;
+  padding-top: 10px;
+  border-top: 1px solid #e2e8f0;
+  font-size: 0.75rem;
+  color: var(--light-text);
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.tag-location {
+  background-color: #FF8C00;
+}
+
+.tag-status {
+  background-color: #20B2AA;
+}
+</style>

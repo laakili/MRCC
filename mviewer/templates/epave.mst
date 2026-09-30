@@ -1,0 +1,171 @@
+{{#features}}
+<li class="item feature-card" id="templateRight">
+  <div class="feature-header">
+    <h3 class="title-feature">
+      <i class="fas fa-ship feature-icon"></i>
+      Épave n°{{wreck_id}} ({{Wreck_cate}})
+    </h3>
+    <div id="select-features-list">
+      <span class="select-features tag-position"><i class="fas fa-map-marker-alt"></i> {{latitude}}, {{longitude}}</span>
+      <span class="select-features tag-activite"><i class="fas fa-water"></i> {{water_leve}}</span>
+      <span class="select-features tag-etat"><i class="fas fa-eye-slash"></i> {{conspic_vi}}</span>
+    </div>
+  </div>
+
+  <div class="feature-details">
+    <div class="detail-item"><i class="fas fa-flag detail-icon"></i><div><span class="detail-label">Statut</span><span class="detail-value">{{status}}</span></div></div>
+    <div class="detail-item"><i class="fas fa-globe detail-icon"></i><div><span class="detail-label">Système horizontal</span><span class="detail-value">{{horizontal}}</span></div></div>
+    <div class="detail-item"><i class="fas fa-ruler-vertical detail-icon"></i><div><span class="detail-label">Profondeur eau (m)</span><span class="detail-value">{{water_dept}}</span></div></div>
+    <div class="detail-item"><i class="fas fa-wave-square detail-icon"></i><div><span class="detail-label">Type de fond</span><span class="detail-value">{{bottom_tex}}</span></div></div>
+    <div class="detail-item"><i class="fas fa-eye detail-icon"></i><div><span class="detail-label">Conspicuité visuelle</span><span class="detail-value">{{conspic_vi}}</span></div></div>
+    <div class="detail-item"><i class="fas fa-radar detail-icon"></i><div><span class="detail-label">Conspicuité radar</span><span class="detail-value">{{conspic_ra}}</span></div></div>
+    <div class="detail-item"><i class="fas fa-tachometer-alt detail-icon"></i><div><span class="detail-label">Tirant d'eau</span><span class="detail-value">{{draught}}</span></div></div>
+    <div class="detail-item"><i class="fas fa-arrows-alt-h detail-icon"></i><div><span class="detail-label">Longueur</span><span class="detail-value">{{length}}</span></div></div>
+    <div class="detail-item"><i class="fas fa-arrows-alt-v detail-icon"></i><div><span class="detail-label">Largeur</span><span class="detail-value">{{width}}</span></div></div>
+    <div class="detail-item"><i class="fas fa-anchor detail-icon"></i><div><span class="detail-label">Tonnage</span><span class="detail-value">{{tonnage}}</span></div></div>
+    <div class="detail-item"><i class="fas fa-box detail-icon"></i><div><span class="detail-label">Type de cargaison</span><span class="detail-value">{{cargo}}</span></div></div>
+    <div class="detail-item"><i class="fas fa-calendar-alt detail-icon"></i><div><span class="detail-label">Date de naufrage</span><span class="detail-value">{{date_sunk}}</span></div></div>
+    <div class="detail-item"><i class="fas fa-calendar detail-icon"></i><div><span class="detail-label">Date originale</span><span class="detail-value">{{Original_d}}</span></div></div>
+    <div class="detail-item"><i class="fas fa-calendar-check detail-icon"></i><div><span class="detail-label">Dernière modification</span><span class="detail-value">{{last_amend}}</span></div></div>
+    <div class="detail-item"><i class="fas fa-bullhorn detail-icon"></i><div><span class="detail-label">Source</span><span class="detail-value">{{original00}}</span></div></div>
+    <div class="detail-item"><i class="fas fa-question-circle detail-icon"></i><div><span class="detail-label">Méthode de profondeur</span><span class="detail-value">{{depth_meth}}</span></div></div>
+    <div class="detail-item"><i class="fas fa-exclamation-triangle detail-icon"></i><div><span class="detail-label">Qualité profondeur</span><span class="detail-value">{{depth_qual}}</span></div></div>
+    <div class="detail-item"><i class="fas fa-location-arrow detail-icon"></i><div><span class="detail-label">Position (texte)</span><span class="detail-value">{{position}}</span></div></div>
+    <div class="detail-item"><i class="fas fa-map detail-icon"></i><div><span class="detail-label">Mviewer ID</span><span class="detail-value">{{Mviewerid}}</span></div></div>
+  </div>
+
+  <div class="source-footer">
+    <i class="fas fa-water"></i>
+    <span class="source-text">Source : MViewer / {{Mviewerid}}</span>
+  </div>
+</li>
+{{/features}}
+
+<!-- Font Awesome Icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+<!-- STYLES -->
+<style>
+:root {
+  --primary-color: #161A30;
+  --secondary-color: #4D79B8;
+  --accent-color: #5DB0C3;
+  --light-bg: #F8F9FA;
+  --dark-text: #2D3748;
+  --light-text: #718096;
+  --border-radius: 12px;
+  --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --font-family: 'Inter', sans-serif;
+}
+
+.item.feature-card {
+  background-color: white;
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.feature-header {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid #e2e8f0;
+  padding-bottom: 12px;
+}
+
+.title-feature {
+  color: var(--primary-color);
+  font-family: var(--font-family);
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.feature-icon {
+  color: var(--secondary-color);
+  font-size: 1.2em;
+}
+
+#select-features-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.select-features {
+  background-color: var(--primary-color);
+  color: white;
+  padding: 6px 12px;
+  font-size: 0.75rem;
+  border-radius: 20px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.feature-details {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 15px;
+}
+
+.detail-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px;
+  background-color: var(--light-bg);
+  border-radius: var(--border-radius);
+}
+
+.detail-icon {
+  color: var(--secondary-color);
+  font-size: 1.2em;
+  background-color: rgba(77, 121, 184, 0.1);
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+
+.detail-label {
+  font-size: 0.75rem;
+  color: var(--light-text);
+}
+
+.detail-value {
+  font-size: 0.9rem;
+  color: var(--dark-text);
+  font-weight: 500;
+}
+
+.source-footer {
+  margin-top: 20px;
+  padding-top: 10px;
+  border-top: 1px solid #e2e8f0;
+  font-size: 0.75rem;
+  color: var(--light-text);
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.tag-commune {
+  background-color: #FF8C00;
+}
+
+.tag-position {
+  background-color: #20B2AA;
+}
+
+.tag-activite {
+  background-color: #5DB0C3;
+}
+</style>

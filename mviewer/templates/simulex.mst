@@ -1,0 +1,523 @@
+{{#features}}
+	<li class="item" id="{{feature_ol_uid}}" style="width:100%;">
+		
+		<h3 class="title-feature"> {{categorie}}</h3>
+        <h3 class="title-feature"> {{type}}</h3>
+        
+		<!-- ./NameDim-->
+		<!-- SelectFeature-->
+             {{^is_buffer}}
+
+		<div class="select-feature">
+			<h3><span class="glyphicon glyphicon-map-marker" aria-hidden="true"><span class="TitleFeature" id="event-denomination_{{id}}"> {{libelle}}</span></h3>
+		</div>
+
+        <p class="text-feature">
+
+
+            <span style="font-family:'roboto_bold'"><i style="color: #6c757d !important" class="fa fa-map-marked "></i> Lieu :</span><span id="event-lieu_{{id}}"> {{lieu}}</span><br/>
+			<span style="font-family:'roboto_bold'"> <i style="color: #6c757d !important" class="fa fa-calendar-day "></i> Début :</span> <span id="event-date-debut_{{id}}">{{date_debut}} <b>à</b> {{heure_debut}}</span> <br/>
+			<span style="font-family:'roboto_bold'"> <i style="color: #6c757d !important" class="fa fa-calendar "></i> Fin :</span><span  id="event-date-fin_{{id}}">{{date_fin}}</span> <br/>
+				<!-- Categorie-->
+
+					<hr class="divider-unite">
+
+
+						<span style="font-family:'roboto_bold'"><i style="color: #6c757d !important" class="fa fa-book "></i>  Circonstances :</span> <span  id="event-resume_{{id}}">{{resume}}</span> <br/>
+					<hr class="divider-unite">
+
+			
+
+
+			<br/>
+
+		</p>
+	             {{/is_buffer}}
+	                          {{#is_buffer}}
+
+                 		<div class="select-feature">
+                 			<h3><span class="glyphicon glyphicon-map-marker" aria-hidden="true"><span class="TitleFeature" id="event-denomination_{{id}}"> {{libelle}}</span></h3>
+                 		</div>
+
+                         <p class="text-feature">
+
+                             <span style="font-family:'roboto_bold'"><i style="color: #6c757d !important" class="fa fa-circle"></i> Rayon Buffer :</span><span > {{rayon_buffer}} Km</span><br/>
+
+                 		</p>
+                 	             {{/is_buffer}}
+		<!-- ./SelectFeature-->
+
+
+        		<div class="btn-update admin operator" id="group-btn-update-event" style="display: none" >
+                    <button   onclick="showPopUp({{id}})" style="border-radius: 50rem !important;position:absolute,bottom:10px,display:inline-block" id="btn-update-event" class="btn btn-success mt-2 d-flex align-self-center"> <i class="fa fa-edit"></i>Modifier </button>
+                    <button  onclick="deleteEvent()" style="border-radius: 50rem !important;display:inline-block"    class="btn btn-danger mt-2 d-flex align-self-center">
+                    <i class="fa fa-trash"></i>
+                    Supprimer </button>
+                </div>
+                	<div class="btn-update btn-update-buffer admin" style="display: none" >
+                        		     <button onclick="analyse.showPopUp({{id_categorie}})"   style="visibility:hidden;border-radius: 50rem !important" id="btn-update-buffer" class="btn btn-success mt-2 d-flex align-self-center"> <i class="fa fa-edit"></i>Modifier Buffer </button>
+                                </div>
+
+	</li>
+
+{{/features}}
+
+<style>
+/* Définition des propriétés de style pour le service */
+:root {
+--mycolor:#161A30;
+--mycolortheme5:#514367;
+--myfont:'Inter', sans-serif;
+}
+/* */
+
+#templateRight {
+padding: 10px;
+}
+
+.title-feature {
+color: var(--mycolor);
+font-family: var(--myfont);
+font-size: 19px;
+line-height: 1.2;
+font-weight: 700;
+}
+
+.subtitle-feature {
+color: var(--mycolor);
+font-family:var(--myfont);
+font-size:18px;
+margin-top:7%;
+line-height:1;
+}
+
+.text-feature, p {
+font-family:var(--myfont);
+color:#555;
+font-size:13px;
+}
+
+.center{
+text-align:center;
+}
+
+.block-grey {
+border-radius: 10px;
+background-color: #e2e2e28f;
+height: 250px;
+}
+
+.block-number{
+padding: 50px 10px;
+}
+
+.block-graph{
+padding: 25px 15px;
+}
+
+/* Critères de selection des entités */
+
+span.select-features {
+background-color: var(--mycolor);
+padding: 5px 10px;
+color: white;
+font-size: 11px;
+font-family: var(--myfont);
+border-radius: 12px;
+}
+
+/* Message d'alerte sur la validité des informations */
+
+p.warning {
+font-size: 11px!important;
+font-style: italic!important;
+font-weight: 500!important;
+margin: 10px 0px;
+}
+
+.warning-info2019, .warning-info2020 {
+display:none;
+}
+
+.warning-info2021{
+display:block;
+}
+
+/* Affichage du contenu selon usagers O/N */
+#user-OUI .user-service-non {
+display:none;
+}
+
+#user-NON .user-service-oui {
+display:none;
+}
+
+/* Mise en fome USER-OUI */
+
+.user-service-oui {
+padding: 30px 0px;
+}
+
+.service-block-marches {
+background-color: var(--mycolortheme5);
+padding: 5%;;
+border-radius: 10px;
+}
+
+.service-block-info {
+padding: 0px 0px 0px 90px;
+/* color: white!important; */
+}
+
+.user-service-oui .icon-block {
+width: 60px;
+padding: 12px;
+background-color: #ffffff33;
+border-radius: 15px;
+position: absolute;
+}
+
+.service-block-info p {
+color: white;
+}
+
+p.service-title {
+font-size: 14px;
+font-weight: 600;
+padding: 10px 0px 0px;
+margin: 0;
+}
+
+/* Numbers */
+
+.service-block-number {
+margin-top: 20px;
+}
+
+.number-feature-marches {
+font-size: 24px;
+font-weight: 600;
+color: var(--mycolortheme5);
+margin: 10px 0px 0px;
+}
+
+.title-number-feature-marches {
+font-weight: 600;
+color: var(--mycolortheme5);
+margin:0;
+}
+
+.subtitle-number-feature {
+font-size: 10px;
+font-style: italic;
+}
+
+/* Chart */
+
+p.title-chart-feature {
+font-size: 12px;
+font-weight: 600;
+margin: 0;
+}
+
+/* Bouton en savoir plus */
+
+.acces-service-marches {
+text-align: center;
+margin: 0 auto;
+}
+
+/* Mise en fome USER-NON */
+
+.user-service-non {
+text-align:center;
+padding: 50px;
+}
+
+.user-service-non .icon-block-marches {
+background-color: var(--mycolortheme5);
+opacity: 0.8;
+width: 60px;
+border-radius: 15px;
+padding: 12px;
+margin: 0 auto;
+}
+
+h2.user-title-feature-marches {
+font-weight: 600!important;
+color: var(--mycolortheme5);
+}
+
+.btn-link-user {
+margin:40px 0px;
+}
+
+.btn-link-user a{
+font-family: var(--myfont);
+border: solid 1px #161A30;
+color: #161A30;
+padding: 8px 12px;
+border-radius: 8px;
+margin: 40px 0px;
+}
+
+.btn-link-user a:hover {
+background-color: #161A30;
+color: white!important;
+-webkit-transition: background-color 0.5s ease-out;
+-moz-transition: background-color 0.5s ease-out;
+-o-transition: background-color 0.5s ease-out;
+transition: background-color 0.5s ease-out;
+}
+
+
+</style>
+
+<script>
+if("auth" in sessionStorage && sessionStorage.getItem('auth'))
+{
+    sessionStorage.getItem('auth').split(',').map(s=>{
+        $(`.${s}`).css('display',"block")
+    })
+
+}
+
+let id,date_debut,theme,classification,id_source,competence,type,lieu,pays,localite,heureDebut,heureFin,ged,simulation,rayon_buffer,is_buffer,id_categorie;
+let classifications;
+var date = new Date();
+var syntheseGCA='Non' ;
+{{#features}}
+     id={{id}};
+{{/features}}
+{{#features}}
+     if('{{id_categorie}}')
+          id_categorie="{{id_categorie}}"
+{{/features}}
+{{#features}}
+if('{{date_debut}}')
+     date_debut='{{date_debut}}'
+{{/features}}
+{{#features}}
+if('{{synthese_gca}}')
+     syntheseGCA='{{synthese_gca}}'
+{{/features}}
+{{#features}}
+if('{{theme}}')
+     theme='{{theme}}'
+{{/features}}
+{{#features}}
+if('{{classification}}')
+     classification='{{classification}}'
+{{/features}}
+{{#features}}
+if('{{competence}}')
+     competence='{{competence}}'
+{{/features}}
+{{#features}}
+if('{{type}}')
+     type='{{type}}'
+{{/features}}
+
+{{#features}}
+if('{{id_source}}')
+     id_source='{{id_source}}'
+{{/features}}
+{{#features}}
+if('{{lieu}}')
+     lieu='{{lieu}}'
+{{/features}}
+{{#features}}
+if('{{pays}}')
+     pays='{{pays}}'
+{{/features}}
+{{#features}}
+if('{{localite}}')
+     localite='{{localite}}'
+{{/features}}
+{{#features}}
+if('{{heure_debut}}')
+     heureDebut="{{heure_debut}}".substr(0,"{{heure_debut}}".length-1)
+{{/features}}
+{{#features}}
+if('{{heure_fin}}')
+     heureFin="{{heure_fin}}".substr(0,"{{heure_fin}}".length-1)
+{{/features}}
+
+{{#features}}
+if('{{ged}}')
+     ged="{{ged}}"
+{{/features}}
+{{#features}}
+if('{{simulation}}')
+     simulation="{{simulation}}"
+{{/features}}
+{{#features}}
+if('{{rayon_buffer}}')
+     rayon_buffer="{{rayon_buffer}}"
+{{/features}}
+{{#features}}
+if('{{is_buffer}}')
+     is_buffer="{{is_buffer}}"
+{{/features}}
+if(is_buffer=='true'){
+document.getElementById("btn-update-buffer").style.visibility='visible'
+document.getElementById("group-btn-update-event").style.display='none'
+}
+var showPopUp= function (id) {
+console.log(id_categorie)
+  $('#select_competence').empty()
+  $('#select_update_event_classification').empty()
+  $('#select_source').empty()
+  for (let i = 0; i < apis._thems.length; i++){
+    $('#select_update_event_ponctuel').append($('<option>', {
+        value: apis._thems[i].id_theme,
+        text: apis._thems[i].theme,
+        selected:apis._thems[i].theme == theme
+    }))
+  }
+    for (let i = 0; i < apis._competence.length; i++){
+      $('#select_competence').append($('<option>', {
+          value: apis._competence[i].id,
+          text: apis._competence[i].competence,
+          selected:apis._competence[i].competence == competence
+      }))
+    }
+        for (let i = 0; i < apis._types.length; i++){
+          $('#select_update_event_type').append($('<option>', {
+              value: apis._types[i].id_type,
+              text: apis._types[i].type,
+              selected:apis._types[i].type == type
+          }))
+        }
+                for (let i = 0; i < apis._sources.length; i++){
+                  $('#select_source').append($('<option>', {
+                      value: apis._sources[i].id_source,
+                      text: apis._sources[i].source,
+                      selected:apis._sources[i].id_source == id_source
+                  }))
+                }
+              for (let i = 0; i < apis._classifications.length; i++){
+                             $('#select_update_event_classification').append($('<option>', {
+                                                             value: apis._classifications[i].id,
+                                                             text: apis._classifications[i].classification,
+                                                             selected:apis._classifications[i].classification == classification
+                                                         }))
+                }
+
+
+
+
+  $('#update-event-form').find('input, textarea').val('');
+  $("#inp_update_event_name").val($("#event-denomination_"+id).text());
+  $("#inp_update_event_detail").val($("#event-detail_"+id).text());
+  $('#inp_update_event_resume').val($("#event-resume_"+id).text());
+  $("#event_update_date_fin").val($("#event-date-fin_"+id).text());
+  $("#event_update_date_debut").val(date_debut);
+  $("#update_event_lieu").val(lieu);
+  $("#update_event_pays").val(pays);
+  $("#update_event_localite").val(localite);
+  $("#event_update_heure_debut").val(heureDebut);
+  $("#event_update_heure_fin").val(heureFin);
+  $("#event_update_ged").val(ged);
+  $("#update_buffer_simulation").val(rayon_buffer?rayon_buffer/1000:50);
+
+
+  $('#up-modal').modal('show')
+  if( syntheseGCA == "Oui") {
+     $("#syntheseGCAYes").prop("checked",true)
+  }
+  else  {
+      $("#syntheseGCANo").prop("checked",true)
+  }
+    if( simulation == "true") {
+
+       $("#simulationYes").prop("checked",true)
+    }
+    else  {
+        $("#simulationNo").prop("checked",true)
+    }
+}
+
+var hidePopUp= function (id) {
+    $('#up-modal').modal('hide')
+}
+
+var update=function(){
+fetch(_conf._endPointApi+'/events/edit',
+    {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+            detail:$('#inp_update_event_detail').val(),
+            id:id,
+            resume:$('#inp_update_event_resume').val(),
+            lieu:$('#update_event_lieu').val(),
+            denomination:$('#inp_update_event_name').val(),
+            id_classification:$("#select_update_event_classification :selected").val(),
+            id_events_ponctuel:$("#select_update_event_ponctuel :selected").val(),
+            date_fin:$("#event_update_date_fin").val() != '' ? $("#event_update_date_fin").val() : null,
+            date_debut:$("#event_update_date_debut").val() != '' ? $("#event_update_date_debut").val() : null,
+			synthese_gca:$("#syntheseGCAYes").is(':checked')?"Oui" : "Non",
+            pays:$('#update_event_pays').val(),
+            localite:$('#update_event_localite').val(),
+            heure_debut:$("#event_update_heure_debut").val() != '' ? $("#event_update_heure_debut").val() : null,
+            heure_fin:$("#event_update_heure_fin").val() != '' ? $("#event_update_heure_fin").val() : null,
+            id_type:$("#select_update_event_type").val(),
+            ged:$("#event_update_ged").val(),
+            simulation:$("#simulationYes").is(':checked')? true : false,
+            rayon_buffer:$('#update_buffer_simulation').val(),
+            id_competence:$("#select_competence :selected").val(),
+            id_source:$("#select_source :selected").val()
+        })
+    })
+    .then(response => {
+        if (response.ok) {
+            $('#up-modal').modal('hide')
+            customUtils.toAst("success",'Evènement modifié avec succès',4000,'bottom-center');
+            $("#event-denomination_"+id).text($('#inp_update_event_name').val());
+            $("#event-detail_"+id).text($('#inp_update_event_detail').val());
+            $("#event-resume_"+id).text($('#inp_update_event_resume').val());
+            $("#event-classification_"+id).attr("src","img/classificationEvent/"+$("#select_update_event_classification :selected").text()+".svg");
+            competence=$("#select_competence :selected").text()
+            classification=$("#select_update_event_classification :selected").text()
+            syntheseGCA=$("#syntheseGCAYes").is(':checked')?"Oui" : "Non"
+
+            //$("#event-classification_"+id).text($("#select_update_event_classification :selected").text());
+             $("#event-lieu_"+id).text($('#update_event_lieu').val());
+
+            $("#event-date-fin_"+id).text($("#event_update_date_fin").val());
+             $("#event-date-debut_"+id).text($("#event_update_date_debut").val());
+
+        }
+        ;
+    })
+    .catch(reason => console.log(reason))
+}
+
+var deleteEvent=function(){
+let isConfirm= confirm('Voulez vous suprimer cet évènement ?')
+if(isConfirm == true)
+{
+fetch(_conf._endPointApi+'/events/delete/'+id,
+    {
+        method: 'GET',
+        headers: {'Content-Type': 'application/json'}
+    })
+    .then(response => {
+        if (response.ok) {
+            customUtils.toAst("success",'Evènement supprimé avec succès',3000);
+        }
+    })
+    .catch(reason => {
+    customUtils.toAst("success",'Erreur lors de la supression',3000)
+    })
+}
+
+}
+
+var showPopUpBuffer=function(){
+       $('#up-buffer-modal').modal('show')
+}
+
+
+</script>

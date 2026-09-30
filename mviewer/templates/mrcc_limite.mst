@@ -1,0 +1,247 @@
+<ul id="feature-list">
+{{#features}}
+  <li class="item feature-card" id="templateRight">
+    <div class="feature-header">
+      <h3 class="title-feature">
+        <i class="fas fa-map-marker-alt feature-icon"></i>
+        {{EEZ}} — {{IHO_Sea}}
+      </h3>
+      <div id="select-features-list">
+        <span class="select-features"><i class="fas fa-globe"></i> {{MarRegion}}</span>
+        <span class="select-features"><i class="fas fa-database"></i> ID: {{MRGID_comb}}</span>
+      </div>
+    </div>
+
+    <div class="feature-details">
+      {{#SOVEREIGN1}}<div class="detail-item">
+        <i class="fas fa-flag detail-icon"></i>
+        <div>
+          <span class="detail-label">Souverain 1</span>
+          <span class="detail-value">{{SOVEREIGN1}} ({{ISO_SOV1}} – {{UN_SOV1}})</span>
+        </div>
+      </div>{{/SOVEREIGN1}}
+
+      {{#SOVEREIGN2}}<div class="detail-item">
+        <i class="fas fa-flag detail-icon"></i>
+        <div>
+          <span class="detail-label">Souverain 2</span>
+          <span class="detail-value">{{SOVEREIGN2}} ({{ISO_SOV2}} – {{UN_SOV2}})</span>
+        </div>
+      </div>{{/SOVEREIGN2}}
+
+      {{#SOVEREIGN3}}<div class="detail-item">
+        <i class="fas fa-flag detail-icon"></i>
+        <div>
+          <span class="detail-label">Souverain 3</span>
+          <span class="detail-value">{{SOVEREIGN3}} ({{ISO_SOV3}} – {{UN_SOV3}})</span>
+        </div>
+      </div>{{/SOVEREIGN3}}
+
+      {{#TERRITORY1}}<div class="detail-item">
+        <i class="fas fa-landmark detail-icon"></i>
+        <div>
+          <span class="detail-label">Territoire 1</span>
+          <span class="detail-value">{{TERRITORY1}} ({{ISO_TER1}} – {{UN_TER1}})</span>
+        </div>
+      </div>{{/TERRITORY1}}
+
+      {{#TERRITORY2}}<div class="detail-item">
+        <i class="fas fa-landmark detail-icon"></i>
+        <div>
+          <span class="detail-label">Territoire 2</span>
+          <span class="detail-value">{{TERRITORY2}} ({{ISO_TER2}} – {{UN_TER2}})</span>
+        </div>
+      </div>{{/TERRITORY2}}
+
+      {{#TERRITORY3}}<div class="detail-item">
+        <i class="fas fa-landmark detail-icon"></i>
+        <div>
+          <span class="detail-label">Territoire 3</span>
+          <span class="detail-value">{{TERRITORY3}} ({{ISO_TER3}} – {{UN_TER3}})</span>
+        </div>
+      </div>{{/TERRITORY3}}
+
+      <div class="detail-item">
+        <i class="fas fa-ruler-combined detail-icon"></i>
+        <div>
+          <span class="detail-label">Superficie</span>
+          <span class="detail-value">{{AREA_KM2}} km²</span>
+        </div>
+      </div>
+
+      <div class="detail-item">
+        <i class="fas fa-arrow-up detail-icon"></i>
+        <div>
+          <span class="detail-label">Latitude</span>
+          <span class="detail-value">{{Latitude}}</span>
+        </div>
+      </div>
+
+      <div class="detail-item">
+        <i class="fas fa-arrow-right detail-icon"></i>
+        <div>
+          <span class="detail-label">Longitude</span>
+          <span class="detail-value">{{Longitude}}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="source-footer">
+      <i class="fas fa-camera"></i>
+      <span class="source-text">Source : Photo-interprétation CRTS</span>
+    </div>
+  </li>
+{{/features}}
+</ul>
+
+<!-- STYLES -->
+<style>
+  :root {
+    --primary-color: #161A30;
+    --secondary-color: #4D79B8;
+    --accent-color: #5DB0C3;
+    --light-bg: #F8F9FA;
+    --dark-text: #2D3748;
+    --light-text: #718096;
+    --border-radius: 12px;
+    --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    --font-family: 'Arial', sans-serif;
+  }
+
+  .item.feature-card {
+    background-color: white;
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    padding: 20px;
+    margin-bottom: 20px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .item.feature-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+  }
+
+  .feature-header {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #e2e8f0;
+  }
+
+  .title-feature {
+    color: var(--primary-color);
+    font-family: var(--font-family);
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .feature-icon {
+    color: var(--secondary-color);
+    font-size: 1.1em;
+  }
+
+  #select-features-list {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .select-features {
+    background-color: var(--primary-color);
+    padding: 6px 12px;
+    color: white;
+    font-size: 1rem;
+    font-family: var(--font-family);
+    border-radius: 20px;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .select-features i {
+    font-size: 0.7em;
+  }
+
+  .feature-details {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 15px;
+  }
+
+  .detail-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px;
+    background-color: var(--light-bg);
+    border-radius: var(--border-radius);
+  }
+
+  .detail-icon {
+    color: var(--secondary-color);
+    font-size: 1.2em;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(77, 121, 184, 0.1);
+    border-radius: 50%;
+  }
+
+  .detail-label {
+    display: block;
+    font-family: var(--font-family);
+    font-size: 1.2rem;
+    color: var(--light-text);
+    margin-bottom: 2px;
+  }
+
+  .detail-value {
+    display: block;
+    font-family: var(--font-family);
+    font-size: 1.6rem;
+    color: var(--dark-text);
+    font-weight: 500;
+  }
+
+  @media (max-width: 768px) {
+    .feature-details {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .feature-card {
+    animation: fadeIn 0.4s ease-out forwards;
+  }
+
+  .source-footer {
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 1px solid #e2e8f0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 1rem;
+    color: var(--light-text);
+  }
+
+  .source-footer i {
+    color: var(--secondary-color);
+  }
+</style>
+
+<!-- Font Awesome pour les icônes -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">

@@ -32,6 +32,12 @@ services:
     volumes:
       - uploads_data:/app/uploads
 
+  mviewer:
+    build: ./mviewer
+    restart: always
+    ports:
+      - "8090:80"
+
 volumes:
   db_data:
   uploads_data:

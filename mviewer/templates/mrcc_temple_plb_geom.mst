@@ -1,0 +1,655 @@
+{{#features}}
+<li class="item feature-card" id="templateRight">
+    <div class="feature-header">
+        <h3 class="title-feature">
+            <i class="fas fa-satellite-dish feature-icon"></i>
+            Balise {{beacon_type}} - {{unit_name}}
+        </h3>
+        <div id="select-features-list">
+            <span class="select-features tag-region"><i class="fas fa-anchor"></i> {{port}}</span>
+            <span class="select-features tag-zone"><i class="fas fa-ship"></i> {{activity_type}}</span>
+            <span class="select-features tag-type"><i class="fas fa-battery-full"></i> {{beacon_status}}</span>
+        </div>
+    </div>
+
+    <div class="feature-details">
+        
+        <div class="detail-item highlight">
+            <i class="fas fa-user detail-icon"></i>
+            <div>
+                <span class="detail-label">Propriétaire</span>
+                <span class="detail-value">{{owner}}</span>
+            </div>
+        </div>
+        
+        <div class="detail-item">
+            <i class="fas fa-qrcode detail-icon"></i>
+            <div>
+                <span class="detail-label">Numéro d'Enregistrement</span>
+                <span class="detail-value">{{registration_number}}</span>
+            </div>
+        </div>
+        
+        <div class="detail-item">
+            <i class="fas fa-flag detail-icon"></i>
+            <div>
+                <span class="detail-label">Port d'Attache</span>
+                <span class="detail-value">{{port}}</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Section des caractéristiques techniques -->
+    <div class="project-specs">
+        <h4 class="specs-title">
+            <i class="fas fa-microchip"></i>
+            Caractéristiques Techniques
+        </h4>
+        <div class="specs-grid">
+            <div class="spec-item">
+                <div class="spec-icon">
+                    <i class="fas fa-satellite"></i>
+                </div>
+                <div class="spec-content">
+                    <div class="spec-value">{{beacon_type}}</div>
+                    <div class="spec-label">type</div>
+                    <div class="spec-detail">Balise</div>
+                </div>
+            </div>
+            
+            <div class="spec-item">
+                <div class="spec-icon">
+                    <i class="fas fa-industry"></i>
+                </div>
+                <div class="spec-content">
+                    <div class="spec-value">{{manufacturer}}</div>
+                    <div class="spec-label">fabricant</div>
+                    <div class="spec-detail">{{model}}</div>
+                </div>
+            </div>
+            
+            <div class="spec-item">
+                <div class="spec-icon">
+                    <i class="fas fa-battery-three-quarters"></i>
+                </div>
+                <div class="spec-content">
+                    <div class="spec-value">{{beacon_status}}</div>
+                    <div class="spec-label">statut</div>
+                    <div class="spec-detail">Activation</div>
+                </div>
+            </div>
+            
+            <div class="spec-item">
+                <div class="spec-icon">
+                    <i class="fas fa-hashtag"></i>
+                </div>
+                <div class="spec-content">
+                    <div class="spec-value">{{tac}}</div>
+                    <div class="spec-label">TAC</div>
+                    <div class="spec-detail">Code</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Section des identifiants techniques -->
+    <div class="identifiers-grid">
+        <div class="identifier-item">
+            <i class="fas fa-fingerprint"></i>
+            <div class="identifier-content">
+                <span class="identifier-label">UIN</span>
+                <span class="identifier-value">{{Uin}}</span>
+            </div>
+        </div>
+        
+        <div class="identifier-item">
+            <i class="fas fa-cogs"></i>
+            <div class="identifier-content">
+                <span class="identifier-label">SN Fabricant</span>
+                <span class="identifier-value">{{Serial_number_manufacturer}}</span>
+            </div>
+        </div>
+        
+        <div class="identifier-item">
+            <i class="fas fa-search"></i>
+            <div class="identifier-content">
+                <span class="identifier-label">SN SAR</span>
+                <span class="identifier-value">{{serial_number_sar}}</span>
+            </div>
+        </div>
+
+        <div class="identifier-item">
+            <i class="fas fa-qrcode"></i>
+            <div class="identifier-content">
+                <span class="identifier-label">Mviewer ID</span>
+                <span class="identifier-value">{{Mviewerid}}</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Informations supplémentaires -->
+    <div class="additional-info">
+        <h4 class="info-title">
+            <i class="fas fa-info-circle"></i>
+            Informations Complémentaires
+        </h4>
+        <div class="info-grid">
+            <div class="info-item">
+                <i class="fas fa-id-card-alt"></i>
+                <div class="info-content">
+                    <span class="info-label">ID Port</span>
+                    <span class="info-value">{{id_port}}</span>
+                </div>
+            </div>
+            {{#link}}
+            <div class="info-item">
+                <i class="fas fa-link"></i>
+                <div class="info-content">
+                    <span class="info-label">Lien Associé</span>
+                    <span class="info-value">{{link}}</span>
+                </div>
+            </div>
+            {{/link}}
+            <div class="info-item">
+                <i class="fas fa-tag"></i>
+                <div class="info-content">
+                    <span class="info-label">Type d'Activité</span>
+                    <span class="info-value">{{activity_type}}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Indicateur visuel du statut -->
+    <div class="project-type-indicator">
+        <div class="indicator-header">
+            <i class="fas fa-satellite"></i>
+            <span>Statut de la Balise PLB</span>
+        </div>
+        <div class="indicator-content">
+            <div class="project-class project-plb">
+                <span class="class-badge {{beacon_status}}">{{beacon_status}}</span>
+                <span class="class-desc">{{unit_name}} - {{port}}</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="source-footer">
+        <i class="fas fa-database"></i>
+        <span class="source-text">Source : MRCC | Balise {{beacon_type}} - {{manufacturer}} {{model}} | Port : {{port}}</span>
+    </div>
+</li>
+{{/features}}
+
+<!-- Inclure Font Awesome pour les icônes -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+<style>
+/* Définition des variables CSS pour les balises PLB - Thème maritime/urgence */
+:root {
+    --primary-color: #1E6EA7;
+    --secondary-color: #2E8BC0;
+    --accent-color: #145DA0;
+    --status-active: #4CAF50;
+    --status-inactive: #f44336;
+    --emergency-color: #FF6B6B;
+    --navy-blue: #0C2D48;
+    --ocean-blue: #145DA0;
+    --light-blue: #B1D4E0;
+    --light-bg: #F0F8FF;
+    --dark-text: #2C3E50;
+    --light-text: #5D6D7E;
+    --border-radius: 10px;
+    --box-shadow: 0 4px 12px rgba(30, 110, 167, 0.15);
+    --font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+/* Style général */
+.item.feature-card {
+    background: linear-gradient(135deg, #ffffff 0%, #F0F8FF 100%);
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    padding: 20px;
+    margin-bottom: 20px;
+    transition: all 0.3s ease;
+    border-left: 4px solid var(--secondary-color);
+    font-family: var(--font-family);
+}
+
+.item.feature-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(30, 110, 167, 0.2);
+}
+
+.feature-header {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid var(--light-bg);
+}
+
+.title-feature {
+    color: var(--navy-blue);
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.feature-icon {
+    color: var(--secondary-color);
+    font-size: 1.4em;
+}
+
+#select-features-list {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.select-features {
+    padding: 6px 12px;
+    color: white;
+    font-size: 1rem;
+    border-radius: 6px;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    transition: all 0.2s ease;
+    font-weight: 600;
+}
+
+.tag-region {
+    background-color: var(--primary-color);
+}
+
+.tag-zone {
+    background-color: var(--ocean-blue);
+}
+
+.tag-type {
+    background-color: var(--emergency-color);
+}
+
+.select-features:hover {
+    transform: scale(1.05);
+    opacity: 0.9;
+}
+
+.feature-details {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.detail-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    background-color: var(--light-bg);
+    border-radius: var(--border-radius);
+    transition: all 0.2s ease;
+    border: 1px solid transparent;
+}
+
+.detail-item.highlight {
+    background: linear-gradient(135deg, #B1D4E0 0%, #ffffff 100%);
+    border: 1px solid var(--primary-color);
+}
+
+.detail-item:hover {
+    background-color: #B1D4E0;
+    border-color: var(--accent-color);
+    transform: translateX(2px);
+}
+
+.detail-icon {
+    color: var(--secondary-color);
+    font-size: 1.1em;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: white;
+    border-radius: 50%;
+    flex-shrink: 0;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.detail-label {
+    display: block;
+    font-size: 1rem;
+    color: var(--light-text);
+    margin-bottom: 4px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.detail-value {
+    display: block;
+    font-size: 1.15rem;
+    color: var(--dark-text);
+    font-weight: 600;
+}
+
+/* Section des caractéristiques techniques */
+.project-specs {
+    background: linear-gradient(135deg, #f5f5f5 0%, #ffffff 100%);
+    border-radius: var(--border-radius);
+    padding: 15px;
+    margin: 20px 0;
+    border: 1px solid #e0e0e0;
+}
+
+.specs-title {
+    color: var(--navy-blue);
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 0 0 15px 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.specs-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 12px;
+}
+
+.spec-item {
+    background: white;
+    padding: 15px;
+    border-radius: 8px;
+    text-align: center;
+    border: 1px solid var(--light-blue);
+    transition: all 0.2s ease;
+}
+
+.spec-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(30, 110, 167, 0.2);
+}
+
+.spec-icon {
+    color: var(--primary-color);
+    font-size: 1.5rem;
+    margin-bottom: 8px;
+}
+
+.spec-value {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--dark-text);
+    margin-bottom: 2px;
+    min-height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.spec-label {
+    font-size: 1rem;
+    color: var(--light-text);
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.spec-detail {
+    font-size: 0.65rem;
+    color: var(--light-text);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Section des identifiants */
+.identifiers-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 10px;
+    margin: 15px 0;
+}
+
+.identifier-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    background-color: #f8f9fa;
+    border-radius: 6px;
+    border-left: 3px solid var(--accent-color);
+}
+
+.identifier-item i {
+    color: var(--accent-color);
+    font-size: 1rem;
+    width: 24px;
+    text-align: center;
+}
+
+.identifier-content {
+    display: flex;
+    flex-direction: column;
+}
+
+.identifier-label {
+    font-size: 1rem;
+    color: var(--light-text);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.identifier-value {
+    font-size: 1.1rem;
+    color: var(--dark-text);
+    font-weight: 600;
+    font-family: 'Courier New', monospace;
+}
+
+/* Section informations supplémentaires */
+.additional-info {
+    background: linear-gradient(135deg, #E8F4FD 0%, #ffffff 100%);
+    border-radius: var(--border-radius);
+    padding: 15px;
+    margin: 15px 0;
+    border: 1px solid #B1D4E0;
+}
+
+.info-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 12px 0;
+    color: var(--navy-blue);
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 10px;
+}
+
+.info-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px;
+    background: white;
+    border-radius: 6px;
+    border-left: 3px solid var(--secondary-color);
+}
+
+.info-item i {
+    color: var(--secondary-color);
+    font-size: 1rem;
+    width: 24px;
+    text-align: center;
+}
+
+.info-content {
+    display: flex;
+    flex-direction: column;
+}
+
+.info-label {
+    font-size: 1rem;
+    color: var(--light-text);
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.info-value {
+    font-size: 1.1rem;
+    color: var(--dark-text);
+    font-weight: 600;
+}
+
+/* Indicateur du statut */
+.project-type-indicator {
+    background: linear-gradient(135deg, #E8F5E8 0%, #ffffff 100%);
+    border-radius: var(--border-radius);
+    padding: 15px;
+    margin: 15px 0;
+    border: 1px solid #C8E6C9;
+}
+
+.indicator-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+    font-weight: 600;
+    color: var(--dark-text);
+}
+
+.indicator-content {
+    display: flex;
+    justify-content: center;
+}
+
+.project-class {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 16px;
+    background: white;
+    border-radius: 20px;
+    border: 2px solid var(--primary-color);
+}
+
+.project-plb {
+    border-color: var(--ocean-blue);
+}
+
+.class-badge {
+    background-color: var(--ocean-blue);
+    color: white;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 700;
+}
+
+.class-badge.Active {
+    background-color: var(--status-active);
+}
+
+.class-badge.Inactive {
+    background-color: var(--status-inactive);
+}
+
+.class-desc {
+    font-size: 1.2rem;
+    color: var(--dark-text);
+    font-weight: 600;
+}
+
+.source-footer {
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 2px solid var(--light-bg);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 1rem;
+    color: var(--light-text);
+    font-weight: 600;
+}
+
+.source-footer i {
+    color: var(--secondary-color);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .feature-details {
+        grid-template-columns: 1fr;
+    }
+    
+    .specs-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .identifiers-grid, .info-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .item.feature-card {
+        padding: 15px;
+    }
+    
+    .title-feature {
+        font-size: 1.2rem;
+    }
+    
+    #select-features-list {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from { 
+        opacity: 0; 
+        transform: translateY(15px); 
+    }
+    to { 
+        opacity: 1; 
+        transform: translateY(0); 
+    }
+}
+
+.feature-card {
+    animation: fadeIn 0.4s ease-out forwards;
+}
+
+/* Animation pour l'icône satellite */
+@keyframes satellitePulse {
+    0% { transform: rotate(0deg) scale(1); }
+    50% { transform: rotate(10deg) scale(1.1); }
+    100% { transform: rotate(0deg) scale(1); }
+}
+
+.feature-icon {
+    animation: satellitePulse 3s ease-in-out infinite;
+}
+
+/* Style pour les statuts */
+.detail-item.highlight .detail-value {
+    color: var(--navy-blue);
+    font-weight: 700;
+    font-size: 1rem;
+}
+</style>

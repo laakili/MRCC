@@ -1,0 +1,215 @@
+{{#features}}
+<li id="{{feature_ol_uid}}" class="item" style="width:100%;max-width:600px;">
+  <div class="fr-container fr-py-2w">
+    <div class="fr-grid-row fr-grid-row--gutters">
+      <div class="fr-col-12">
+        <h3 class="fr-h4 fr-mb-2w" style="color: #3a86ff; border-bottom: 2px solid #3a86ff; padding-bottom: 8px;">
+          Indicateurs Mensuels DS 2023
+        </h3>
+        
+        <div class="fr-table fr-table--bordered fr-table--layout-fixed" style="margin-bottom: 1.5rem;">
+          <table>
+            <thead>
+              <tr style="background-color: #f8f9fa;">
+                <th scope="col" class="fr-text--bold" style="width: 50%; padding: 12px;">Période</th>
+                <th scope="col" class="fr-text--bold" style="width: 50%; padding: 12px;">Valeur</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td style="padding: 12px;">Indice DS 01/2023</td>
+                <td class="fr-text--bold" style="color: #3a86ff; padding: 12px;">
+                  {{ds_2023_01}} <span class="fr-text--sm" style="color: #666;">unités</span>
+                </td>
+              </tr>
+              <tr>
+                <td style="padding: 12px;">Indice DS 02/2023</td>
+                <td class="fr-text--bold" style="color: #3a86ff; padding: 12px;">
+                  {{ds_2023_02}} <span class="fr-text--sm" style="color: #666;">unités</span>
+                </td>
+              </tr>
+              <tr>
+                <td style="padding: 12px;">Indice DS 03/2023</td>
+                <td class="fr-text--bold" style="color: #3a86ff; padding: 12px;">
+                  {{ds_2023_03}} <span class="fr-text--sm" style="color: #666;">unités</span>
+                </td>
+              </tr>
+              <tr>
+                <td style="padding: 12px;">Indice DS 04/2023</td>
+                <td class="fr-text--bold" style="color: #3a86ff; padding: 12px;">
+                  {{ds_2023_04}} <span class="fr-text--sm" style="color: #666;">unités</span>
+                </td>
+              </tr>
+              <tr>
+                <td style="padding: 12px;">Indice DS 05/2023</td>
+                <td class="fr-text--bold" style="color: #3a86ff; padding: 12px;">
+                  {{ds_2023_05}} <span class="fr-text--sm" style="color: #666;">unités</span>
+                </td>
+              </tr>
+              <tr>
+                <td style="padding: 12px;">Indice DS 06/2023</td>
+                <td class="fr-text--bold" style="color: #3a86ff; padding: 12px;">
+                  {{ds_2023_06}} <span class="fr-text--sm" style="color: #666;">unités</span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="chart-container" style="height: 300px; margin-top: 2rem;">
+            <canvas id="chart-static-test"></canvas>
+          </div>
+          
+      </div>
+    </div>
+  </div>
+</li>
+
+
+<!-- Intégration de Chart.js -->
+
+
+<style>
+/* Style général */
+.mv-popup-content {
+  font-family: 'Marianne', sans-serif;
+  color: #333;
+}
+
+/* Tableau amélioré */
+.fr-table {
+  font-size: 0.9rem;
+  border-collapse: separate;
+  border-spacing: 0;
+  width: 100%;
+}
+
+.fr-table th {
+  background-color: #f8f9fa;
+  position: sticky;
+  top: 0;
+}
+
+.fr-table td, .fr-table th {
+  padding: 12px;
+  border: 1px solid #e5e5e5;
+}
+
+.fr-table tbody tr:nth-child(even) {
+  background-color: #f8f9fa;
+}
+
+.fr-table tbody tr:hover {
+  background-color: #f0f7ff;
+  transition: background-color 0.2s;
+}
+
+/* Graphique */
+.chart-container {
+  position: relative;
+  width: 100%;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .fr-table {
+    font-size: 0.8rem;
+  }
+  
+  .fr-table td, .fr-table th {
+    padding: 8px;
+  }
+  
+  .chart-container {
+    height: 250px;
+  }
+}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+// Démarre le graphique lorsque le DOM est prêt
+document.addEventListener('DOMContentLoaded', function () {
+  const ctx = document.getElementById('chart-static-test').getContext('2d');
+
+  new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: ['01/2023', '02/2023', '03/2023', '04/2023', '05/2023', '06/2023'],
+      datasets: [{
+        label: 'Évolution des indices DS',
+        data: [
+          33.24927139,  // Janvier
+          23.72254944,  // Février
+          29.94771767,  // Mars
+          34.67505264,  // Avril
+          38.24716949,  // Mai
+          40.15832632   // Juin (valeur ajoutée pour test)
+        ],
+        backgroundColor: 'rgba(58, 134, 255, 0.1)',
+        borderColor: '#3a86ff',
+        borderWidth: 3,
+        tension: 0.4,
+        pointBackgroundColor: '#3a86ff',
+        pointRadius: 5,
+        pointHoverRadius: 7,
+        fill: true
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          position: 'top',
+          labels: {
+            font: {
+              family: 'Marianne',
+              size: 14
+            }
+          }
+        },
+        tooltip: {
+          backgroundColor: 'rgba(0,0,0,0.8)',
+          titleFont: {
+            family: 'Marianne'
+          },
+          bodyFont: {
+            family: 'Marianne',
+            size: 14
+          },
+          callbacks: {
+            label: function(context) {
+              return context.parsed.y.toFixed(2) + ' unités';
+            }
+          }
+        }
+      },
+      scales: {
+        y: {
+          beginAtZero: false,
+          grid: {
+            color: 'rgba(0,0,0,0.05)'
+          },
+          ticks: {
+            font: {
+              family: 'Marianne'
+            }
+          }
+        },
+        x: {
+          grid: {
+            display: false
+          },
+          ticks: {
+            font: {
+              family: 'Marianne'
+            }
+          }
+        }
+      }
+    }
+  });
+});
+</script>
+
+{{/features}}

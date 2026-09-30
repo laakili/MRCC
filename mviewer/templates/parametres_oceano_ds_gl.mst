@@ -1,0 +1,141 @@
+<!-- Chart.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+
+{{#features}}
+<li class="item" id="templateRight" style="padding: 10px;">
+  <div id="select-features-list-{{id}}">
+    <span class="select-features" id="latest-date-{{id}}">Date :</span>
+    <span class="select-features" id="latest-value-{{id}}">Valeur :</span> 
+  </div>
+
+  <div class="block-grey block-graph center">
+    <div class="chart-container">
+      <canvas id="chart_{{id}}"></canvas>
+    </div>
+    <p class="title-chart-feature">Évolution de la valeur mesurée</p>
+    <p class="subtitle-number-feature">Source : parametres_oceano_ds_gdata</p>
+  </div>
+</li>
+{{/features}}
+
+<style>
+  .block-grey {
+    border-radius: 10px;
+    background-color: #f3f3f3;
+    padding: 15px;
+    margin-top: 10px;
+  }
+
+  .center {
+    text-align: center;
+  }
+
+  .chart-container {
+    position: relative;
+    height: 160px; /* fixe la hauteur du graphe */
+    width: 100%;
+  }
+
+  .select-features {
+    background-color: #161A30;
+    padding: 5px 10px;
+    color: white;
+    font-size: 11px;
+    border-radius: 12px;
+    margin-right: 5px;
+    display: inline-block;
+  }
+
+  .title-chart-feature {
+    font-size: 13px;
+    font-weight: 600;
+    margin-top: 10px;
+  }
+
+  .subtitle-number-feature {
+    font-size: 11px;
+    font-style: italic;
+    color: #555;
+  }
+</style>
+
+<script>
+// Fonction pour récupérer les données WFS
+function get_wfsdata(url, params, callback) {
+  const query = new URLSearchParams({
+    service: "WFS",
+    version: "2.0.0",
+    request: "GetFeature",
+    outputFormat: "application/json",
+    ...params
+  }).toString();
+
+  fetch(url + "?" + query)
+    .then(res => res.json())
+    .then(callback)
+    .catch(err => console.error("Erreur WFS:", err));
+}
+
+{{#features}}
+get_wfsdata("http://geoai-solutions.ddns.net:8888/geomaritime/geodata/wfs", {
+  typeNames: "parametres_oceano_ds_gdata",
+  propertyName: "date,value",
+  CQL_FILTER: "id='{{id}}'"
+}, function(data) {
+  const cleanData = data.features
+    .map(f => f.properties)
+    .filter(p => p.value !== null)
+    .sort((a, b) => new Date(a.date) - new Date(b.date));
+
+  if (cleanData.length === 0) return;
+
+  const labels = cleanData.map(p => p.date.replace("Z", ""));
+  const values = cleanData.map(p => p.value);
+
+  const latest = cleanData[cleanData.length - 1];
+  const formattedDate = new Date(latest.date).toLocaleDateString('fr-FR');
+  const formattedValue = latest.value.toFixed(2);
+
+  document.getElementById("latest-date-{{id}}").textContent = `Date : ${formattedDate}`;
+  document.getElementById("latest-value-{{id}}").textContent = `Valeur : ${formattedValue}`;
+
+  const ctx = document.getElementById("chart_{{id}}").getContext("2d");
+
+  new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: labels,
+      datasets: [{
+        label: "Valeur mesurée",
+        data: values,
+        borderColor: "rgba(77, 121, 184, 1)",
+        backgroundColor: "rgba(77, 121, 184, 0.1)",
+        fill: true,
+        tension: 0.3,
+        pointRadius: 2,
+        borderWidth: 1
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: {
+        x: {
+          title: { display: true, text: "Date" }
+        },
+        y: {
+          title: { display: true, text: "Valeur" }
+        }
+      },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          mode: 'index',
+          intersect: false
+        }
+      }
+    }
+  });
+});
+{{/features}}
+</script>

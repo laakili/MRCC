@@ -1,0 +1,250 @@
+<!-- Template Mustache Forces Auxiliaires avec actions (Email / SMS) -->
+{{#features}}
+<li class="item feature-card" id="templateRight">
+  <div class="feature-header">
+    <h3 class="title-feature">
+      <i class="fas fa-shield-alt feature-icon"></i>
+      {{name}} 
+    </h3>
+    <div id="select-features-list">
+      <span class="select-features"><i class="fas fa-layer-group"></i> {{secteur}}</span>
+      <span class="select-features"><i class="fas fa-layer-group"></i> {{categorie}}</span>
+      <span class="select-features"><i class="fas fa-ship"></i> {{type}}</span>
+    </div>
+    <div id="select-features-list">
+      <span class="select-features tag-region"><i class="fas fa-map"></i> {{region_adms}}</span>
+      <span class="select-features tag-province"><i class="fas fa-map-marker"></i> {{province}}</span>
+      <span class="select-features tag-commune"><i class="fas fa-city"></i> {{commune}}</span>
+    </div>
+  </div>
+
+  <div class="feature-details">
+
+   
+    <div class="detail-item">
+      <i class="fas fa-map-marker-alt detail-icon"></i>
+      <div>
+        <span class="detail-label">Adresse</span>
+        <span class="detail-value">{{rdresse}}</span>
+      </div>
+    </div>
+
+    <div class="detail-item">
+      <i class="fas fa-envelope detail-icon"></i>
+      <div>
+        <span class="detail-label">Email professionnel</span>
+        <span class="detail-value">
+          <a href="mailto:{{Mail_pro}}" class="contact-link">{{mail_pro}}</a>
+        </span>
+      </div>
+    </div>
+
+    <div class="detail-item">
+      <i class="fas fa-envelope-open-text detail-icon"></i>
+      <div>
+        <span class="detail-label">Email personnel</span>
+        <span class="detail-value">
+          <a href="mailto:{{Mail_perso}}" class="contact-link">{{mail_perso}}</a>
+        </span>
+      </div>
+    </div>
+
+    <div class="detail-item">
+      <i class="fas fa-phone detail-icon"></i>
+      <div>
+        <span class="detail-label">Téléphone 1</span>
+        <span class="detail-value">
+          <a href="tel:{{Telepone_1}}" class="contact-link">{{telepone_1}}</a>
+        </span>
+      </div>
+    </div>
+
+    <div class="detail-item">
+      <i class="fas fa-phone-alt detail-icon"></i>
+      <div>
+        <span class="detail-label">Téléphone 2</span>
+        <span class="detail-value">
+          <a href="tel:{{Telepone_2}}" class="contact-link">{{telepone_2}}</a>
+        </span>
+      </div>
+    </div>
+
+    <div class="detail-item">
+      <i class="fas fa-mobile-alt detail-icon"></i>
+      <div>
+        <span class="detail-label">GSM</span>
+        <span class="detail-value">
+          <a href="sms:{{Gsm}}" class="contact-link">{{gsm}}</a>
+        </span>
+      </div>
+    </div>
+
+    <div class="detail-item">
+      <i class="fas fa-fax detail-icon"></i>
+      <div>
+        <span class="detail-label">Fax</span>
+        <span class="detail-value">{{fax}}</span>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="source-footer">
+    <i class="fas fa-camera"></i>
+    <span class="source-text">Source : GeoAi SOLUTIONS - MViewer</span>
+  </div>
+</li>
+{{/features}}
+
+<!-- STYLES CSS -->
+<style>
+:root {
+  --primary-color: #161A30;
+  --secondary-color: #4D79B8;
+  --accent-color: #5DB0C3;
+  --light-bg: #F8F9FA;
+  --dark-text: #2D3748;
+  --light-text: #718096;
+  --border-radius: 12px;
+  --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --font-family: 'Inter', sans-serif;
+}
+
+.item.feature-card {
+  background-color: white;
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
+  padding: 20px;
+  margin-bottom: 20px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.item.feature-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+}
+
+.feature-header {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.title-feature {
+  color: var(--primary-color);
+  font-family: var(--font-family);
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.feature-icon {
+  color: var(--secondary-color);
+  font-size: 1.1em;
+}
+
+#select-features-list {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.select-features {
+  background-color: var(--primary-color);
+  padding: 6px 12px;
+  color: white;
+  font-size: 0.75rem;
+  font-family: var(--font-family);
+  border-radius: 20px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.feature-details {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 15px;
+}
+
+.detail-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px;
+  background-color: var(--light-bg);
+  border-radius: var(--border-radius);
+}
+
+.detail-icon {
+  color: var(--secondary-color);
+  font-size: 1.2em;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(77, 121, 184, 0.1);
+  border-radius: 50%;
+}
+
+.detail-label {
+  display: block;
+  font-family: var(--font-family);
+  font-size: 0.75rem;
+  color: var(--light-text);
+  margin-bottom: 2px;
+}
+
+.detail-value {
+  display: block;
+  font-family: var(--font-family);
+  font-size: 0.9rem;
+  color: var(--dark-text);
+  font-weight: 500;
+}
+
+.source-footer {
+  margin-top: 20px;
+  padding-top: 15px;
+  border-top: 1px solid #e2e8f0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.75rem;
+  color: var(--light-text);
+}
+
+.source-footer i {
+  color: var(--secondary-color);
+}
+
+.tag-region {
+  background-color: #1E90FF;
+}
+
+.tag-province {
+  background-color: #20B2AA;
+}
+
+.tag-commune {
+  background-color: #FF8C00;
+}
+
+.contact-link {
+  color: var(--accent-color);
+  text-decoration: none;
+}
+.contact-link:hover {
+  text-decoration: underline;
+}
+</style>
+
+<!-- Font Awesome Icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">

@@ -1,0 +1,772 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+   <application  id="print"
+   title="Plateforme Risque Sismique"
+                 mouseposition="true"
+                 logo="img/logo1.png"
+                 help="global_help.html"
+                 exportpng="true"
+              showhelp="false"
+              coordinates="true"
+              measuretools="true"
+              togglealllayersfromtheme="true"
+                geoloc="true"
+                zoomtools ="true"
+                 style="css/themes/style.css"
+                 templaterightinfopanel="allintabs"
+                 templatebottominfopanel="accordion"
+                 home ="{{fqdn}}/mviewer1"
+                 addlayerstools="true"
+                 favicon="img/logo1.png"
+                 titlehelp ="Documentation et Aide"
+               
+                 
+    />
+
+
+            <mapoptions maxzoom="25"
+                projection="EPSG:3857"
+                center="-330750.13768758904,3400000.57790189"
+                zoom="6" projextent="-1054102.879204, 3408576.175412, -166037.099019, 3397597.327197"
+                scalebar="true" lang="en,fr"
+                langfile="demo/demo.i18n.json"
+                showhelp="false"/>
+                <olscompletion url=""
+                type="ban"
+                attribution="La recherche est un service de Geocodage propre 
+                "/>
+
+ <proxy url=""/>
+
+ <searchparameters imgurl='img/map_marker.png'
+                   imgwidth='50px'
+                   svgcolor='orange'
+                   localities="true"
+                   features="true"
+                   bbox="false"
+                   querymaponclick="true"
+                   closeafterclick="false"
+                   animate="true"/>
+    <baselayers style="gallery">
+        
+              
+              <baselayer type="OSM" id="esri_topo"
+           label="esri_topo"
+           title="ESRI Topo"
+           tiled="true"
+           thumbgallery="img/basemap/esriworldstreetmap.png"
+           url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}"
+           format="image/png"
+           visible="false"
+           attribution="ESRI Topo"/>
+
+<baselayer type="OSM" id="esri_world_imagery"
+           label="esri_world_imagery"
+           title="ESRI World Imagery"
+           tiled="true"
+           thumbgallery="img/basemap/esriworldimagery.png"
+           url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
+           format="image/png"
+           visible="false"
+           attribution="ESRI World Imagery"/>
+
+<baselayer type="OSM" id="google_imagery"
+           label="google_imagery"
+           title="Google Imagery"
+           tiled="true"
+           thumbgallery="img/basemap/baselayers-ArcGIS.Imagery_v1.png"
+         
+           url="https://mt1.google.com/vt/lyrs=s&amp;x={x}&amp;y={y}&amp;z={z}"
+           format="image/png"
+           visible="false"
+           attribution="Google World Imagery"/>
+
+
+<baselayer type="OSM" id="google1_imagery"
+           label="google_terrain"
+           title="Google Terrain"
+           tiled="true"
+           thumbgallery="img/basemap/baselayers-ArcGIS.Imagery_v1.png"
+           url="http://mt0.google.com/vt/lyrs=t&amp;hl=en&amp;x={x}&amp;y={y}&amp;z={z}"
+           
+           format="image/png"
+           visible="false"
+           attribution="Google World Imagery"/>
+<!-- ESRI World Light Gray -->
+<baselayer type="OSM" id="esri_world_light_gray"
+           label="esri_world_light_gray"
+           title="ESRI World Light Gray"
+           tiled="true"
+           thumbgallery="img/basemap/cartodb.png"
+           url="https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}"
+           format="image/png"
+           visible="false"
+           attribution="ESRI World Light Gray"/>
+
+<!-- ESRI World Dark Gray -->
+<baselayer type="OSM" id="World_Dark_Gray_Base"
+           label="World_Dark_Gray_Base"
+           title="ESRI World Dark Gray"
+           tiled="true"
+           thumbgallery="img/basemap/cartodbdark.png"
+           url="https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}"
+           format="image/png"
+           visible="true"
+           attribution="ESRI World Dark Gray"/>
+    </baselayers>
+    <proxy url=""/>
+     
+
+    <themes> 
+       <theme name="Zones sinistrées" id="event-zt" icon="fas fa-thumbtack">
+              <layer id="decouoage_touche_kpi"
+                     name="Zones sinistrées"
+                     visible="false"
+                     type="wms"
+                     opacity="0"
+                     url="{{fqdn}}/georisque/geodata/wms"
+                     attribution=""
+                     metadata=""
+                     metadata-csw=""
+                     queryable="true"
+                     infoformat="application/vnd.ogc.gml"
+                     dynamiclegend="false"
+                     customcontrol="true"
+                     customcontrolpath="apps/risque/addons/decoupage/Controls"
+                     expanded="true">
+              </layer>
+
+
+
+              <layer id="buffer"
+                              name="Zone à risque"
+                              visible="false"
+                              queryable="true"
+                              url="{{fqdn}}/georisque/geodata/wms"
+                              dynamiclegend="true"
+                              infoformat="application/vnd.ogc.gml"
+                       >
+                       </layer>
+                       <layer id="decouoage_touche_kpi"
+                              name="Région Touchées"
+                              visible="false"
+                              queryable="true"
+                              url="{{fqdn}}/georisque/geodata/wms"
+                              dynamiclegend="true"
+                              infoformat="application/vnd.ogc.gml"
+                              style="decoupage_region_touche_kpi">
+                              <template url="templates/province.mst"></template>
+                            </layer>
+                       <layer id="decouoage_touche_kpi"
+                              name="Provinces Touchées"
+                              visible="false"
+                              queryable="true"
+                              url="{{fqdn}}/georisque/geodata/wms"
+                              dynamiclegend="true"
+                              infoformat="application/vnd.ogc.gml"
+                              style="decoupage_province_touche_kpi">
+                              <template url="templates/province.mst"></template>
+                            </layer>
+                       <layer id="decouoage_touche_kpi" 
+                            name="Communes Touchées"
+                            visible="false"
+                            queryable="true"
+                            url="{{fqdn}}/georisque/geodata/wms"
+                            dynamiclegend="true"
+                            infoformat="application/vnd.ogc.gml"
+                            style="decoupage_commune_touche_kpi">
+                     <template url="templates/commune.mst"></template>
+                     </layer>
+
+                     <layer id="lieu_habite_touche"
+                              name="Douars touchés"
+                              visible="false"
+                              queryable="true"
+                              url="{{fqdn}}/georisque/geodata/wms"
+                              dynamiclegend="true"
+                              infoformat="application/vnd.ogc.gml"
+                              featurecount="5">
+                       <template url="templates/douars.mst"></template>
+                       </layer>
+        </theme>
+
+         <theme name="Risque Séisme" id="event-seismez" icon="fas fa-thumbtack" >
+              <group name="Evenement à Risque" id="event" >
+                     <layer id="vue_event_current"
+                       isEditable="true"
+                       name="Risque Event"
+                       visible="false"
+                       queryable="true"
+                       fields="denomination,categorie,type,date_debut,date_fin,web,photo,image,alfresco,resume,detail,obs,synthese_gca,classification"
+                       aliases="Dénomination,Categorie,Type,Date Début,Date Fin,Web,Photo,Image,Alfresco,Résumé,Détail,Obs,Synthèse GCA,Classification"
+                       url="{{fqdn}}/georisque/geodata/wms"
+                       infoformat="application/vnd.ogc.gml"
+                       attributefilter="true"
+                       attributefield="competence,categorie,synthese_gca,classification,date_debut,date_fin"
+                       attributevalues="GR,SN,--;Accident,Accident maritime,Activités proséparatistes,Aérien,Affaires judiciaires,Armement et munition,Assistance,Convoyage,Diplomatique,Dispositif de sécurité,Environnement,Forces de l'Ordre,Frontière,Immigration,Incendie,Intempérie,Intervention militaire,Manifestations,Militaire,Polution,Présence de garde civile espagnole,Préside,Sécurité,Séisme,Terrorisme,Tourisme,VIP;Oui,Non;Faible,Moyen,Important,ND,Phare;--;--"
+                       attributelabel="Compétence,Types,Synthése GCA,Classification,Date début,Date Fin"
+                       attributeinput="select,select,select,select,date,date"
+                       attributeoperator="=,=,=,=,&gt;=,&lt;="
+                       dynamiclegend="true"
+                       exclusive="true"
+                       isToRefresh="true"
+                       tiled="true"
+                       type="wms"
+                       tooltipcontent="{{denomination}}"
+                       searchableBBOX="true"
+                       searchableFields="libelle"
+                       contextMenu="true"
+
+                       attributeTable="libelle,categorie,type,date_debut,date_fin,web,photo,image,alfresco,resume,detail,obs,synthese_gca,classification"
+                       aliasesAttributeTable="Libellé,Categorie,Type,Date Début,Date Fin,Web,Photo,Image,Alfresco,Résumé,Détail,Obs,Synthèse GCA,Classification"
+                       showTableAttribute="true"
+                >
+
+                    <template url="templates/global.event.now.mst"></template>
+                </layer>
+          
+              </group>
+              <group name="Dégats matériels" id="dmg" >
+                     <layer id="v_degats_batis"
+                              name="Constructions"
+                              visible="false"
+                              queryable="true"
+                              url="{{fqdn}}/georisque/geodata/wms"
+                              dynamiclegend="true"
+                              infoformat="application/vnd.ogc.gml">
+                              <template url="templates/dommage.mst"></template>
+                     </layer>
+                     <layer id="v_degats_points_sensibles"
+                              name="Points sensibles"
+                              visible="false"
+                              queryable="true"
+                              url="{{fqdn}}/georisque/geodata/wms"
+                              dynamiclegend="true"
+                              infoformat="application/vnd.ogc.gml">
+                              <template url="templates/dommage.mst"></template>
+                     </layer>
+                     <layer id="v_degats_routes_bloquees"
+                            name="Routes bloquées"
+                            visible="false"
+                            queryable="true"
+                            url="{{fqdn}}/georisque/geodata/wms"
+                            dynamiclegend="true"
+                            infoformat="application/vnd.ogc.gml">
+                            <template url="templates/route.mst"></template>
+                     </layer>
+              </group>
+              <group name="Dégats humains" id="dmgh" >
+                     <layer id="v_degats_humains"
+                              name="Dégats humains"
+                              visible="false"
+                              queryable="true"
+                              url="{{fqdn}}/georisque/geodata/wms"
+                              dynamiclegend="true"
+                              infoformat="application/vnd.ogc.gml">
+                              <template url="templates/dommage.mst"></template>
+                     </layer>
+                     <layer id="v_degats_points_sensibles"
+                              name="Points sensibles"
+                              visible="false"
+                              queryable="true"
+                              url="{{fqdn}}/georisque/geodata/wms"
+                              dynamiclegend="true"
+                              infoformat="application/vnd.ogc.gml">
+                              <template url="templates/dommage.mst"></template>
+                     </layer>
+                     <layer id="v_degats_routes_bloquees"
+                            name="Routes bloquées"
+                            visible="false"
+                            queryable="true"
+                            url="{{fqdn}}/georisque/geodata/wms"
+                            dynamiclegend="true"
+                            infoformat="application/vnd.ogc.gml">
+                            <template url="templates/route.mst"></template>
+                     </layer>
+              </group>
+              <group name="Mésures prises" id="sec_tentes_installes">
+
+                <layer id="	sec_tente_installee"
+                       name="Tentes installées"
+                       visible="false"
+                       queryable="true"
+                       url="{{fqdn}}/georisque/geodata/wms"
+                       dynamiclegend="true"
+                       infoformat="application/vnd.ogc.gml"
+                       
+                       >
+                       <template url="templates/tente.mst"></template>
+                       </layer>
+
+                <layer id="depots_log"
+                name="Dépôts Logistiques"
+                visible="false"
+                queryable="true"
+                url="{{fqdn}}/georisque/geodata/wms"
+                dynamiclegend="true"
+                infoformat="application/vnd.ogc.gml"
+                featurecount="5"
+                
+                >
+                <template url="templates/depots.mst"></template>
+              </layer>
+            
+
+
+       
+
+                <layer id="aide_by_commune"
+                       name="Aides par commune"
+                       visible="false"
+                       queryable="true"
+                       url="{{fqdn}}/georisque/geodata/wms"
+                       dynamiclegend="true"
+                       infoformat="application/vnd.ogc.gml"
+                       
+
+                >
+                <template url="templates/aide.mst"></template>
+              </layer>
+           
+
+               
+            </group>
+                  <group name="Répliques" id="sec" >
+
+                <layer id="Secousses"
+                       name="Secousses"
+                       visible="false"
+                       queryable="true"
+                       url="{{fqdn}}/georisque/geodata/wms"
+                       dynamiclegend="true"
+                       infoformat="application/vnd.ogc.gml"
+                       
+
+                       >
+                       <template url="templates/replique.mst"></template>
+                     </layer>
+            </group>
+
+        
+        </theme>
+        
+<theme name="Analyse Post Event" id="analyse2" icon="fas fa-chart-bar">
+
+             
+             
+                 <layer id="EOS-RS_20230911_DPM_S1_Morocco_Earthquake_v0.9_cvd"
+                   name="NASA Proxy Dammage"
+                   visible="false"
+                   queryable="true"
+                   url="{{fqdn}}/georisque/geodata/wms"
+                   infoformat="application/vnd.ogc.gml"
+                   infopanel="right-panel"
+                   isToRefresh="true"
+                   dynamiclegend="true"
+            ></layer>
+                     
+            
+                          <layer id="1"
+                   name="NASA Aria Deplacement "
+                   visible="false"
+                   queryable="true"
+                   url="{{fqdn}}/georisque/geodata/wms"
+                   infoformat="application/vnd.ogc.gml"
+                   infopanel="right-panel"
+                   isToRefresh="true"
+                   dynamiclegend="true"
+            >
+            </layer>
+                            <layer id="2"
+                   name="NASA Sentinel data"
+                   visible="false"
+                   queryable="true"
+                   url="{{fqdn}}/georisque/geodata/wms"
+                   infoformat="application/vnd.ogc.gml"
+                   infopanel="right-panel"
+                   isToRefresh="true"
+                   dynamiclegend="true"
+            >
+            </layer>
+            
+
+
+        </theme>
+        <theme name="Historique" id="historique" icon="fas fa-laptop-house">
+
+              <layer id="secousse_point"
+                  name="Historique des secousses"
+                  visible="false"
+                  queryable="true"
+                  url="{{fqdn}}/georisque/geodata/wms"
+                  infoformat="application/vnd.ogc.gml"
+                  infopanel="right-panel"
+                  isToRefresh="true"
+                  dynamiclegend="true"
+           >
+           </layer>
+            
+        
+           
+
+
+       </theme>
+   
+         <theme name="Données de Réference" id="territoire" icon="fas fa-globe">
+            
+
+            <group name="Découpage administratif" id="grp3">
+
+
+                
+                
+                <layer id="region_adm"
+                       name="Région administratives"
+                       visible="false"
+                       queryable="true"
+                       url="{{fqdn}}/geocarte/geodata/wms"
+                       infopanel="bottom-panel"
+                       dynamiclegend="true"
+                       infoformat="application/vnd.ogc.gml"
+                       featurecount="5">
+                    <template url="templates/construction.mst"></template>
+                </layer>
+
+                <layer id="province"
+                       name="Province"
+                       url="{{fqdn}}/geocarte/geodata/wms"
+                       queryable="true"
+                       visible="false"
+                       tiled="true"
+                       infoformat="application/vnd.ogc.gml"
+                />
+                <layer id="cercle"
+                       name="Cercle"
+
+                       url="{{fqdn}}/geocarte/geodata/wms"
+
+                />
+                <layer id="caidat"
+                       name="Caidat"
+                       queryable="true"
+                       url="{{fqdn}}/geocarte/geodata/wms"
+
+                />
+                <layer id="commune"
+                       name="Communes"
+
+                       url="{{fqdn}}/geocarte/geodata/wms"
+
+                />
+                
+
+                <layer id="arrondissement"
+                       name="Arrondissement"
+
+                       url="{{fqdn}}/geocarte/geodata/wms"
+
+                />
+
+            </group>
+
+
+       
+
+       
+            <group name="Intervenants" id="grp5">
+                
+                <layer id="forces_sa_p"
+                       name="Police"
+                       visible="false"
+                       tiled="false"
+                       searchable="true"
+                       queryable="true"
+                       url="{{fqdn}}/georisque/geodata/wms"
+                       infopanel="bottom-panel"
+                       infoformat="application/vnd.ogc.gml"
+                       >
+                       <template url="templates/police.mst"></template>
+                       </layer>
+          
+            
+
+         
+                <layer id="v_forces_fa_p"
+                       name="Forces Auxiliares"
+                       visible="false"
+                       queryable="true"
+                       url="{{fqdn}}/georisque/geodata/wms"
+                       dynamiclegend="true"
+                       infoformat="application/vnd.ogc.gml"
+                       attributefilter="true"
+                       attributefield="type"
+                       attributevalues="--"
+                       attributelabel="Type"
+                       attributeinput="select"
+                       attributeoperator="="
+                >
+                </layer>
+                
+       
+                <layer id="google_pc"
+                name="Protection civile"
+                       visible="false"
+                       queryable="true"
+                       url="{{fqdn}}/georisque/geodata/wms"
+                       tiled="false"
+                       searchable="true"
+                       dynamiclegend="true"
+                       infoformat="application/vnd.ogc.gml"
+                       featurecount="20"
+                       >
+                       <template url="templates/pc.mst"></template>
+                       </layer>
+          
+                
+            </group>
+
+            
+
+            <group name="Secteur Public" id="grp65">
+                <layer id="lieu_habite"
+                       name="Douars"
+                       visible="false"
+                       queryable="true"
+                       url="{{fqdn}}/geocarte/geodata/wms"
+                       dynamiclegend="true"
+                       infoformat="application/vnd.ogc.gml"
+                       featurecount="20"
+                />
+          
+         
+            </group>
+            <group name="Secteur Enseignement" id="grp55">
+              <layer id="ecole_p"
+                     name="Ecoles"
+                     visible="false"
+                     queryable="true"
+                     url="{{fqdn}}/geocarte/geodata/wms"
+                     dynamiclegend="true"
+                     infoformat="application/vnd.ogc.gml"
+                     featurecount="20"
+                     >
+                     <template url="templates/ecole.mst"></template>
+                     </layer>
+        
+       
+          </group>
+            
+            <group name="Secteur de santé" id="grp28">
+                		    <layer id="sante_social_p"
+                       name="Etablissements sanitaires"
+                       visible="false"
+                       queryable="true"
+                       url="{{fqdn}}/geocarte/geodata/wms"
+                       dynamiclegend="true"
+                       attributefilter="true"
+                       attributefield="type"
+                       attributevalues ="HOPITAL MILITAIRE,POLYCLINIQUE,CENTRE REGIONAL DE TRANSFUSION SANGUINE,MORGUE,CENTRE REGIONAL D'ONCOLOGIE,CENTRE DADDICTOLOGIE,CENTRE DE CARDIOLOGIE,CENTRE DONCOLOGIE,LABORATOIRE MEDICAL,CENTRE DOPHTALMOLOGIE,CHU,CENTRE DE RADIOLOGIE,CENTRE MEDICAL,DIRECTION REGIONALE DE LA SANTE,CROISSANT ROUGE,DELEGATION DU MINISTERE DE LA SANTE ET DE LA PROTECTION SOCIALE,MATERNITE,CENTRE D'HEMODIALYSE,PHARMACIE,CABINET MEDICAL,CENTRE DONTAIRE,CLINIQUE,DISPENSAIRE,HOPITAL,CENTRE DE SANTE"
+                        attributeinput="select"
+                       attributeoperator="="
+                       infoformat="application/vnd.ogc.gml"
+                       
+                >
+                <template url="templates/hopital.mst"></template>
+                </layer>
+            
+
+            </group>
+            
+            <group name="Secteur Energétique" id="grp32">
+
+         
+
+                <layer id="mines"
+                       name="Mines"
+                       url="{{fqdn}}/geocarte/geodata/wms"
+                       queryable="true"
+                       visible="false"
+                       tiled="true"
+                       infoformat="application/vnd.ogc.gml">
+
+
+                </layer>
+
+
+            </group>
+
+            <group name="Hydrographie" id="grp26">
+                <layer id="hydrographie_p"
+                       name="Barrages"
+                       url="{{fqdn}}/geocarte/geodata/wms"
+                       queryable="true"
+                       visible="false"
+                       tiled="true"
+                       infoformat="application/vnd.ogc.gml">
+                    
+                </layer>
+            </group>
+
+            <group name="Logistque" id="grp27">
+
+                
+
+
+                <layer id="route_l"
+                       name="Réseau Routier"
+                       url="{{fqdn}}/geocarte/geodata/wms"
+                       queryable="true"
+                       visible="false"
+                       tiled="true"
+                       vectorlegend="false"
+                       infoformat="application/vnd.ogc.gml"
+                       dynamiclegend="true"
+                >
+                    <!--                    <template url="templates/global.bar.mst"></template>-->
+                </layer>
+
+              
+                <layer id="aeroports"
+                       name="Aérienne"
+                       url="{{fqdn}}/geocarte/geodata/wms"
+                       queryable="true"
+                       visible="false"
+                       tiled="true"
+                       infoformat="application/vnd.ogc.gml">
+                    <template url="templates/temp.aeroport.mst"></template>
+                </layer>
+                <layer id="v_voie_ferree"
+                       name="Voie ferrée"
+                       url="{{fqdn}}/geocarte/geodata/wms"
+                       queryable="true"
+                       visible="false"
+                       tiled="true"
+                       infoformat="application/vnd.ogc.gml">
+
+                </layer>
+                <layer id="gare_p"
+                       name="Gares de voyageurs"
+                       url="{{fqdn}}/geocarte/geodata/wms"
+                       queryable="true"
+                       visible="false"
+                       tiled="true"
+                       infoformat="application/vnd.ogc.gml">
+
+                </layer>
+
+
+            </group>
+
+
+           
+        </theme>
+
+        <theme name="Analyse" id="analyse" icon="fas fa-chart-bar">
+
+              <layer id="siesme_buffer"
+                     name="Zone à Risque"
+                     visible="false"      
+                     queryable="true"
+                     url="{{fqdn}}/georisque/geodata/wms"
+                     infoformat="application/vnd.ogc.gml"
+                     infopanel="right-panel"
+                     contextMenu="true"
+                     dynamiclegend="true"
+              >
+                  <template url="templates/global.event.now.mst"></template>
+  
+              </layer>
+              <layer id="simu_milieu_p"
+                     name="Infrastructure à risque"
+                     visible="false"
+                     queryable="true"
+                     url="{{fqdn}}/georisque/geodata/wms"
+                     infoformat="application/vnd.ogc.gml"
+                     infopanel="right-panel"
+                     isToRefresh="true"
+                     dynamiclegend="true"
+              >
+  
+              </layer>
+              <layer id="simu_force_p"
+                     name="Batiment à risque"
+                     visible="false"
+                     queryable="true"
+                     url="{{fqdn}}/georisque/geodata/wms"
+                     infoformat="application/vnd.ogc.gml"
+                     infopanel="bottom-panel"
+                     isToRefresh="true"
+                     dynamiclegend="true"
+              >
+  
+              </layer>
+  
+              <layer id="earthQuake"
+				   name="Earthquakes"
+				   visible="false"
+				   type="customlayer"
+				   vectorlegend="true"
+				   opacity="1"
+				   url="demo/addons/earthQuakes/layer.js"
+				   attribution=""
+				   metadata=""
+				   metadata-csw=""
+				   tooltip="true"
+				   tooltipenabled="true"
+				   tooltipcontent="{{title}}"
+				   queryable="true"
+				   infoformat="text/html"
+				   customcontrol="true"
+				   customcontrolpath="demo/addons/earthQuakes/Controls"
+			>
+			</layer>
+          </theme>
+        <theme name="Outils" id="profile" icon="fas fa-cogs">
+            <layer type="import"
+                   id="import_file"
+                   name="Importer des fichiers externes"
+                   visible="false"
+                   legendurl="img/blank.gif"
+                   queryable="true"
+                   vectorlegend="true"
+                   geocoder="ban"
+                   xfield="longitude"
+                   yfield="latitude"
+                   attribution="Dans cet exemple, l'utilisateur sélectionne un fichier csv depuis son poste. le fichier est ensuite géocodé après paramétrage du géocodage. Il n'y a pas de persistance du résultat. La recherche peut être activée en sélectionnant au moins un champ de recherche. exemple avec ce &lt;a href='https://raw.githubusercontent.com/geobretagne/mviewer/master/demo/demo.csv' target='_blank'>fichier &lt;/a>"
+                   expanded="true">
+                <projections>
+                    <projection
+                            proj4js="'EPSG:3857','+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +wktext  +no_defs'"/>
+                    <projection
+                            proj4js="'EPSG:2154','+proj=lcc +lat_1=49 +lat_2=44 +lat_0=46.5 +lon_0=3 +x_0=700000 +y_0=6600000 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs'"/>
+                </projections>
+            </layer>
+           
+
+
+        </theme>
+    </themes>
+     <extensions>
+       <extension type="component" id="print" path="demo/addons"/>
+       <extension type="component" id="customSearch" path="demo/addons"/>
+       <extension type="component" id="apis" path="demo/addons"/>
+       <extension type="component" id="menuContext" path="demo/addons"/>
+       <extension type="component" id="administration" path="demo/addons"/>
+       <extension type="component" id="routing" path="demo/addons"/>
+       <extension type="component" id="searchGPS" path="demo/addons"/>
+       <extension type="component" id="fileimport" path="demo/addons"/>
+       <extension type="component" id="layerfilter" path="demo/addons"/>
+       <extension type="component" id="fullscreen" path="demo/addons"/>
+       <extension type="component" id="filter" path="demo/addons"/>
+       <extension type="component" id="styleinfo" path="demo/addons"/>
+       <extension type="component" id="analyse" path="demo/addons"/>
+       <extension type="component" id="detailLayer" path="demo/addons"/>
+       <extension type="component" id="managementEvent" path="demo/addons"/>
+      
+       <extension type="component" id="evolutionEvent" path="demo/addons"/>
+       <extension type="component" id="modifyFeature" path="demo/addons"/>
+
+   
+
+    </extensions>
+</config>

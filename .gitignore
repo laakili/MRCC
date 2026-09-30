@@ -17,3 +17,12 @@ GUIDE UTILISATEUR*.pdf
 *_old.html
 *01.html
 add_alerte1.html
+
+# mviewer : contenu volumineux non nécessaire au déploiement
+mviewer/demo/
+mviewer/docs/
+mviewer/index - Copie.html
+mviewer/index000.html
+mviewer/index2.html
+mviewer/index_avec mdp.html
+mviewer/~BROMIUM/

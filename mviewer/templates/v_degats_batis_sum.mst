@@ -1,0 +1,92 @@
+{{#features}}
+<li class="item feature-card" id="templateRight">
+  <!-- En-tête -->
+  <div class="feature-header">
+    <h3 class="title-feature">
+      <i class="fas fa-house-damage feature-icon"></i>
+      {{Denomination}} ({{type}})
+    </h3>
+    <div id="select-features-list">
+      <span class="select-features tag-commune"><i class="fas fa-city"></i> {{commune}}</span>
+      <span class="select-features tag-position"><i class="fas fa-map-marker-alt"></i> {{region_adms}} - {{province}}</span>
+      <span class="select-features tag-activite"><i class="fas fa-exclamation-triangle"></i> {{statut}}</span>
+    </div>
+  </div>
+
+
+  <!-- Bloc : Dégâts Matériels -->
+  <div class="category-block">
+    <h4 class="category-title"><i class="fas fa-building"></i> Dégâts Matériels</h4>
+    <div class="feature-details">
+      <div class="detail-item"><i class="fas fa-home detail-icon"></i><div><span class="detail-label">Hab. partiellement détruites</span><span class="detail-value">{{habitations_partiel}}</span></div></div>
+      <div class="detail-item"><i class="fas fa-house-crack detail-icon"></i><div><span class="detail-label">Hab. totalement détruites</span><span class="detail-value">{{habitations_total}}</span></div></div>
+      <div class="detail-item"><i class="fas fa-landmark detail-icon"></i><div><span class="detail-label">Admin partiel</span><span class="detail-value">{{admin_partiel}}</span></div></div>
+      <div class="detail-item"><i class="fas fa-landmark detail-icon"></i><div><span class="detail-label">Admin total</span><span class="detail-value">{{admin_total}}</span></div></div>
+      <div class="detail-item"><i class="fas fa-road detail-icon"></i><div><span class="detail-label">Routes endommagées</span><span class="detail-value">{{routes_endommagees}}</span></div></div>
+      <div class="detail-item"><i class="fas fa-car-crash detail-icon"></i><div><span class="detail-label">Ponts endommagés</span><span class="detail-value">{{ponts_endommages}}</span></div></div>
+    </div>
+  </div>
+
+  
+
+  <!-- Pied de page -->
+  <div class="source-footer">
+    <i class="fas fa-database"></i>
+    <span class="source-text">Source : MViewer / {{mviewerid}}</span>
+  </div>
+</li>
+{{/features}}
+
+<style>
+/* Blocs */
+.category-block {
+  margin-top: 20px;
+  padding: 12px;
+  background: #f8f9fa;
+  border-left: 4px solid #007bff;
+  border-radius: 6px;
+}
+.category-title {
+  font-size: 1.2em;
+  font-weight: 600;
+  color: #343a40;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+/* Détails */
+.feature-details {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.detail-item {
+  display: flex;
+  align-items: center;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  padding: 6px 10px;
+  flex: 1 1 45%;
+  gap: 8px;
+}
+.detail-icon {
+  color: #007bff;
+}
+.detail-label {
+
+  display: block;
+}
+.detail-value {
+  display: block;
+}
+.source-footer {
+  margin-top: 15px;
+  font-size: 0.9em;
+  color: #6c757d;
+  text-align: right;
+  border-top: 1px dashed #ccc;
+  padding-top: 10px;
+}
+</style>

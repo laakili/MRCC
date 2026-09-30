@@ -1,0 +1,258 @@
+
+{{#features}}
+	<li class="item">
+		<div class="title-feature">{{region_adms}}</div>
+ 
+	<!-- DATAVIZ -->
+      <!-- Chart-->
+	 <div class="container">
+	  <div class="row" style="text-align: center;">
+		<div class="col-md-4">
+			<div id="idChart">
+				<canvas class="chart" id="ConstChart1" width="400" height="250"></canvas>              
+			</div>
+			<div class="title-chart">
+				  <p style="font-family:'roboto_bold';">Nombre de ménage (RGP 2014-HCP)</br></p>
+				  <p><i>Pour la région administrative sélectionnée</i></p>
+			</div>
+        </div>
+		<div class="col-md-4">
+			<div id="idChart2">
+				<canvas class="chart" id="ConstChart2" width="400" height="250"></canvas>              
+			</div>
+			<div class="title-chart">
+				  <p style="font-family:'roboto_bold';">Nombre de ménage (RGP 2014-HCP)</br></p>
+				  <p><i>Pour la région administrative sélectionnée</i></p>
+			</div>        
+        </div>
+      </div>
+	 </div>
+
+
+	</li>
+{{/features}}
+
+<style>
+    @font-face {
+        font-family: 'roboto_black';
+        src: url('Roboto-Black.ttf');
+    }
+    @font-face {
+        font-family: 'roboto_bold';
+        src: url('Roboto-Bold.ttf');
+    }
+    @font-face {
+        font-family: 'roboto_regular';
+        src: url('Roboto-Regular.ttf');
+    }
+    .title-feature {
+      color: #38344D;
+      font-family:"roboto_black";
+      font-size:23px;
+      margin-bottom:1%;
+    }
+    .critere {
+      color: #fff;      
+      font-size:13px;     
+      background-color:#38344D;
+      border-radius:3px;
+      padding:7px 16px 8px 13px;      
+    }
+    #text{
+      font-family:"roboto_regular";
+      margin-left:3px;
+    }
+    .title-chart {
+      font-family:"roboto_regular";
+      font-size: 13px;
+      color:#777;
+      line-height: 0.5;
+      margin-top: 16px;
+    }
+    .number{
+        font-family: "roboto_black";
+        font-size:30px;
+        color: #FBBB4D;
+    }
+    .unit{
+      font-size:18px;
+    }
+    .title-number{
+      font-family: "roboto_bold";
+      font-size:13px;
+      color: #FBBB4D;
+      line-height: 1;      
+    } 
+    .grey{
+      color:#555; 
+    }   
+    .sub-class{
+      font-size: 11px;
+      line-height: 1;
+    }
+</style>
+
+<script language="javascript"> 
+
+//Récupération des attributs
+  var aut_ind_15 = [];
+        {{#features}}
+            aut_ind_15.push('{{Marocains}}');
+        {{/features}}
+
+  var aut_col_15 = [];
+        {{#features}}
+            aut_col_15.push('{{Etrangers}}');
+        {{/features}}
+
+  var aut_tot_14 = [];
+        {{#features}}
+            aut_tot_14.push('{{Population_tot}}');
+        {{/features}}
+		
+  var aut_ind_14 = [];
+        {{#features}}
+            aut_ind_14.push('{{Marocains}}');
+        {{/features}}
+
+  var aut_col_14 = [];
+        {{#features}}
+            aut_col_14.push('{{Etrangers}}');
+        {{/features}}
+
+//Création du graphique 1
+  var indicateur_a = {};
+  indicateur_a.getData = function () {
+    var data = {ConstChart1: {labels:["Marocains", "Etrangers"], data: {datasets:[[aut_ind_15,aut_col_15]]}}};
+    indicateur_a.drawChart(data);
+  };    
+  
+  indicateur_a.drawChart = function (data) {
+			var ctx2 = document.getElementById("ConstChart1");
+			var ConstChart1 = new Chart(ctx2, {
+			type: 'doughnut',
+			data: {
+			labels: data.ConstChart1.labels,
+			datasets: [{
+							label: 'Part selon le type',
+							backgroundColor: [
+								"rgba(78,184,151,0.9)",
+								"rgba(38,143,145,0.9)"
+							],
+							hoverBackgroundColor: [
+								"rgba(78,184,151,1)",
+								"rgba(38,143,145,1)"	
+							],
+							borderWidth: 3,
+							data: data.ConstChart1.data.datasets[0]
+						}]
+					},	
+			options:{
+				legend:{
+					display: true, 
+					labels:{
+						fontFamily:'Open Sans',
+						fontSize:11,
+						boxWidth:15,
+						padding:5,
+					}
+				},
+				tooltips: {
+					titleFontFamily:"roboto_bold",
+		        	titleFontSize:13,
+		        	bodyFontFamily:"roboto_regular",
+		        	backgroundColor:"rgba(36, 36, 36, 0.85)",
+		            callbacks: {
+		                label: function(tooltipItem, data) {
+		                    return parseInt(data.datasets[0].data[tooltipItem.index]).toLocaleString() + " logements";
+		                }
+		            }
+		        }
+			}
+			}); 
+	};
+    if  (typeof Chart === 'function') {
+      indicateur_a.getData();
+  } else {
+      $.get('Chart.min.js', function() {
+        indicateur_a.getData();
+        
+      }); 
+  }
+
+  
+//Création du graphique 2
+// Normalement le graphique en Y prend la valeur la + haute. Ne marche pas ici...
+  var indicateur_b = {};
+  indicateur_b.getData = function () {
+    var data = {ConstChart2: {labels:["Marocains", "Etrangers"], data: {datasets:[[aut_ind_14,aut_col_14,100]]}}};
+    indicateur_b.drawChart(data);
+  };    
+  
+  indicateur_b.drawChart = function (data) {
+			var ctx2 = document.getElementById("ConstChart2");
+			var ConstChart2 = new Chart(ctx2, {
+			type: 'bar',
+			data: {
+			labels: data.ConstChart2.labels,
+			datasets: [{
+							label: 'Nombre selon le type',
+							borderWidth: 1,
+							backgroundColor: [
+								"rgba(78,184,151,0.9)",
+								"rgba(38,143,145,0.9)",
+								"rgba(38,143,145,0.9)"
+							],
+							hoverBackgroundColor: [
+								"rgba(78,184,151,1)",
+								"rgba(38,143,145,1)",
+								"rgba(38,143,145,0.9)"
+							],
+							borderWidth: 3,
+							data: data.ConstChart2.data.datasets[0]
+						}]
+					},	
+			options:{
+				scales:{
+						yAxes:[{
+								ticks:{
+									beginAtZero:true
+									}
+							}]
+					},
+				legend:{
+					display: true, 
+					labels:{
+						fontFamily:'Open Sans',
+						fontSize:11,
+						boxWidth:15,
+						padding:5,
+					},
+				},
+				tooltips: {
+					titleFontFamily:"roboto_bold",
+		        	titleFontSize:13,
+		        	bodyFontFamily:"roboto_regular",
+		        	backgroundColor:"rgba(36, 36, 36, 0.85)",
+		            callbacks: {
+		                label: function(tooltipItem, data) {
+		                    return parseInt(data.datasets[0].data[tooltipItem.index]).toLocaleString() + " logements";
+		                }
+		            }
+		        }
+			}
+			}); 
+	};
+    if  (typeof Chart === 'function') {
+      indicateur_b.getData();
+  } else {
+      $.get('Chart.min.js', function() {
+        indicateur_b.getData();
+        
+      }); 
+  }
+
+  
+  
+  
+</script>
