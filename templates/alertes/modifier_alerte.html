@@ -1,0 +1,321 @@
+{% extends "base.html" %}
+
+{% block title %}MRCC - Modifier l'alerte #{{ alerte.id }}{% endblock %}
+
+{% block extra_css %}
+<style>
+  .map-container {
+    height: 400px;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  
+  #map {
+    height: 100%;
+    width: 100%;
+    min-height: 350px;
+  }
+  
+  .card-body.p-0 {
+    padding: 0 !important;
+  }
+  
+  .required-field::after {
+    content: " *";
+    color: red;
+  }
+  
+  @media (max-width: 768px) {
+    .map-container {
+      height: 300px;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3 mb-0">
+      <i class="bi bi-pencil-square me-2"></i>
+      Modifier l'alerte #{{ alerte.id }}
+    </h1>
+    <div>
+      <a href="{{ url_for('details_alerte', alerte_id=alerte.id) }}" class="btn btn-outline-secondary me-2">
+        <i class="bi bi-eye me-1"></i> Voir
+      </a>
+      <a href="{{ url_for('mes_alertes') }}" class="btn btn-outline-primary">
+        <i class="bi bi-arrow-left me-1"></i> Retour
+      </a>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header bg-light">
+      <ul class="nav nav-tabs card-header-tabs" id="alerteTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+          <button class="nav-link active" id="info-tab" data-bs-toggle="tab" data-bs-target="#info" type="button" role="tab">
+            <i class="bi bi-info-circle me-1"></i>Informations
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="position-tab" data-bs-toggle="tab" data-bs-target="#position" type="button" role="tab">
+            <i class="bi bi-geo-alt me-1"></i>Position & Carte
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="navire-tab" data-bs-toggle="tab" data-bs-target="#navire" type="button" role="tab">
+            <i class="bi bi-ship me-1"></i>Navire & Moyens
+          </button>
+        </li>
+      </ul>
+    </div>
+    
+    <div class="card-body">
+      <form method="POST" action="{{ url_for('modifier_alerte', alerte_id=alerte.id) }}" enctype="multipart/form-data">
+        <div class="tab-content">
+          <!-- Onglet Informations -->
+          <div class="tab-pane fade show active" id="info" role="tabpanel">
+            <div class="row">
+              <div class="col-md-12 mb-3">
+                <label for="titre" class="form-label required-field">Titre de l'alerte</label>
+                <input type="text" class="form-control" id="titre" name="titre" required 
+                       value="{{ alerte.titre or '' }}">
+              </div>
+              
+              <div class="col-md-6 mb-3">
+                <label for="type_incident" class="form-label required-field">Type d'incident</label>
+                <select class="form-select" id="type_incident" name="type_incident" required>
+                  <option value="">Sélectionnez un type</option>
+                  <option value="navire_en_detresse" {% if alerte.type_incident == 'navire_en_detresse' %}selected{% endif %}>🚢 Navire en détresse</option>
+                  <option value="homme_a_la_mer" {% if alerte.type_incident == 'homme_a_la_mer' %}selected{% endif %}>👨 Homme à la mer</option>
+                  <option value="avarie" {% if alerte.type_incident == 'avarie' %}selected{% endif %}>⚠️ Avarie</option>
+                  <option value="incendie" {% if alerte.type_incident == 'incendie' %}selected{% endif %}>🔥 Incendie à bord</option>
+                  <option value="collision" {% if alerte.type_incident == 'collision' %}selected{% endif %}>💥 Collision</option>
+                  <option value="echouement" {% if alerte.type_incident == 'echouement' %}selected{% endif %}>🏝️ Échouement</option>
+                  <option value="pollution" {% if alerte.type_incident == 'pollution' %}selected{% endif %}>🛢️ Pollution</option>
+                  <option value="autre" {% if alerte.type_incident == 'autre' %}selected{% endif %}>❓ Autre</option>
+                </select>
+              </div>
+              
+              <div class="col-md-6 mb-3">
+                <label for="niveau_urgence" class="form-label required-field">Niveau d'urgence</label>
+                <select class="form-select" id="niveau_urgence" name="niveau_urgence" required>
+                  <option value="normal" {% if alerte.niveau_urgence == 'normal' %}selected{% endif %}>🟢 Normal</option>
+                  <option value="urgent" {% if alerte.niveau_urgence == 'urgent' %}selected{% endif %}>🟡 Urgent</option>
+                  <option value="critique" {% if alerte.niveau_urgence == 'critique' %}selected{% endif %}>🔴 Critique</option>
+                </select>
+              </div>
+              
+              <div class="col-12 mb-3">
+                <label for="description" class="form-label required-field">Description détaillée</label>
+                <textarea class="form-control" id="description" name="description" rows="5" required
+                          placeholder="Décrivez précisément la situation...">{{ alerte.description or '' }}</textarea>
+              </div>
+              
+              <div class="col-md-4 mb-3">
+                <label for="nombre_personnes" class="form-label">Nombre de personnes</label>
+                <input type="number" class="form-control" id="nombre_personnes" name="nombre_personnes" min="1"
+                       value="{{ alerte.nombre_personnes or '' }}">
+              </div>
+              
+              <div class="col-md-8 mb-3">
+                <label for="conditions_meteo" class="form-label">Conditions météorologiques</label>
+                <input type="text" class="form-control" id="conditions_meteo" name="conditions_meteo"
+                       placeholder="Ex: Vent 25 nœuds, mer agitée, visibilité réduite"
+                       value="{{ alerte.conditions_meteo or '' }}">
+              </div>
+              
+              <div class="col-12 mb-3">
+                <label for="notes_complementaires" class="form-label">Notes complémentaires</label>
+                <textarea class="form-control" id="notes_complementaires" name="notes_complementaires" rows="3"
+                          placeholder="Informations supplémentaires...">{{ alerte.notes_complementaires or '' }}</textarea>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Onglet Position & Carte -->
+          <div class="tab-pane fade" id="position" role="tabpanel">
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <div class="card">
+                  <div class="card-header bg-light">
+                    <h5 class="card-title mb-0">Coordonnées</h5>
+                  </div>
+                  <div class="card-body">
+                    <div class="mb-3">
+                      <label for="latitude" class="form-label">Latitude</label>
+                      <input type="text" class="form-control" id="latitude" name="latitude" 
+                             placeholder="ex: 31.7917" value="{{ alerte.latitude or '' }}">
+                    </div>
+                    <div class="mb-3">
+                      <label for="longitude" class="form-label">Longitude</label>
+                      <input type="text" class="form-control" id="longitude" name="longitude" 
+                             placeholder="ex: -7.0926" value="{{ alerte.longitude or '' }}">
+                    </div>
+                    <div class="mb-3">
+                      <label for="precision_position" class="form-label">Précision de la position</label>
+                      <select class="form-select" id="precision_position" name="precision_position">
+                        <option value="exacte" {% if alerte.precision_position == 'exacte' %}selected{% endif %}>📌 Exacte (GPS)</option>
+                        <option value="approximative" {% if alerte.precision_position == 'approximative' %}selected{% endif %}>📍 Approximative (estimation)</option>
+                        <option value="inconnue" {% if alerte.precision_position == 'inconnue' %}selected{% endif %}>❓ Inconnue</option>
+                      </select>
+                    </div>
+                    <button type="button" class="btn btn-primary w-100" id="localiserBtn">
+                      <i class="bi bi-crosshair me-1"></i> Centrer sur les coordonnées
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6 mb-3">
+                <div class="card h-100">
+                  <div class="card-header bg-light">
+                    <h5 class="card-title mb-0">Carte interactive</h5>
+                  </div>
+                  <div class="card-body p-0">
+                    <div id="map" class="map-container"></div>
+                  </div>
+                  <div class="card-footer bg-light">
+                    <small class="text-muted">
+                      <i class="bi bi-info-circle"></i> Cliquez sur la carte pour définir la position
+                    </small>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Onglet Navire & Moyens -->
+          <div class="tab-pane fade" id="navire" role="tabpanel">
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label for="navire_implique" class="form-label">Nom du navire impliqué</label>
+                <input type="text" class="form-control" id="navire_implique" name="navire_implique"
+                       placeholder="Nom du bateau" value="{{ alerte.navire_implique or '' }}">
+              </div>
+              
+              <div class="col-md-6 mb-3">
+                <label for="immatriculation_navire" class="form-label">Immatriculation</label>
+                <input type="text" class="form-control" id="immatriculation_navire" name="immatriculation_navire"
+                       placeholder="Numéro d'immatriculation" value="{{ alerte.immatriculation_navire or '' }}">
+              </div>
+              
+              <div class="col-md-6 mb-3">
+                <label for="moyen_alerte" class="form-label">Moyen d'alerte</label>
+                <select class="form-select" id="moyen_alerte" name="moyen_alerte">
+                  <option value="">Sélectionnez un moyen</option>
+                  <option value="vhf" {% if alerte.moyen_alerte == 'vhf' %}selected{% endif %}>📻 VHF</option>
+                  <option value="inmarsat" {% if alerte.moyen_alerte == 'inmarsat' %}selected{% endif %}>🛰️ Inmarsat</option>
+                  <option value="epirb" {% if alerte.moyen_alerte == 'epirb' %}selected{% endif %}>🆘 Balise EPIRB</option>
+                  <option value="telephone" {% if alerte.moyen_alerte == 'telephone' %}selected{% endif %}>📞 Téléphone</option>
+                  <option value="email" {% if alerte.moyen_alerte == 'email' %}selected{% endif %}>📧 Email</option>
+                  <option value="autre" {% if alerte.moyen_alerte == 'autre' %}selected{% endif %}>❓ Autre</option>
+                </select>
+              </div>
+              
+              <div class="col-md-6 mb-3">
+                <label for="fichier_joint" class="form-label">Fichier joint</label>
+                {% if alerte.fichier_joint %}
+                  <div class="mb-2">
+                    <span class="badge bg-info">
+                      <i class="bi bi-paperclip me-1"></i> Fichier actuel: {{ alerte.fichier_joint }}
+                    </span>
+                    <button type="button" class="btn btn-sm btn-outline-danger ms-2" onclick="removeFile()">
+                      <i class="bi bi-trash"></i> Supprimer
+                    </button>
+                  </div>
+                {% endif %}
+                <input type="file" class="form-control" id="fichier_joint" name="fichier_joint" 
+                       accept=".pdf,.jpg,.jpeg,.png">
+                <div class="form-text">Laissez vide pour conserver le fichier actuel. Formats acceptés: PDF, JPG, PNG (max 5MB)</div>
+                <input type="hidden" id="supprimer_fichier" name="supprimer_fichier" value="0">
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <hr>
+        
+        <div class="d-flex justify-content-end gap-2">
+          <button type="button" class="btn btn-outline-secondary" onclick="window.history.back()">
+            <i class="bi bi-x-circle me-1"></i> Annuler
+          </button>
+          <button type="submit" class="btn btn-primary">
+            <i class="bi bi-save me-1"></i> Enregistrer les modifications
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Vérifier que Leaflet est chargé
+    if (typeof L === 'undefined') {
+      console.error('Leaflet non chargé');
+      return;
+    }
+    
+    // Initialisation de la carte
+    let map = L.map('map').setView([31.7917, -7.0926], 6);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
+    
+    let marker = null;
+    
+    // Récupérer les coordonnées existantes
+    const latInput = document.getElementById('latitude');
+    const lngInput = document.getElementById('longitude');
+    const existingLat = parseFloat(latInput.value);
+    const existingLng = parseFloat(lngInput.value);
+    
+    // Si des coordonnées existent, les afficher sur la carte
+    if (!isNaN(existingLat) && !isNaN(existingLng) && existingLat !== 0 && existingLng !== 0) {
+      const latlng = L.latLng(existingLat, existingLng);
+      marker = L.marker(latlng).addTo(map);
+      map.setView(latlng, 12);
+    }
+    
+    // Clic sur la carte
+    map.on('click', function(e) {
+      if (marker) map.removeLayer(marker);
+      marker = L.marker(e.latlng).addTo(map);
+      latInput.value = e.latlng.lat.toFixed(6);
+      lngInput.value = e.latlng.lng.toFixed(6);
+    });
+    
+    // Bouton localiser
+    const localiserBtn = document.getElementById('localiserBtn');
+    if (localiserBtn) {
+      localiserBtn.addEventListener('click', function() {
+        const lat = parseFloat(latInput.value);
+        const lng = parseFloat(lngInput.value);
+        
+        if (isNaN(lat) || isNaN(lng)) {
+          alert('Veuillez entrer des coordonnées valides');
+          return;
+        }
+        
+        const latlng = L.latLng(lat, lng);
+        if (marker) map.removeLayer(marker);
+        marker = L.marker(latlng).addTo(map);
+        map.setView(latlng, 12);
+      });
+    }
+  });
+  
+  // Fonction pour supprimer le fichier
+  function removeFile() {
+    if (confirm('Voulez-vous vraiment supprimer ce fichier ?')) {
+      document.getElementById('supprimer_fichier').value = '1';
+      const fileDiv = document.querySelector('.badge.bg-info').parentElement;
+      fileDiv.style.display = 'none';
+    }
+  }
+</script>
+{% endblock %}

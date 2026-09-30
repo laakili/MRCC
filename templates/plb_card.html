@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Fiche PLB - {{ plb.registration_number or 'N/A' }} - MRCC Maroc</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+            background: white;
+            color: #1a2540;
+            font-size: 12px;
+            line-height: 1.4;
+            padding: 20px;
+        }
+        
+        /* ── PAGE CONTAINER ── */
+        .page {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+        }
+        
+        /* ── HEADER SECTION ── */
+        .header {
+            background: linear-gradient(135deg, #001F4D 0%, #0a2d6d 60%, #0e3d8a 100%);
+            color: white;
+            padding: 20px 25px;
+            border-radius: 12px 12px 0 0;
+            position: relative;
+            margin-bottom: 20px;
+        }
+        
+        .header h1 {
+            font-size: 24px;
+            font-weight: 700;
+            margin: 0 0 5px 0;
+        }
+        
+        .header .subtitle {
+            font-size: 11px;
+            opacity: 0.7;
+            letter-spacing: 1px;
+        }
+        
+        .badge-mrcc {
+            background: rgba(201, 169, 74, 0.2);
+            border: 1px solid rgba(201, 169, 74, 0.4);
+            border-radius: 20px;
+            padding: 4px 12px;
+            font-size: 10px;
+            font-weight: 600;
+            display: inline-block;
+            margin-top: 10px;
+        }
+        
+        /* ── QR CODE ── */
+        .qr-container {
+            position: absolute;
+            top: 20px;
+            right: 25px;
+            text-align: center;
+            background: white;
+            padding: 8px;
+            border-radius: 10px;
+        }
+        
+        .qr-container img {
+            width: 90px;
+            height: 90px;
+        }
+        
+        .qr-container .qr-label {
+            font-size: 9px;
+            color: #001F4D;
+            font-weight: 600;
+            margin-top: 4px;
+        }
+        
+        /* ── TWO COLUMN LAYOUT ── */
+        .two-columns {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .col {
+            flex: 1;
+        }
+        
+        /* ── INFO CARDS ── */
+        .card {
+            background: #f8faff;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            overflow: hidden;
+            border: 1px solid #eaeff7;
+        }
+        
+        .card-header {
+            background: linear-gradient(135deg, #001F4D, #0a2d6d);
+            color: white;
+            padding: 10px 16px;
+            font-weight: 700;
+            font-size: 13px;
+            letter-spacing: 0.5px;
+        }
+        
+        .card-header i {
+            margin-right: 8px;
+        }
+        
+        .card-body {
+            padding: 16px;
+        }
+        
+        /* ── INFO GRID ── */
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+        
+        .info-item {
+            border-bottom: 1px solid #eaeff7;
+            padding-bottom: 6px;
+        }
+        
+        .info-label {
+            font-size: 9px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #6b7fa3;
+            font-weight: 700;
+        }
+        
+        .info-value {
+            font-size: 12px;
+            font-weight: 600;
+            color: #1a2540;
+            margin-top: 3px;
+            word-break: break-word;
+        }
+        
+        .info-value.mono {
+            font-family: 'Courier New', monospace;
+            font-size: 11px;
+        }
+        
+        /* ── STATUS BADGE ── */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+        
+        .status-badge::before {
+            content: '';
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+        
+        .status-Actif { background: #d1fae5; color: #065f46; }
+        .status-Actif::before { background: #10b981; }
+        
+        .status-Inactif { background: #f3f4f6; color: #6b7280; }
+        .status-Inactif::before { background: #9ca3af; }
+        
+        .status-Expiré { background: #fee2e2; color: #991b1b; }
+        .status-Expiré::before { background: #ef4444; }
+        
+        .status-Maintenance { background: #e0f2fe; color: #0369a1; }
+        .status-Maintenance::before { background: #0ea5e9; }
+        
+        /* ── BATTERY STATUS ── */
+        .battery-ok { color: #0d9e6e; font-weight: 700; }
+        .battery-warning { color: #f4a261; font-weight: 700; }
+        .battery-expired { color: #e63946; font-weight: 700; }
+        
+        /* ── TABLE STYLES ── */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 10px;
+        }
+        
+        .data-table th {
+            background: #f0f3f8;
+            padding: 8px 10px;
+            text-align: left;
+            font-weight: 700;
+            color: #6b7fa3;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid #dde3f0;
+        }
+        
+        .data-table td {
+            padding: 8px 10px;
+            border-bottom: 1px solid #f0f3f8;
+        }
+        
+        .data-table tr:last-child td {
+            border-bottom: none;
+        }
+        
+        /* ── TIMELINE ── */
+        .timeline {
+            position: relative;
+            padding-left: 20px;
+        }
+        
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 7px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: #eaeff7;
+        }
+        
+        .timeline-item {
+            position: relative;
+            padding: 0 0 15px 20px;
+        }
+        
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -13px;
+            top: 4px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            border: 2px solid white;
+            box-shadow: 0 0 0 2px #001F4D;
+            background: #001F4D;
+        }
+        
+        .timeline-date {
+            font-size: 9px;
+            color: #6b7fa3;
+        }
+        
+        .timeline-action {
+            font-size: 11px;
+            font-weight: 700;
+            color: #1a2540;
+        }
+        
+        .timeline-detail {
+            font-size: 10px;
+            color: #6b7fa3;
+            margin-top: 2px;
+        }
+        
+        /* ── FOOTER ── */
+        .footer {
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 2px solid #eaeff7;
+            text-align: center;
+            font-size: 9px;
+            color: #6b7fa3;
+        }
+        
+        /* ── PRINT OPTIMIZATION ── */
+        @media print {
+            body {
+                padding: 0;
+                margin: 0;
+            }
+            
+            .page {
+                margin: 0;
+                padding: 15px;
+            }
+            
+            .card {
+                break-inside: avoid;
+                page-break-inside: avoid;
+            }
+            
+            .header {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+            
+            .card-header {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+        }
+        
+        /* ── PAGE BREAK ── */
+        .page-break {
+            page-break-before: always;
+            margin-top: 20px;
+        }
+        
+        /* ── SIGNATURE SECTION ── */
+        .signature-section {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px dashed #dde3f0;
+        }
+        
+        .signature-box {
+            text-align: center;
+            width: 200px;
+        }
+        
+        .signature-line {
+            border-top: 1px solid #1a2540;
+            margin-top: 30px;
+            padding-top: 8px;
+            font-size: 9px;
+            color: #6b7fa3;
+        }
+        
+        /* ── ALERT BOX ── */
+        .alert-info {
+            background: #e0f2fe;
+            border-left: 4px solid #0ea5e9;
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-size: 10px;
+            margin: 15px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="page">
+        <!-- HEADER -->
+        <div class="header">
+            <div>
+                <div class="badge-mrcc">
+                    <span>COSPAS-SARSAT | MRCC MAROC</span>
+                </div>
+                <h1>FICHE D'IDENTIFICATION PLB</h1>
+                <div class="subtitle">Personal Locator Beacon - Enregistrement officiel</div>
+            </div>
+            {% if qr_image %}
+            <div class="qr-container">
+                <img src="{{ qr_image }}" alt="QR Code PLB">
+                <div class="qr-label">Scanner pour détails</div>
+            </div>
+            {% endif %}
+        </div>
+        
+        <!-- MAIN CONTENT - TWO COLUMNS -->
+        <div class="two-columns">
+            <!-- LEFT COLUMN -->
+            <div class="col">
+                <!-- Identification Balise -->
+                <div class="card">
+                    <div class="card-header">
+                        <i>📡</i> IDENTIFICATION DE LA BALISE
+                    </div>
+                    <div class="card-body">
+                        <div class="info-grid">
+                            <div class="info-item">
+                                <div class="info-label">Code HEX (15 caract.)</div>
+                                <div class="info-value mono">{{ plb.registration_number or '—' }}</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">UIN</div>
+                                <div class="info-value mono">{{ plb.uin or '—' }}</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">Type de balise</div>
+                                <div class="info-value">{{ plb.beacon_type or 'PLB' }}</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">Fabricant</div>
+                                <div class="info-value">{{ plb.manufacturer or '—' }}</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">Modèle</div>
+                                <div class="info-value">{{ plb.model or '—' }}</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">TAC</div>
+                                <div class="info-value">{{ plb.tac or '—' }}</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">N° série fabricant</div>
+                                <div class="info-value mono">{{ plb.serial_number_manufacturer or '—' }}</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">N° série SAR</div>
+                                <div class="info-value mono">{{ plb.serial_number_sar or '—' }}</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">Date d'enregistrement</div>
+                                <div class="info-value">{{ plb.registration_date or '—' }}</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">Statut</div>
+                                <div class="info-value">
+                                    <span class="status-badge status-{{ plb.beacon_status }}">
+                                        {{ plb.beacon_status or 'Inconnu' }}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Navire Associé -->
+                <div class="card">
+                    <div class="card-header">
+                        <i>🚢</i> NAVIRE ASSOCIÉ
+                    </div>
+                    <div class="card-body">
+                        <div class="info-grid">
+                            <div class="info-item">
+                                <div class="info-label">Nom du navire</div>
+                                <div class="info-value">{{ plb.unit_name or '—' }}</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">MMSI</div>
+                                <div class="info-value mono">{{ plb.mmsi or '—' }}</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">Port d'attache</div>
+                                <div class="info-value">{{ plb.port or '—' }}</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">Type d'activité</div>
+                                <div class="info-value">{{ plb.activity_type or '—' }}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Batterie -->
+                <div class="card">
+                    <div class="card-header">
+                        <i>🔋</i> BATTERIE
+                    </div>
+                    <div class="card-body">
+                        <div class="info-grid">
+                            <div class="info-item">
+                                <div class="info-label">Date d'expiration</div>
+                                <div class="info-value">
+                                    {% if plb.battery_expiration_date %}
+                                        {% set expiry_parts = plb.battery_expiration_date.split('-') %}
+                                        {% set expiry_date = None %}
+                                        {% if expiry_parts|length == 3 %}
+                                            {% set expiry_date = expiry_parts[0] ~ '-' ~ expiry_parts[1] ~ '-' ~ expiry_parts[2] %}
+                                        {% endif %}
+                                        <span class="
+                                            {% if expiry_date and expiry_date < today.strftime('%Y-%m-%d') %}battery-expired
+                                            {% elif expiry_date and expiry_date < (today + timedelta(days=90)).strftime('%Y-%m-%d') %}battery-warning
+                                            {% else %}battery-ok{% endif %}
+                                        ">
+                                            {{ plb.battery_expiration_date }}
+                                            {% if expiry_date and expiry_date < today.strftime('%Y-%m-dd') %}
+                                                (EXPIRÉE)
+                                            {% endif %}
+                                        </span>
+                                    {% else %}
+                                        —
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- RIGHT COLUMN -->
+            <div class="col">
+                <!-- Propriétaire -->
+                <div class="card">
+                    <div class="card-header">
+                        <i>👤</i> PROPRIÉTAIRE
+                    </div>
+                    <div class="card-body">
+                        <div class="info-grid">
+                            <div class="info-item">
+                                <div class="info-label">Nom complet</div>
+                                <div class="info-value">{{ plb.owner or '—' }}</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">Email</div>
+                                <div class="info-value">{{ plb.email or '—' }}</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">Téléphone principal</div>
+                                <div class="info-value">{{ plb.phone_number or '—' }}</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">Téléphone secondaire</div>
+                                <div class="info-value">{{ plb.secondary_phone_number or '—' }}</div>
+                            </div>
+                            <div class="info-item info-item-full">
+                                <div class="info-label">Adresse</div>
+                                <div class="info-value">{{ plb.address or '—' }}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Contacts d'Urgence -->
+                <div class="card">
+                    <div class="card-header">
+                        <i>🆘</i> CONTACTS D'URGENCE
+                    </div>
+                    <div class="card-body">
+                        <div class="info-grid">
+                            <div class="info-item">
+                                <div class="info-label">Contact 1 - Nom</div>
+                                <div class="info-value">{{ plb.emergency_contact_name or '—' }}</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">Contact 1 - Téléphone</div>
+                                <div class="info-value">{{ plb.emergency_contact_phone_number or '—' }}</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">Contact 2 - Nom</div>
+                                <div class="info-value">{{ plb.secondary_emergency_contact_name or '—' }}</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">Contact 2 - Téléphone</div>
+                                <div class="info-value">{{ plb.secondary_emergency_contact_phone_number or '—' }}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Informations Système -->
+                <div class="card">
+                    <div class="card-header">
+                        <i>ℹ️</i> INFORMATIONS SYSTÈME
+                    </div>
+                    <div class="card-body">
+                        <div class="info-grid">
+                            <div class="info-item">
+                                <div class="info-label">ID Base de données</div>
+                                <div class="info-value mono">#{{ plb.id }}</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">Créé le</div>
+                                <div class="info-value">{{ plb.created_at.strftime('%d/%m/%Y %H:%M') if plb.created_at else '—' }}</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">Dernière mise à jour</div>
+                                <div class="info-value">{{ plb.updated_at.strftime('%d/%m/%Y %H:%M') if plb.updated_at else '—' }}</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">Document généré le</div>
+                                <div class="info-value">{{ today.strftime('%d/%m/%Y à %H:%M') }}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Historique des Transferts -->
+        {% if transfers and transfers|length > 0 %}
+        <div class="card">
+            <div class="card-header">
+                <i>🔄</i> HISTORIQUE DES TRANSFERTS
+            </div>
+            <div class="card-body">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Type</th>
+                            <th>Ancien propriétaire</th>
+                            <th>Nouveau propriétaire</th>
+                            <th>Ancien navire</th>
+                            <th>Nouveau navire</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for t in transfers %}
+                        <tr>
+                            <td>{{ t.transfer_date.strftime('%d/%m/%Y') if t.transfer_date else '—' }}</td>
+                            <td>
+                                {% if t.transfer_type == 'OWNER_CHANGE' %}Changement propriétaire
+                                {% elif t.transfer_type == 'VESSEL_CHANGE' %}Changement navire
+                                {% else %}Transfert complet{% endif %}
+                            </td>
+                            <td>{{ t.old_owner or '—' }}</td>
+                            <td>{{ t.new_owner or '—' }}</td>
+                            <td>{{ t.old_vessel_name or '—' }}</td>
+                            <td>{{ t.new_vessel_name or '—' }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% endif %}
+        
+        <!-- Maintenance -->
+        {% if maintenance and maintenance|length > 0 %}
+        <div class="card">
+            <div class="card-header">
+                <i>🔧</i> HISTORIQUE DES MAINTENANCES
+            </div>
+            <div class="card-body">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Type</th>
+                            <th>Résultat</th>
+                            <th>Effectué par</th>
+                            <th>Notes</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for m in maintenance %}
+                        <tr>
+                            <td>{{ m.maintenance_date.strftime('%d/%m/%Y') if m.maintenance_date else '—' }}</td>
+                            <td>
+                                {% if m.maintenance_type == 'TEST_MENSUEL' %}Test mensuel
+                                {% elif m.maintenance_type == 'BATTERY_CHANGE' %}Remplacement batterie
+                                {% elif m.maintenance_type == 'INSPECTION' %}Inspection
+                                {% else %}Réparation{% endif %}
+                            </td>
+                            <td>
+                                {% if m.result == 'OK' %}✅ OK
+                                {% elif m.result == 'NOK' %}❌ NOK
+                                {% else %}⚠️ À surveiller{% endif %}
+                            </td>
+                            <td>{{ m.performed_by or '—' }}</td>
+                            <td>{{ m.notes or '—' }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% endif %}
+        
+        <!-- Historique Général -->
+        {% if history and history|length > 0 %}
+        <div class="card">
+            <div class="card-header">
+                <i>📜</i> HISTORIQUE GÉNÉRAL
+            </div>
+            <div class="card-body">
+                <div class="timeline">
+                    {% for h in history %}
+                    <div class="timeline-item">
+                        <div class="timeline-date">{{ h.created_at.strftime('%d/%m/%Y %H:%M') if h.created_at else '—' }}</div>
+                        <div class="timeline-action">
+                            {% if h.action == 'CREATION' %}Création de la balise
+                            {% elif h.action == 'TRANSFERT' %}Transfert
+                            {% elif h.action == 'MAINTENANCE' %}Maintenance
+                            {% elif h.action == 'TEST' %}Test mensuel
+                            {% elif h.action == 'DECOMMISSION' %}Mise hors service
+                            {% else %}{{ h.action }}{% endif %}
+                        </div>
+                        {% if h.comment %}
+                        <div class="timeline-detail">{{ h.comment }}</div>
+                        {% endif %}
+                        {% if h.field_changed %}
+                        <div class="timeline-detail">Champ: {{ h.field_changed }}</div>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        
+        <!-- ALERTES ET RAPPELS -->
+        <div class="alert-info">
+            <strong>⚠️ RAPPELS IMPORTANTS</strong><br>
+            • Test mensuel obligatoire - à effectuer tous les mois<br>
+            • Vérifier la date d'expiration de la batterie<br>
+            • En cas de changement de propriétaire ou de navire, contacter le MRCC Maroc<br>
+            • En cas de perte ou de vol, déclaration immédiate obligatoire
+        </div>
+        
+        <!-- SIGNATURES -->
+        <div class="signature-section">
+            <div class="signature-box">
+                <div class="signature-line">Signature du propriétaire</div>
+                <div style="font-size: 9px; margin-top: 5px;">Date: _______________</div>
+            </div>
+            <div class="signature-box">
+                <div class="signature-line">Cachet MRCC Maroc</div>
+                <div style="font-size: 9px; margin-top: 5px;">Validé le: {{ today.strftime('%d/%m/%Y') }}</div>
+            </div>
+        </div>
+        
+        <!-- FOOTER -->
+        <div class="footer">
+            <p>MRCC Maroc - Centre Régional de Coordination de Sauvetage Maritime</p>
+            <p>Tél: +212 (0)5 37 70 70 70 | Email: mrcc@maroc.ma | 24h/24 - 7j/7</p>
+            <p>Document officiel - Version du {{ today.strftime('%d/%m/%Y') }}</p>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,27 @@
+{
+  "wms_servers": [
+    {
+      "name": "GeoServer Local",
+      "url": "http://localhost:8082/geocarte/geo_data/wms",
+      "layers": ["operations_actives", "vedettes_sauvetage"]
+    },
+    {
+      "name": "GeoServer Prod",
+      "url": "https://geoserver.mrcc.ma/wms",
+      "layers": ["ais_temps_reel", "conditions_mer"]
+    },
+    {
+      "name": "QGIS Server",
+      "url": "https://qgis.mrcc.ma/qgis_mapserv/ows",
+      "layers": ["courants_marins", "provinces"]
+    }
+  ],
+  "db_connections": {
+    "postgres_sar": {
+      "host": "localhost",
+      "port": 5432,
+      "db": "sar_db",
+      "table": "operations_sar"
+    }
+  }
+}

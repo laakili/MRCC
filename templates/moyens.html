@@ -428,12 +428,34 @@ let resourceBases = [];
 function initMap() {
     map = L.map('resourcesMap').setView([31.7917, -7.0926], 6);
     
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; CartoDB',
         subdomains: 'abcd',
         maxZoom: 19
     }).addTo(map);
+
+    // Désactive complètement le zoom molette au départ
+    map.scrollWheelZoom.disable();
+
+    let isCtrlPressed = false;
+
+    document.addEventListener('keydown', function(e) {
+        if (e.ctrlKey) {
+            isCtrlPressed = true;
+            map.scrollWheelZoom.enable(); // active le zoom avec la molette
+        }
+    });
+
+    document.addEventListener('keyup', function(e) {
+        // Teste n’importe quelle touche, si CTRL n’est pas enfoncé
+        if (!e.ctrlKey) {
+            isCtrlPressed = false;
+            map.scrollWheelZoom.disable(); // desactive la molette
+        }
+    });
 }
+
+
 
 // Charger les ressources
 function loadResources() {

@@ -1,0 +1,1085 @@
+{% extends "base.html" %}
+
+{% block title %}Gestion PLB - MRCC Maroc{% endblock %}
+
+{% block extra_css %}
+<style>
+  :root {
+    --navy:   #001F4D;
+    --navy2:  #0a2d6d;
+    --gold:   #C9A94A;
+    --gold2:  #FFD700;
+    --green:  #0d9e6e;
+    --red:    #e63946;
+    --orange: #f4a261;
+    --cyan:   #0dcaf0;
+    --bg:     #f0f3f8;
+    --card:   #ffffff;
+    --text:   #1a2540;
+    --muted:  #6b7fa3;
+  }
+
+  body { background: var(--bg); }
+
+  /* ── PAGE HEADER ── */
+  .plb-hero {
+    background: linear-gradient(135deg, var(--navy) 0%, var(--navy2) 60%, #0e3d8a 100%);
+    padding: 32px 0 24px;
+    position: relative;
+    overflow: hidden;
+  }
+  .plb-hero::before {
+    content:'';
+    position:absolute; inset:0;
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  }
+  .plb-hero h1 { color:#fff; font-size:1.9rem; font-weight:700; margin:0; }
+  .plb-hero p  { color:rgba(255,255,255,.65); margin:4px 0 0; font-size:.9rem; }
+  .plb-hero .badge-hero {
+    background:rgba(201,169,74,.18); color:var(--gold2);
+    border:1px solid rgba(201,169,74,.4);
+    border-radius:20px; padding:4px 14px; font-size:.8rem; font-weight:600;
+  }
+
+  /* ── STAT CARDS ── */
+  .stat-card {
+    background:var(--card); border-radius:14px;
+    padding:20px 22px; display:flex; align-items:center; gap:16px;
+    box-shadow:0 2px 12px rgba(0,31,77,.07);
+    border-left:4px solid transparent;
+    transition:transform .2s,box-shadow .2s;
+  }
+  .stat-card:hover { transform:translateY(-3px); box-shadow:0 6px 24px rgba(0,31,77,.12); }
+  .stat-card .icon {
+    width:50px; height:50px; border-radius:12px;
+    display:flex; align-items:center; justify-content:center;
+    font-size:1.4rem; flex-shrink:0;
+  }
+  .stat-card .val  { font-size:1.8rem; font-weight:800; color:var(--text); line-height:1; }
+  .stat-card .lbl  { font-size:.78rem; color:var(--muted); font-weight:500; margin-top:2px; }
+
+  .stat-total   { border-color:var(--navy);  } .stat-total .icon   { background:rgba(0,31,77,.1);   color:var(--navy);  }
+  .stat-actif   { border-color:var(--green); } .stat-actif .icon   { background:rgba(13,158,110,.1); color:var(--green); }
+  .stat-expire  { border-color:var(--red);   } .stat-expire .icon  { background:rgba(230,57,70,.1);  color:var(--red);   }
+  .stat-maint   { border-color:var(--cyan);  } .stat-maint .icon   { background:rgba(13,202,240,.1); color:var(--cyan);  }
+
+  /* ── TOOLBAR ── */
+  .toolbar {
+    background:var(--card); border-radius:14px;
+    padding:16px 20px; box-shadow:0 2px 12px rgba(0,31,77,.07);
+    display:flex; flex-wrap:wrap; gap:12px; align-items:center;
+  }
+  .toolbar .search-box {
+    flex:1; min-width:220px; position:relative;
+  }
+  .toolbar .search-box input {
+    width:100%; padding:9px 14px 9px 38px;
+    border:1.5px solid #dde3f0; border-radius:10px;
+    font-size:.88rem; background:#f7f9fc; color:var(--text);
+    transition:border-color .2s;
+  }
+  .toolbar .search-box input:focus { outline:none; border-color:var(--navy); background:#fff; }
+  .toolbar .search-box i {
+    position:absolute; left:12px; top:50%; transform:translateY(-50%);
+    color:var(--muted); font-size:.9rem;
+  }
+  .toolbar select {
+    padding:9px 14px; border:1.5px solid #dde3f0; border-radius:10px;
+    font-size:.88rem; background:#f7f9fc; color:var(--text); cursor:pointer;
+    transition:border-color .2s;
+  }
+  .toolbar select:focus { outline:none; border-color:var(--navy); }
+  .btn-add {
+    background:linear-gradient(135deg,var(--navy),var(--navy2));
+    color:#fff; border:none; border-radius:10px;
+    padding:9px 20px; font-size:.88rem; font-weight:600;
+    display:flex; align-items:center; gap:7px; cursor:pointer;
+    transition:transform .2s,box-shadow .2s;
+  }
+  .btn-add:hover { transform:translateY(-2px); box-shadow:0 4px 16px rgba(0,31,77,.3); }
+
+  /* ── TABLE ── */
+  .table-wrap {
+    background:var(--card); border-radius:14px;
+    box-shadow:0 2px 12px rgba(0,31,77,.07); overflow:hidden;
+  }
+  .plb-table { width:100%; border-collapse:collapse; font-size:.85rem; }
+  .plb-table thead th {
+    background:#f5f7fb; color:var(--muted);
+    font-size:.75rem; font-weight:700; letter-spacing:.05em; text-transform:uppercase;
+    padding:13px 16px; border-bottom:2px solid #eaeff7; white-space:nowrap;
+  }
+  .plb-table tbody tr { border-bottom:1px solid #f0f3f8; transition:background .15s; }
+  .plb-table tbody tr:hover { background:#f8faff; }
+  .plb-table td { padding:13px 16px; color:var(--text); vertical-align:middle; }
+  .plb-table .hex-code { font-family:'Courier New',monospace; font-size:.8rem; color:var(--navy); font-weight:700; }
+  .plb-table .vessel   { font-weight:600; }
+  .plb-table .owner-cell { color:var(--muted); font-size:.82rem; }
+
+  /* badges statut */
+  .badge-status {
+    display:inline-flex; align-items:center; gap:5px;
+    padding:4px 10px; border-radius:20px; font-size:.75rem; font-weight:700;
+  }
+  .badge-status::before { content:''; width:6px; height:6px; border-radius:50%; }
+  .s-actif    { background:#d1fae5; color:#065f46; } .s-actif::before    { background:#10b981; }
+  .s-inactif  { background:#f3f4f6; color:#6b7280; } .s-inactif::before  { background:#9ca3af; }
+  .s-expire   { background:#fee2e2; color:#991b1b; } .s-expire::before   { background:#ef4444; }
+  .s-maintenance { background:#e0f2fe; color:#0369a1; } .s-maintenance::before { background:#0ea5e9; }
+
+  /* action buttons */
+  .action-btns { display:flex; gap:6px; }
+  .btn-act {
+    width:30px; height:30px; border-radius:8px; border:none;
+    display:flex; align-items:center; justify-content:center;
+    font-size:.8rem; cursor:pointer; transition:all .2s;
+  }
+  .btn-act-view  { background:#eff6ff; color:#2563eb; } .btn-act-view:hover  { background:#2563eb; color:#fff; }
+  .btn-act-edit  { background:#f0fdf4; color:#16a34a; } .btn-act-edit:hover  { background:#16a34a; color:#fff; }
+  .btn-act-print { background:#fff7ed; color:#ea580c; } .btn-act-print:hover { background:#ea580c; color:#fff; }
+  .btn-act-del   { background:#fef2f2; color:#dc2626; } .btn-act-del:hover   { background:#dc2626; color:#fff; }
+
+  /* ── PAGINATION ── */
+  .pagination-wrap { display:flex; justify-content:space-between; align-items:center; padding:14px 20px; border-top:1px solid #f0f3f8; flex-wrap:wrap; gap:10px; }
+  .pag-info { font-size:.82rem; color:var(--muted); }
+  .pag-btns { display:flex; gap:6px; }
+  .pag-btn  { width:34px; height:34px; border-radius:8px; border:1.5px solid #dde3f0; background:#fff; color:var(--text); font-size:.82rem; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all .2s; }
+  .pag-btn:hover, .pag-btn.active { background:var(--navy); color:#fff; border-color:var(--navy); }
+  .pag-btn:disabled { opacity:.4; cursor:not-allowed; }
+
+  /* ── BATTERY WARNING ── */
+  .battery-warn { color:var(--red); font-weight:700; }
+  .battery-ok   { color:var(--green); }
+  .battery-soon { color:var(--orange); font-weight:600; }
+
+  /* ── MODALS ── */
+  .modal-overlay {
+    display:none; position:fixed; inset:0;
+    background:rgba(0,15,40,.6); z-index:2000;
+    align-items:center; justify-content:center;
+    backdrop-filter:blur(4px);
+  }
+  .modal-overlay.open { display:flex; }
+  .modal-box {
+    background:#fff; border-radius:18px;
+    width:min(760px,95vw); max-height:92vh;
+    overflow-y:auto; box-shadow:0 20px 60px rgba(0,0,0,.25);
+    animation:modalIn .25s ease;
+  }
+  .modal-box.modal-lg { width:min(920px,96vw); }
+  @keyframes modalIn { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+  .modal-head {
+    background:linear-gradient(135deg,var(--navy),var(--navy2));
+    padding:20px 24px; border-radius:18px 18px 0 0;
+    display:flex; justify-content:space-between; align-items:center;
+  }
+  .modal-head h5 { color:#fff; margin:0; font-size:1.1rem; font-weight:700; }
+  .modal-close {
+    background:rgba(255,255,255,.15); border:none; color:#fff;
+    width:32px; height:32px; border-radius:8px; cursor:pointer;
+    display:flex; align-items:center; justify-content:center; font-size:1rem;
+    transition:background .2s;
+  }
+  .modal-close:hover { background:rgba(255,255,255,.3); }
+  .modal-body { padding:24px; }
+  .modal-foot { padding:16px 24px; border-top:1px solid #f0f3f8; display:flex; justify-content:flex-end; gap:10px; }
+
+  /* form */
+  .form-section { margin-bottom:24px; }
+  .form-section-title {
+    font-size:.78rem; font-weight:700; letter-spacing:.08em; text-transform:uppercase;
+    color:var(--muted); padding:0 0 8px; border-bottom:1.5px solid #f0f3f8; margin-bottom:14px;
+  }
+  .form-grid   { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  .form-grid.g3 { grid-template-columns:1fr 1fr 1fr; }
+  .form-col-full { grid-column:1/-1; }
+  .form-group { display:flex; flex-direction:column; gap:5px; }
+  .form-label { font-size:.8rem; font-weight:600; color:var(--text); }
+  .form-control {
+    padding:9px 13px; border:1.5px solid #dde3f0; border-radius:9px;
+    font-size:.87rem; color:var(--text); background:#f9fafc;
+    transition:border-color .2s, background .2s;
+  }
+  .form-control:focus { outline:none; border-color:var(--navy); background:#fff; }
+  select.form-control { cursor:pointer; }
+
+  /* detail view */
+  .detail-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  .detail-item { background:#f8faff; border-radius:10px; padding:12px 14px; }
+  .detail-item .d-lbl { font-size:.73rem; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); font-weight:700; }
+  .detail-item .d-val { font-size:.9rem; color:var(--text); font-weight:600; margin-top:3px; word-break:break-all; }
+  .detail-item .d-val.mono { font-family:'Courier New',monospace; }
+  .section-divider { border:none; border-top:1.5px solid #eaeff7; margin:20px 0; }
+
+  /* history timeline */
+  .timeline { position:relative; padding-left:20px; }
+  .timeline::before { content:''; position:absolute; left:7px; top:0; bottom:0; width:2px; background:#eaeff7; }
+  .tl-item { position:relative; padding:0 0 18px 20px; }
+  .tl-item::before {
+    content:''; position:absolute; left:-13px; top:4px;
+    width:12px; height:12px; border-radius:50%;
+    border:2px solid #fff; box-shadow:0 0 0 2px var(--navy);
+    background:var(--navy);
+  }
+  .tl-date { font-size:.74rem; color:var(--muted); }
+  .tl-action { font-size:.85rem; font-weight:600; color:var(--text); }
+  .tl-detail { font-size:.8rem; color:var(--muted); margin-top:2px; }
+
+  /* btn styles */
+  .btn-navy  { background:var(--navy); color:#fff; border:none; padding:9px 20px; border-radius:9px; font-weight:600; cursor:pointer; transition:all .2s; }
+  .btn-navy:hover { background:var(--navy2); }
+  .btn-gold  { background:var(--gold); color:var(--navy); border:none; padding:9px 20px; border-radius:9px; font-weight:700; cursor:pointer; transition:all .2s; }
+  .btn-gold:hover { background:var(--gold2); }
+  .btn-outline { background:transparent; color:var(--text); border:1.5px solid #dde3f0; padding:9px 20px; border-radius:9px; font-weight:600; cursor:pointer; transition:all .2s; }
+  .btn-outline:hover { border-color:var(--navy); color:var(--navy); }
+  .btn-danger { background:var(--red); color:#fff; border:none; padding:9px 20px; border-radius:9px; font-weight:600; cursor:pointer; }
+
+  /* toast */
+  .toast-container { position:fixed; bottom:24px; right:24px; z-index:9999; display:flex; flex-direction:column; gap:10px; }
+  .toast {
+    background:#fff; border-radius:12px; padding:14px 18px;
+    box-shadow:0 4px 20px rgba(0,0,0,.15);
+    display:flex; align-items:center; gap:12px;
+    animation:toastIn .3s ease; min-width:280px; max-width:360px;
+    border-left:4px solid var(--green);
+  }
+  .toast.error { border-color:var(--red); }
+  .toast.warning { border-color:var(--orange); }
+  @keyframes toastIn { from{opacity:0;transform:translateX(40px)} to{opacity:1;transform:translateX(0)} }
+  .toast-icon { font-size:1.2rem; }
+  .toast-msg  { font-size:.87rem; font-weight:600; color:var(--text); flex:1; }
+
+  /* loading */
+  .spinner { display:inline-block; width:20px; height:20px; border:3px solid rgba(255,255,255,.3); border-radius:50%; border-top-color:#fff; animation:spin .6s linear infinite; }
+  @keyframes spin { to{transform:rotate(360deg)} }
+
+  /* empty state */
+  .empty-state { text-align:center; padding:60px 20px; color:var(--muted); }
+  .empty-state i { font-size:3rem; opacity:.3; display:block; margin-bottom:12px; }
+
+  /* responsive */
+  @media(max-width:768px){
+    .form-grid, .form-grid.g3, .detail-grid { grid-template-columns:1fr; }
+    .plb-table td:nth-child(n+4):not(:last-child) { display:none; }
+    .stat-card .val { font-size:1.4rem; }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- ── HERO ── -->
+<section class="plb-hero">
+  <div class="container">
+    <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+      <div>
+        <div class="badge-hero mb-2"><i class="bi bi-broadcast me-1"></i>COSPAS-SARSAT</div>
+        <h1><i class="bi bi-shield-check me-2" style="color:var(--gold2)"></i>Gestion des Balises PLB</h1>
+        <p>Cycle de vie complet — Enregistrement · Transfert · Maintenance · Désaffectation</p>
+      </div>
+      <button class="btn-add" onclick="openModal('modalCreate')">
+        <i class="bi bi-plus-lg"></i> Nouvelle PLB
+      </button>
+    </div>
+  </div>
+</section>
+
+<div class="container" style="padding:28px 12px;">
+
+  <!-- ── STATS ── -->
+  <div class="row g-3 mb-4" id="statsRow">
+    <div class="col-6 col-md-3">
+      <div class="stat-card stat-total">
+        <div class="icon"><i class="bi bi-broadcast"></i></div>
+        <div><div class="val" id="statTotal">—</div><div class="lbl">Total balises</div></div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="stat-card stat-actif">
+        <div class="icon"><i class="bi bi-check-circle"></i></div>
+        <div><div class="val" id="statActif">—</div><div class="lbl">Actives</div></div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="stat-card stat-expire">
+        <div class="icon"><i class="bi bi-battery"></i></div>
+        <div><div class="val" id="statExpire">—</div><div class="lbl">Batterie expirée</div></div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="stat-card stat-maint">
+        <div class="icon"><i class="bi bi-tools"></i></div>
+        <div><div class="val" id="statMaint">—</div><div class="lbl">Maintenance</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── TOOLBAR ── -->
+  <div class="toolbar mb-3">
+    <div class="search-box">
+      <i class="bi bi-search"></i>
+      <input type="text" id="searchInput" placeholder="Rechercher par code HEX, MMSI, UIN, navire, propriétaire…">
+    </div>
+    <select id="statusFilter">
+      <option value="">Tous les statuts</option>
+      <option value="Actif">Actif</option>
+      <option value="Inactif">Inactif</option>
+      <option value="Expiré">Expiré</option>
+      <option value="Maintenance">Maintenance</option>
+    </select>
+    <button class="btn-add" style="background:linear-gradient(135deg,#0d9e6e,#059669)" onclick="exportCSV()">
+      <i class="bi bi-download"></i> Export CSV
+    </button>
+  </div>
+
+  <!-- ── TABLE ── -->
+  <div class="table-wrap">
+    <div style="overflow-x:auto">
+      <table class="plb-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Code HEX</th>
+            <th>Navire</th>
+            <th>MMSI</th>
+            <th>Propriétaire</th>
+            <th>Batterie</th>
+            <th>Statut</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="plbTableBody">
+          <tr><td colspan="8"><div class="empty-state"><div class="spinner" style="border-top-color:var(--navy);border-color:rgba(0,31,77,.2)"></div></div></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="pagination-wrap">
+      <span class="pag-info" id="pagInfo">Chargement…</span>
+      <div class="pag-btns" id="pagBtns"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     MODAL — CRÉER PLB
+══════════════════════════════════════════════ -->
+<div class="modal-overlay" id="modalCreate">
+  <div class="modal-box modal-lg">
+    <div class="modal-head">
+      <h5><i class="bi bi-plus-circle me-2"></i>Enregistrer une nouvelle PLB</h5>
+      <button class="modal-close" onclick="closeModal('modalCreate')"><i class="bi bi-x-lg"></i></button>
+    </div>
+    <div class="modal-body">
+      <form id="formCreate" onsubmit="submitCreate(event)">
+
+        <div class="form-section">
+          <div class="form-section-title">📡 Identification balise</div>
+          <div class="form-grid g3">
+            <div class="form-group">
+              <label class="form-label">Code HEX (15 car.) *</label>
+              <input type="text" class="form-control" name="registration_number" maxlength="15" placeholder="Ex: 6B2A3F9C1E04D00" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">UIN</label>
+              <input type="text" class="form-control" name="uin" placeholder="Unique Identification Number">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Type balise</label>
+              <select class="form-control" name="beacon_type">
+                <option value="PLB">PLB</option>
+                <option value="EPIRB">EPIRB</option>
+                <option value="ELT">ELT</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Fabricant</label>
+              <input type="text" class="form-control" name="manufacturer" placeholder="Ex: McMurdo, ACR, Ocean Signal">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Modèle</label>
+              <input type="text" class="form-control" name="model" placeholder="Ex: FastFind 220">
+            </div>
+            <div class="form-group">
+              <label class="form-label">TAC</label>
+              <input type="text" class="form-control" name="tac" placeholder="Type Approval Certificate">
+            </div>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <div class="form-section-title">🚢 Navire associé</div>
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="form-label">Nom du navire *</label>
+              <input type="text" class="form-control" name="unit_name" required placeholder="Nom du navire">
+            </div>
+            <div class="form-group">
+              <label class="form-label">MMSI</label>
+              <input type="text" class="form-control" name="mmsi" placeholder="9 chiffres" maxlength="9">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Port d'attache</label>
+              <input type="text" class="form-control" name="port" placeholder="Ex: Tanger, Casablanca">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Type d'activité</label>
+              <select class="form-control" name="activity_type">
+                <option value="">— Sélectionner —</option>
+                <option value="Pêche">Pêche</option>
+                <option value="Plaisance">Plaisance</option>
+                <option value="Commerce">Commerce</option>
+                <option value="Militaire">Militaire</option>
+                <option value="Autre">Autre</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <div class="form-section-title">👤 Propriétaire</div>
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="form-label">Nom complet *</label>
+              <input type="text" class="form-control" name="owner" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Email</label>
+              <input type="email" class="form-control" name="email">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Téléphone</label>
+              <input type="tel" class="form-control" name="phone_number">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Téléphone secondaire</label>
+              <input type="tel" class="form-control" name="secondary_phone_number">
+            </div>
+            <div class="form-group form-col-full">
+              <label class="form-label">Adresse</label>
+              <input type="text" class="form-control" name="address">
+            </div>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <div class="form-section-title">🆘 Contacts d'urgence</div>
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="form-label">Contact 1 — Nom</label>
+              <input type="text" class="form-control" name="emergency_contact_name">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Contact 1 — Téléphone</label>
+              <input type="tel" class="form-control" name="emergency_contact_phone_number">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Contact 2 — Nom</label>
+              <input type="text" class="form-control" name="secondary_emergency_contact_name">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Contact 2 — Téléphone</label>
+              <input type="tel" class="form-control" name="secondary_emergency_contact_phone_number">
+            </div>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <div class="form-section-title">🔧 Maintenance</div>
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="form-label">N° série fabricant</label>
+              <input type="text" class="form-control" name="serial_number_manufacturer">
+            </div>
+            <div class="form-group">
+              <label class="form-label">N° série SAR</label>
+              <input type="text" class="form-control" name="serial_number_sar">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Expiration batterie</label>
+              <input type="date" class="form-control" name="battery_expiration_date">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Statut</label>
+              <select class="form-control" name="beacon_status">
+                <option value="Actif">Actif</option>
+                <option value="Inactif">Inactif</option>
+                <option value="Maintenance">Maintenance</option>
+                <option value="Expiré">Expiré</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+      </form>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-outline" onclick="closeModal('modalCreate')">Annuler</button>
+      <button class="btn-gold" onclick="submitCreate()"><i class="bi bi-check-lg me-1"></i>Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     MODAL — DÉTAIL / ÉDITION
+══════════════════════════════════════════════ -->
+<div class="modal-overlay" id="modalDetail">
+  <div class="modal-box modal-lg">
+    <div class="modal-head">
+      <h5 id="modalDetailTitle"><i class="bi bi-broadcast me-2"></i>Détails PLB</h5>
+      <button class="modal-close" onclick="closeModal('modalDetail')"><i class="bi bi-x-lg"></i></button>
+    </div>
+    <div class="modal-body" id="modalDetailBody">
+      <div class="empty-state"><i class="bi bi-broadcast"></i>Chargement…</div>
+    </div>
+    <div class="modal-foot" id="modalDetailFoot"></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     MODAL — TRANSFERT
+══════════════════════════════════════════════ -->
+<div class="modal-overlay" id="modalTransfer">
+  <div class="modal-box">
+    <div class="modal-head" style="background:linear-gradient(135deg,#0d6e4e,#059669)">
+      <h5><i class="bi bi-arrow-left-right me-2"></i>Transfert de PLB</h5>
+      <button class="modal-close" onclick="closeModal('modalTransfer')"><i class="bi bi-x-lg"></i></button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="transferPlbId">
+      <div class="form-section">
+        <div class="form-section-title">Type de transfert</div>
+        <select class="form-control" id="transferType" onchange="toggleTransferFields()">
+          <option value="BOTH">Changement propriétaire + navire</option>
+          <option value="OWNER_CHANGE">Changement de propriétaire uniquement</option>
+          <option value="VESSEL_CHANGE">Changement de navire uniquement</option>
+        </select>
+      </div>
+      <div id="ownerFields" class="form-section">
+        <div class="form-section-title">Nouveau propriétaire</div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label">Nom</label>
+            <input type="text" class="form-control" id="newOwner">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Email</label>
+            <input type="email" class="form-control" id="newOwnerEmail">
+          </div>
+          <div class="form-group form-col-full">
+            <label class="form-label">Téléphone</label>
+            <input type="tel" class="form-control" id="newOwnerPhone">
+          </div>
+        </div>
+      </div>
+      <div id="vesselFields" class="form-section">
+        <div class="form-section-title">Nouveau navire</div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label">Nom du navire</label>
+            <input type="text" class="form-control" id="newVesselName">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Nouveau MMSI</label>
+            <input type="text" class="form-control" id="newVesselMmsi" placeholder="Recodage requis si changement">
+          </div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Commentaire</label>
+        <textarea class="form-control" id="transferComment" rows="2" placeholder="Motif du transfert…"></textarea>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-outline" onclick="closeModal('modalTransfer')">Annuler</button>
+      <button class="btn-gold" onclick="submitTransfer()"><i class="bi bi-arrow-left-right me-1"></i>Valider le transfert</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     MODAL — MAINTENANCE / TEST
+══════════════════════════════════════════════ -->
+<div class="modal-overlay" id="modalMaint">
+  <div class="modal-box">
+    <div class="modal-head" style="background:linear-gradient(135deg,#0369a1,#0284c7)">
+      <h5><i class="bi bi-tools me-2"></i>Enregistrer une maintenance</h5>
+      <button class="modal-close" onclick="closeModal('modalMaint')"><i class="bi bi-x-lg"></i></button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="maintPlbId">
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="form-label">Type</label>
+          <select class="form-control" id="maintType" onchange="toggleMaintFields()">
+            <option value="TEST_MENSUEL">Test mensuel</option>
+            <option value="BATTERY_CHANGE">Remplacement batterie</option>
+            <option value="INSPECTION">Inspection</option>
+            <option value="REPAIR">Réparation</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Résultat</label>
+          <select class="form-control" id="maintResult">
+            <option value="OK">OK ✓</option>
+            <option value="NOK">NOK ✗</option>
+            <option value="À_surveiller">À surveiller</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Effectué par</label>
+          <input type="text" class="form-control" id="maintBy" placeholder="Technicien">
+        </div>
+        <div class="form-group" id="batteryExpiryField" style="display:none">
+          <label class="form-label">Nouvelle expiration batterie</label>
+          <input type="date" class="form-control" id="newExpiryDate">
+        </div>
+      </div>
+      <div class="form-grid mt-3" id="testFields">
+        <div class="form-group">
+          <label class="form-label">Signal reçu par COSPAS</label>
+          <select class="form-control" id="signalReceived">
+            <option value="true">Oui ✓</option>
+            <option value="false">Non ✗</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Fix GPS OK</label>
+          <select class="form-control" id="gpsOk">
+            <option value="true">Oui ✓</option>
+            <option value="false">Non ✗</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group mt-3">
+        <label class="form-label">Notes</label>
+        <textarea class="form-control" id="maintNotes" rows="2" placeholder="Observations…"></textarea>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-outline" onclick="closeModal('modalMaint')">Annuler</button>
+      <button style="background:linear-gradient(135deg,#0369a1,#0284c7);color:#fff;border:none;padding:9px 20px;border-radius:9px;font-weight:600;cursor:pointer;" onclick="submitMaint()">
+        <i class="bi bi-check-lg me-1"></i>Enregistrer
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     MODAL — DÉSAFFECTATION
+══════════════════════════════════════════════ -->
+<div class="modal-overlay" id="modalDecomm">
+  <div class="modal-box">
+    <div class="modal-head" style="background:linear-gradient(135deg,#991b1b,#b91c1c)">
+      <h5><i class="bi bi-x-circle me-2"></i>Mettre hors service</h5>
+      <button class="modal-close" onclick="closeModal('modalDecomm')"><i class="bi bi-x-lg"></i></button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="decommPlbId">
+      <div class="alert" style="background:#fef2f2;border-left:4px solid var(--red);padding:14px;border-radius:8px;font-size:.87rem;color:#7f1d1d;margin-bottom:18px;">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+        Cette action désactivera définitivement la balise dans le système MRCC.
+      </div>
+      <div class="form-group mb-3">
+        <label class="form-label">Motif de désaffectation *</label>
+        <select class="form-control" id="decommReason">
+          <option value="PERDU">Balise perdue</option>
+          <option value="DETRUIT">Balise détruite</option>
+          <option value="VENDU">Navire vendu (sans balise)</option>
+          <option value="OBSOLETE">Obsolescence technique</option>
+          <option value="AUTRE">Autre</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Commentaire</label>
+        <textarea class="form-control" id="decommComment" rows="3" placeholder="Précisions…"></textarea>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-outline" onclick="closeModal('modalDecomm')">Annuler</button>
+      <button class="btn-danger" onclick="submitDecomm()"><i class="bi bi-x-circle me-1"></i>Confirmer</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── TOAST CONTAINER ── -->
+<div class="toast-container" id="toastContainer"></div>
+{% endblock %}
+
+
+{% block extra_js %}
+<script>
+/* ═══════════════════════════════════════════
+   STATE
+═══════════════════════════════════════════ */
+const state = {
+  page: 1, perPage: 50, search: '', status: '',
+  total: 0, pages: 0, timer: null
+};
+
+/* ═══════════════════════════════════════════
+   INIT
+═══════════════════════════════════════════ */
+document.addEventListener('DOMContentLoaded', () => {
+  loadStats();
+  loadBalises();
+
+  document.getElementById('searchInput').addEventListener('input', e => {
+    clearTimeout(state.timer);
+    state.timer = setTimeout(() => { state.search = e.target.value; state.page = 1; loadBalises(); }, 400);
+  });
+  document.getElementById('statusFilter').addEventListener('change', e => {
+    state.status = e.target.value; state.page = 1; loadBalises();
+  });
+});
+
+/* ═══════════════════════════════════════════
+   API HELPERS
+═══════════════════════════════════════════ */
+async function apiFetch(url, opts = {}) {
+  const res = await fetch(url, {
+    headers: { 'Content-Type': 'application/json' },
+    ...opts
+  });
+  return res.json();
+}
+
+/* ═══════════════════════════════════════════
+   LOAD STATS
+═══════════════════════════════════════════ */
+async function loadStats() {
+  try {
+    const r = await apiFetch('/api/balises/stats');
+    if (r.success) {
+      document.getElementById('statTotal').textContent  = r.stats.total;
+      document.getElementById('statActif').textContent  = r.stats.actives;
+      document.getElementById('statExpire').textContent = r.stats.expired;
+      document.getElementById('statMaint').textContent  = r.stats.maintenance;
+    }
+  } catch(e) { console.error(e); }
+}
+
+/* ═══════════════════════════════════════════
+   LOAD TABLE
+═══════════════════════════════════════════ */
+async function loadBalises() {
+  const tbody = document.getElementById('plbTableBody');
+  tbody.innerHTML = `<tr><td colspan="8"><div style="text-align:center;padding:30px"><div class="spinner" style="border-top-color:var(--navy);border-color:rgba(0,31,77,.15);margin:auto"></div></div></td></tr>`;
+
+  const params = new URLSearchParams({
+    page: state.page, per_page: state.perPage,
+    search: state.search, status: state.status
+  });
+
+  try {
+    const r = await apiFetch(`/api/balises?${params}`);
+    if (!r.success) { tbody.innerHTML = `<tr><td colspan="8"><div class="empty-state"><i class="bi bi-exclamation-circle"></i>${r.error || 'Erreur'}</div></td></tr>`; return; }
+
+    state.total = r.pagination.total;
+    state.pages = r.pagination.pages;
+
+    if (!r.data.length) {
+      tbody.innerHTML = `<tr><td colspan="8"><div class="empty-state"><i class="bi bi-broadcast"></i>Aucune balise trouvée</div></td></tr>`;
+    } else {
+      tbody.innerHTML = r.data.map(b => rowHTML(b)).join('');
+    }
+    renderPagination();
+  } catch(e) {
+    tbody.innerHTML = `<tr><td colspan="8"><div class="empty-state"><i class="bi bi-wifi-off"></i>Erreur de connexion</div></td></tr>`;
+  }
+}
+
+function rowHTML(b) {
+  const bat = batteryHTML(b.battery_expiration_date);
+  const st  = statusBadge(b.beacon_status);
+  return `
+  <tr>
+    <td style="color:var(--muted);font-size:.78rem">${b.id}</td>
+    <td><span class="hex-code">${b.registration_number || '—'}</span></td>
+    <td><span class="vessel">${b.unit_name || '—'}</span><br><small style="color:var(--muted)">${b.port || ''}</small></td>
+    <td style="font-family:'Courier New',monospace;font-size:.82rem">${b.mmsi || '—'}</td>
+    <td class="owner-cell">${b.owner || '—'}</td>
+    <td>${bat}</td>
+    <td>${st}</td>
+    <td>
+      <div class="action-btns">
+        <button class="btn-act btn-act-view"  onclick="viewDetail(${b.id})"     title="Voir détails"><i class="bi bi-eye"></i></button>
+        <button class="btn-act btn-act-edit"  onclick="openTransfer(${b.id})"   title="Transfert"><i class="bi bi-arrow-left-right"></i></button>
+        <button class="btn-act btn-act-print" onclick="printCard(${b.id})"      title="Imprimer fiche"><i class="bi bi-printer"></i></button>
+        <button class="btn-act btn-act-del"   onclick="openDecomm(${b.id})"     title="Mettre hors service"><i class="bi bi-x-circle"></i></button>
+      </div>
+    </td>
+  </tr>`;
+}
+
+function statusBadge(s) {
+  const map = { Actif:'s-actif', Inactif:'s-inactif', Expiré:'s-expire', Maintenance:'s-maintenance' };
+  return `<span class="badge-status ${map[s]||'s-inactif'}">${s||'N/A'}</span>`;
+}
+
+function batteryHTML(d) {
+  if (!d) return '<span style="color:var(--muted)">—</span>';
+  const days = Math.ceil((new Date(d) - new Date()) / 86400000);
+  if (days < 0)   return `<span class="battery-warn"><i class="bi bi-battery me-1"></i>Expirée</span>`;
+  if (days < 90)  return `<span class="battery-soon"><i class="bi bi-battery-half me-1"></i>${d}</span>`;
+  return `<span class="battery-ok"><i class="bi bi-battery-full me-1"></i>${d}</span>`;
+}
+
+/* ═══════════════════════════════════════════
+   PAGINATION
+═══════════════════════════════════════════ */
+function renderPagination() {
+  const from = (state.page - 1) * state.perPage + 1;
+  const to   = Math.min(state.page * state.perPage, state.total);
+  document.getElementById('pagInfo').textContent = `${from}–${to} sur ${state.total} balises`;
+
+  const container = document.getElementById('pagBtns');
+  container.innerHTML = '';
+
+  const btn = (label, page, disabled = false, active = false) => {
+    const b = document.createElement('button');
+    b.className = 'pag-btn' + (active ? ' active' : '');
+    b.innerHTML = label;
+    b.disabled  = disabled;
+    b.onclick   = () => { state.page = page; loadBalises(); };
+    container.appendChild(b);
+  };
+
+  btn('<i class="bi bi-chevron-left"></i>', state.page - 1, state.page <= 1);
+
+  let start = Math.max(1, state.page - 2);
+  let end   = Math.min(state.pages, start + 4);
+  start     = Math.max(1, end - 4);
+
+  for (let i = start; i <= end; i++) btn(i, i, false, i === state.page);
+
+  btn('<i class="bi bi-chevron-right"></i>', state.page + 1, state.page >= state.pages);
+}
+
+/* ═══════════════════════════════════════════
+   VIEW DETAIL
+═══════════════════════════════════════════ */
+async function viewDetail(id) {
+  openModal('modalDetail');
+  document.getElementById('modalDetailBody').innerHTML = `<div class="empty-state"><div class="spinner" style="border-top-color:var(--navy);border-color:rgba(0,31,77,.15);margin:auto"></div></div>`;
+  document.getElementById('modalDetailFoot').innerHTML = '';
+
+  try {
+    const r = await apiFetch(`/api/plb/${id}`);
+    if (!r.success) { document.getElementById('modalDetailBody').innerHTML = `<div class="empty-state"><i class="bi bi-exclamation-circle"></i>${r.error}</div>`; return; }
+
+    const p = r.data;
+    document.getElementById('modalDetailTitle').innerHTML = `<i class="bi bi-broadcast me-2"></i>${p.registration_number || 'PLB #'+id}`;
+
+    const hist = (p.history || []).slice(0, 8).map(h => `
+      <div class="tl-item">
+        <div class="tl-date">${h.timestamp ? new Date(h.timestamp).toLocaleString('fr-FR') : '—'}</div>
+        <div class="tl-action">${h.action}</div>
+        <div class="tl-detail">${h.comment || ''}</div>
+      </div>`).join('') || '<div style="color:var(--muted);font-size:.85rem">Aucun historique</div>';
+
+    const maint = (p.maintenance || []).slice(0, 5).map(m => `
+      <tr>
+        <td>${m.maintenance_date ? new Date(m.maintenance_date).toLocaleDateString('fr-FR') : '—'}</td>
+        <td><span class="badge-status ${m.maintenance_type==='TEST_MENSUEL'?'s-actif':'s-maintenance'}">${m.maintenance_type}</span></td>
+        <td>${m.result || '—'}</td>
+        <td>${m.performed_by || '—'}</td>
+      </tr>`).join('') || '<tr><td colspan="4" style="text-align:center;color:var(--muted);padding:12px">Aucune maintenance</td></tr>';
+
+    document.getElementById('modalDetailBody').innerHTML = `
+      <div class="detail-grid mb-3">
+        <div class="detail-item"><div class="d-lbl">Code HEX</div><div class="d-val mono">${p.registration_number||'—'}</div></div>
+        <div class="detail-item"><div class="d-lbl">UIN</div><div class="d-val mono">${p.uin||'—'}</div></div>
+        <div class="detail-item"><div class="d-lbl">Navire</div><div class="d-val">${p.unit_name||'—'}</div></div>
+        <div class="detail-item"><div class="d-lbl">MMSI</div><div class="d-val mono">${p.mmsi||'—'}</div></div>
+        <div class="detail-item"><div class="d-lbl">Port</div><div class="d-val">${p.port||'—'}</div></div>
+        <div class="detail-item"><div class="d-lbl">Statut</div><div class="d-val">${statusBadge(p.beacon_status)}</div></div>
+        <div class="detail-item"><div class="d-lbl">Propriétaire</div><div class="d-val">${p.owner||'—'}</div></div>
+        <div class="detail-item"><div class="d-lbl">Email</div><div class="d-val">${p.email||'—'}</div></div>
+        <div class="detail-item"><div class="d-lbl">Téléphone</div><div class="d-val">${p.phone_number||'—'}</div></div>
+        <div class="detail-item"><div class="d-lbl">Expiration batterie</div><div class="d-val">${batteryHTML(p.battery_expiration_date)}</div></div>
+        <div class="detail-item"><div class="d-lbl">Fabricant</div><div class="d-val">${p.manufacturer||'—'}</div></div>
+        <div class="detail-item"><div class="d-lbl">Modèle</div><div class="d-val">${p.model||'—'}</div></div>
+      </div>
+
+      <hr class="section-divider">
+      <h6 style="font-weight:700;color:var(--navy);margin-bottom:12px"><i class="bi bi-tools me-2"></i>Maintenance</h6>
+      <div style="overflow-x:auto">
+        <table class="plb-table" style="font-size:.82rem">
+          <thead><tr><th>Date</th><th>Type</th><th>Résultat</th><th>Par</th></tr></thead>
+          <tbody>${maint}</tbody>
+        </table>
+      </div>
+
+      <hr class="section-divider">
+      <h6 style="font-weight:700;color:var(--navy);margin-bottom:12px"><i class="bi bi-clock-history me-2"></i>Historique</h6>
+      <div class="timeline">${hist}</div>`;
+
+    document.getElementById('modalDetailFoot').innerHTML = `
+      <button class="btn-outline" onclick="closeModal('modalDetail')">Fermer</button>
+      <button style="background:linear-gradient(135deg,#0369a1,#0284c7);color:#fff;border:none;padding:9px 18px;border-radius:9px;font-weight:600;cursor:pointer" onclick="closeModal('modalDetail');openMaint(${id})">
+        <i class="bi bi-tools me-1"></i>Maintenance
+      </button>
+      <button class="btn-gold" onclick="printCard(${id})"><i class="bi bi-printer me-1"></i>Imprimer</button>`;
+
+  } catch(e) {
+    document.getElementById('modalDetailBody').innerHTML = `<div class="empty-state"><i class="bi bi-wifi-off"></i>Erreur de connexion</div>`;
+  }
+}
+
+/* ═══════════════════════════════════════════
+   CREATE
+═══════════════════════════════════════════ */
+async function submitCreate() {
+  const form = document.getElementById('formCreate');
+  if (!form.checkValidity()) { form.reportValidity(); return; }
+
+  const fd = new FormData(form);
+  const body = {};
+  fd.forEach((v, k) => { if (v) body[k] = v; });
+
+  try {
+    const r = await apiFetch('/api/plb', { method:'POST', body: JSON.stringify(body) });
+    if (r.success) {
+      toast('Balise enregistrée avec succès !', 'success');
+      closeModal('modalCreate');
+      form.reset();
+      loadBalises(); loadStats();
+    } else {
+      toast(r.error || 'Erreur lors de la création', 'error');
+    }
+  } catch(e) { toast('Erreur de connexion', 'error'); }
+}
+
+/* ═══════════════════════════════════════════
+   TRANSFER
+═══════════════════════════════════════════ */
+function openTransfer(id) {
+  document.getElementById('transferPlbId').value = id;
+  document.getElementById('newOwner').value = '';
+  document.getElementById('newOwnerEmail').value = '';
+  document.getElementById('newOwnerPhone').value = '';
+  document.getElementById('newVesselName').value = '';
+  document.getElementById('newVesselMmsi').value = '';
+  document.getElementById('transferComment').value = '';
+  document.getElementById('transferType').value = 'BOTH';
+  toggleTransferFields();
+  openModal('modalTransfer');
+}
+
+function toggleTransferFields() {
+  const t = document.getElementById('transferType').value;
+  document.getElementById('ownerFields').style.display  = (t === 'VESSEL_CHANGE') ? 'none' : '';
+  document.getElementById('vesselFields').style.display = (t === 'OWNER_CHANGE')  ? 'none' : '';
+}
+
+async function submitTransfer() {
+  const id = document.getElementById('transferPlbId').value;
+  const body = {
+    transfer_type:    document.getElementById('transferType').value,
+    new_owner:        document.getElementById('newOwner').value,
+    new_owner_email:  document.getElementById('newOwnerEmail').value,
+    new_owner_phone:  document.getElementById('newOwnerPhone').value,
+    new_vessel_name:  document.getElementById('newVesselName').value,
+    new_vessel_mmsi:  document.getElementById('newVesselMmsi').value,
+    comment:          document.getElementById('transferComment').value,
+  };
+  try {
+    const r = await apiFetch(`/api/plb/${id}/transfer`, { method:'POST', body: JSON.stringify(body) });
+    if (r.success) { toast('Transfert effectué !', 'success'); closeModal('modalTransfer'); loadBalises(); }
+    else toast(r.error || 'Erreur', 'error');
+  } catch(e) { toast('Erreur de connexion', 'error'); }
+}
+
+/* ═══════════════════════════════════════════
+   MAINTENANCE
+═══════════════════════════════════════════ */
+function openMaint(id) {
+  document.getElementById('maintPlbId').value = id;
+  document.getElementById('maintNotes').value = '';
+  toggleMaintFields();
+  openModal('modalMaint');
+}
+
+function toggleMaintFields() {
+  const t = document.getElementById('maintType').value;
+  document.getElementById('batteryExpiryField').style.display = (t === 'BATTERY_CHANGE') ? '' : 'none';
+  document.getElementById('testFields').style.display = (t === 'TEST_MENSUEL') ? '' : 'none';
+}
+
+async function submitMaint() {
+  const id = document.getElementById('maintPlbId').value;
+  const body = {
+    maintenance_type:     document.getElementById('maintType').value,
+    result:               document.getElementById('maintResult').value,
+    performed_by:         document.getElementById('maintBy').value,
+    notes:                document.getElementById('maintNotes').value,
+    new_expiry_date:      document.getElementById('newExpiryDate').value,
+    test_signal_received: document.getElementById('signalReceived').value === 'true',
+    gps_fix_ok:           document.getElementById('gpsOk').value === 'true',
+  };
+  try {
+    const r = await apiFetch(`/api/plb/${id}/maintenance`, { method:'POST', body: JSON.stringify(body) });
+    if (r.success) { toast('Maintenance enregistrée !', 'success'); closeModal('modalMaint'); loadBalises(); loadStats(); }
+    else toast(r.error || 'Erreur', 'error');
+  } catch(e) { toast('Erreur de connexion', 'error'); }
+}
+
+/* ═══════════════════════════════════════════
+   DÉCOMMISSION
+═══════════════════════════════════════════ */
+function openDecomm(id) {
+  document.getElementById('decommPlbId').value = id;
+  document.getElementById('decommComment').value = '';
+  openModal('modalDecomm');
+}
+
+async function submitDecomm() {
+  const id = document.getElementById('decommPlbId').value;
+  const body = {
+    reason:  document.getElementById('decommReason').value,
+    comment: document.getElementById('decommComment').value,
+  };
+  try {
+    const r = await apiFetch(`/api/plb/${id}/decommission`, { method:'POST', body: JSON.stringify(body) });
+    if (r.success) { toast('Balise mise hors service', 'warning'); closeModal('modalDecomm'); loadBalises(); loadStats(); }
+    else toast(r.error || 'Erreur', 'error');
+  } catch(e) { toast('Erreur de connexion', 'error'); }
+}
+
+/* ═══════════════════════════════════════════
+   PRINT
+═══════════════════════════════════════════ */
+function printCard(id) {
+  window.open(`/api/plb/${id}/print`, '_blank');
+}
+
+/* ═══════════════════════════════════════════
+   EXPORT CSV
+═══════════════════════════════════════════ */
+function exportCSV() {
+  window.location.href = '/api/balises/export';
+  toast('Export CSV en cours…', 'success');
+}
+
+/* ═══════════════════════════════════════════
+   MODAL HELPERS
+═══════════════════════════════════════════ */
+function openModal(id)  { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+document.querySelectorAll('.modal-overlay').forEach(m => {
+  m.addEventListener('click', e => { if (e.target === m) m.classList.remove('open'); });
+});
+
+/* ═══════════════════════════════════════════
+   TOAST
+═══════════════════════════════════════════ */
+function toast(msg, type = 'success') {
+  const icons = { success:'<i class="bi bi-check-circle-fill" style="color:var(--green)"></i>', error:'<i class="bi bi-x-circle-fill" style="color:var(--red)"></i>', warning:'<i class="bi bi-exclamation-triangle-fill" style="color:var(--orange)"></i>' };
+  const t = document.createElement('div');
+  t.className = `toast ${type}`;
+  t.innerHTML = `<span class="toast-icon">${icons[type]||icons.success}</span><span class="toast-msg">${msg}</span>`;
+  document.getElementById('toastContainer').appendChild(t);
+  setTimeout(() => { t.style.opacity='0'; t.style.transform='translateX(40px)'; t.style.transition='.3s'; setTimeout(()=>t.remove(),300); }, 3500);
+}
+</script>
+{% endblock %}

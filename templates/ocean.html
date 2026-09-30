@@ -1,1642 +1,934 @@
-<!DOCTYPE html>
-<html lang="fr">
+{% extends "base.html" %}
 
-<head>
-  <meta charset="utf-8">
-  <meta content="width=device-width, initial-scale=1.0" name="viewport">
-  <title>Dashboard Océanographique</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-  <link rel="stylesheet" href="https://unpkg.com/leaflet.vectorgrid@latest/dist/Leaflet.VectorGrid.bundled.js"/>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.min.css">
+{% block title %}Dashboard Océanographique - MRCC Maroc{% endblock %}
 
-  <meta name="description" content="Dashboard de suivi en temps réel du trafic maritime pour le MRCC Maroc">
-  <meta name="keywords" content="MRCC, trafic maritime, Maroc, surveillance, AIS">
-
-  <!-- Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
-  
-  <!-- Font Awesome -->
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
-
-  <!-- Vendor CSS Files -->
-  <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet">
-  <link href="{{ url_for('static', filename='vendor/bootstrap-icons/bootstrap-icons.css') }}" rel="stylesheet">
-  <link href="{{ url_for('static', filename='vendor/aos/aos.css') }}" rel="stylesheet">
-  <link href="{{ url_for('static', filename='vendor/glightbox/css/glightbox.min.css') }}" rel="stylesheet">
-  <link href="{{ url_for('static', filename='vendor/swiper/swiper-bundle.min.css') }}" rel="stylesheet">
-
-  <!-- Main CSS File -->
-  <link href="{{ url_for('static', filename='css/main.css') }}" rel="stylesheet">
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-  <style>
-    :root {
-      --primary-color: #005baa;
-      --secondary-color: #003366;
-      --accent-color: #00a1e0;
-      --light-color: #f8f9fa;
-      --dark-color: #212529;
-      --success-color: #28a745;
-      --warning-color: #ffc107;
-      --danger-color: #dc3545;
-      --info-color: #17a2b8;
-    }
+{% block extra_css %}
+<style>
+    /* Styles spécifiques à la page océanographique */
+    #ocean-map { height: 600px; }
+    .data-card { transition: all 0.3s; }
+    .data-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+    .ocean-stats { background: linear-gradient(135deg, #1a2980 0%, #26d0ce 100%); color: white; }
+    .current-arrow { display: inline-block; transition: transform 0.5s; }
+    .legend { padding: 10px; background: white; border-radius: 5px; box-shadow: 0 0 15px rgba(0,0,0,0.2); }
+    .temperature-gradient { background: linear-gradient(to right, #313695, #4575b4, #74add1, #abd9e9, #e0f3f8, #ffffbf, #fee090, #fdae61, #f46d43, #d73027, #a50026); }
     
-    body {
-      background-color: #f5f7fb;
-      font-family: 'Inter', sans-serif;
-      color: var(--dark-color);
-      padding-top: 70px;
-    }
-    
-    /* Header Styles */
-    .header {
-      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-      box-shadow: 0 2px 20px rgba(0, 91, 170, 0.2);
-      height: 70px;
-    }
-    
-    /* Main Dashboard Layout */
+    /* Dashboard styles */
     .dashboard-container {
-      padding: 20px;
-      max-width: 1600px;
-      margin: 0 auto;
+        padding: 20px;
+        max-width: 1600px;
+        margin: 0 auto;
     }
     
     .dashboard-header {
-      margin-bottom: 30px;
+        margin-bottom: 30px;
     }
     
     .dashboard-title {
-      font-weight: 700;
-      color: var(--secondary-color);
-      margin-bottom: 10px;
+        font-weight: 700;
+        color: var(--primary-color, #005baa);
+        margin-bottom: 10px;
     }
     
-    .dashboard-subtitle {
-      color: #6c757d;
-      font-weight: 400;
-    }
-    
-    /* Card Styles */
     .dashboard-card {
-      background: white;
-      border-radius: 12px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-      padding: 20px;
-      margin-bottom: 25px;
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
-      border: none;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+        padding: 20px;
+        margin-bottom: 25px;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        border: none;
     }
     
     .dashboard-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
     }
     
-    .card-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 15px;
-      padding-bottom: 10px;
-      border-bottom: 1px solid #eee;
-    }
-    
-    .card-title {
-      font-weight: 600;
-      color: var(--secondary-color);
-      margin: 0;
-    }
-    
-    .card-actions {
-      display: flex;
-      gap: 10px;
-    }
-    
-    /* Map Container */
-    #map-container {
-      position: relative;
-      height: 500px;
-      border-radius: 12px;
-      overflow: hidden;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-    }
-    
-    #map {
-      height: 100%;
-      width: 100%;
-    }
-    
-    .map-controls {
-      position: absolute;
-      top: 15px;
-      right: 15px;
-      z-index: 1000;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-    
-    .map-btn {
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      background: white;
-      border: none;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: var(--primary-color);
-      cursor: pointer;
-      transition: all 0.2s ease;
-    }
-    
-    .map-btn:hover {
-      background: var(--primary-color);
-      color: white;
-    }
-    
-    /* Stats Grid */
     .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-      gap: 20px;
-      margin-bottom: 30px;
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 20px;
+        margin-bottom: 30px;
     }
     
     .stat-card {
-      background: white;
-      border-radius: 12px;
-      padding: 20px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-      display: flex;
-      flex-direction: column;
+        background: white;
+        border-radius: 12px;
+        padding: 20px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
     }
     
     .stat-value {
-      font-size: 2rem;
-      font-weight: 700;
-      color: var(--primary-color);
-      margin: 10px 0;
-    }
-    
-    .stat-label {
-      color: #6c757d;
-      font-size: 0.9rem;
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--primary-color, #005baa);
+        margin: 10px 0;
     }
     
     .stat-icon {
-      width: 50px;
-      height: 50px;
-      border-radius: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.5rem;
-      color: white;
-      margin-bottom: 10px;
+        width: 50px;
+        height: 50px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        color: white;
+        margin-bottom: 10px;
     }
     
-    .stat-icon.ships {
-      background: linear-gradient(135deg, #00a1e0, #005baa);
-    }
+    .stat-icon.ships { background: linear-gradient(135deg, #00a1e0, #005baa); }
+    .stat-icon.ports { background: linear-gradient(135deg, #28a745, #1e7e34); }
+    .stat-icon.alerts { background: linear-gradient(135deg, #dc3545, #c82333); }
+    .stat-icon.area { background: linear-gradient(135deg, #ffc107, #fd7e14); }
     
-    .stat-icon.ports {
-      background: linear-gradient(135deg, #28a745, #1e7e34);
-    }
-    
-    .stat-icon.alerts {
-      background: linear-gradient(135deg, #dc3545, #c82333);
-    }
-    
-    .stat-icon.area {
-      background: linear-gradient(135deg, #ffc107, #fd7e14);
-    }
-    
-    /* Chart Container */
     .chart-container {
-      background: white;
-      border-radius: 12px;
-      padding: 20px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-      height: 100%;
+        background: white;
+        border-radius: 12px;
+        padding: 20px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+        height: 100%;
     }
     
-    #shipTypeChart {
-      width: 100% !important;
-      height: 100% !important;
-    }
-    
-    /* Vessel List */
     .vessel-list {
-      max-height: 500px;
-      overflow-y: auto;
+        max-height: 500px;
+        overflow-y: auto;
     }
     
     .vessel-item {
-      display: flex;
-      align-items: center;
-      padding: 12px 15px;
-      border-bottom: 1px solid #eee;
-      transition: background 0.2s ease;
+        display: flex;
+        align-items: center;
+        padding: 12px 15px;
+        border-bottom: 1px solid #eee;
+        transition: background 0.2s ease;
+        cursor: pointer;
     }
     
     .vessel-item:hover {
-      background: #f8f9fa;
+        background: #f8f9fa;
     }
     
     .vessel-icon {
-      width: 40px;
-      height: 40px;
-      border-radius: 8px;
-      background: #e9f5ff;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-right: 15px;
-      color: var(--primary-color);
+        width: 40px;
+        height: 40px;
+        border-radius: 8px;
+        background: #e9f5ff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 15px;
+        color: var(--primary-color, #005baa);
     }
     
     .vessel-info {
-      flex: 1;
+        flex: 1;
     }
     
     .vessel-name {
-      font-weight: 600;
-      margin-bottom: 3px;
+        font-weight: 600;
+        margin-bottom: 3px;
     }
     
     .vessel-details {
-      font-size: 0.8rem;
-      color: #6c757d;
-      display: flex;
-      gap: 10px;
-    }
-    
-    .vessel-status {
-      font-size: 0.7rem;
-      padding: 3px 8px;
-      border-radius: 10px;
-      font-weight: 600;
+        font-size: 0.8rem;
+        color: #6c757d;
+        display: flex;
+        gap: 10px;
     }
     
     .status-moving {
-      background: #e6f7ee;
-      color: #28a745;
+        background: #e6f7ee;
+        color: #28a745;
+        font-size: 0.7rem;
+        padding: 3px 8px;
+        border-radius: 10px;
+        font-weight: 600;
     }
     
     .status-stopped {
-      background: #fff3cd;
-      color: #856404;
+        background: #fff3cd;
+        color: #856404;
+        font-size: 0.7rem;
+        padding: 3px 8px;
+        border-radius: 10px;
+        font-weight: 600;
     }
     
-    /* Responsive Adjustments */
     @media (max-width: 992px) {
-      .stats-grid {
-        grid-template-columns: repeat(2, 1fr);
-      }
+        .stats-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
     }
     
     @media (max-width: 768px) {
-      .stats-grid {
-        grid-template-columns: 1fr;
-      }
-      
-      #map-container {
-        height: 400px;
-      }
-    }
-    
-    /* Custom Scrollbar */
-    ::-webkit-scrollbar {
-      width: 8px;
-    }
-    
-    ::-webkit-scrollbar-track {
-      background: #f1f1f1;
-      border-radius: 10px;
-    }
-    
-    ::-webkit-scrollbar-thumb {
-      background: #c1c1c1;
-      border-radius: 10px;
-    }
-    
-    ::-webkit-scrollbar-thumb:hover {
-      background: #a8a8a8;
-    }
-
-        :root {
-          --primary-color: #4361ee;
-          --secondary-color: #3f37c9;
-          --accent-color: #4cc9f0;
-          --light-color: #f8f9fa;
-          --dark-color: #212529;
-          --success-color: #4bb543;
-          --warning-color: #f0ad4e;
-          --danger-color: #d9534f;
+        .stats-grid {
+            grid-template-columns: 1fr;
         }
-        
-        body {
-          background-color: #f5f7fb;
-          font-family: 'Inter', sans-serif;
-          color: var(--dark-color);
-          padding-top: 70px;
+        #ocean-map {
+            height: 400px;
         }
-        
-        /* Header Styles - Identique aux autres pages */
-        .header {
-          background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-          box-shadow: 0 2px 20px rgba(67, 97, 238, 0.2);
-          height: 70px;
-        }
-        
-        .header .logo h1 {
-          color: white;
-          font-weight: 700;
-          font-size: 1.5rem;
-        }
-        
-        .header .navmenu ul li a {
-          color: rgba(255, 255, 255, 0.8);
-          font-weight: 500;
-          transition: all 0.3s;
-        }
-        
-        .header .navmenu ul li a:hover,
-        .header .navmenu ul li a.active {
-          color: white;
-        }
-        
-        .user-menu {
-          display: flex;
-          align-items: center;
-          gap: 15px;
-        }
-        
-        .username {
-          color: white;
-          font-weight: 500;
-          margin-right: 10px;
-        }
-        
-        .btn-custom {
-          padding: 8px 16px;
-          border-radius: 20px;
-          font-weight: 500;
-          transition: 0.3s ease-in-out;
-        }
-        
-        .btn-primary-custom {
-          background: white;
-          color: var(--primary-color);
-          border: none;
-        }
-        
-        .btn-primary-custom:hover {
-          background: rgba(255, 255, 255, 0.9);
-        }
-        
-        .btn-secondary-custom {
-          background: rgba(255, 255, 255, 0.1);
-          border: 1px solid white;
-          color: white;
-        }
-        
-        .btn-secondary-custom:hover {
-          background: rgba(255, 255, 255, 0.2);
-        }
-        
-        
-    /* Notifications */
-    .notification-wrapper {
-      position: relative;
-      margin-left: 10px;
     }
     
-    .notification-icon {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: #f0f2f5;
-      color: #4a4a6a;
-      border: none;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      position: relative;
-    }
-    
-    .notification-icon:hover {
-      background: #e4e6eb;
-      color: var(--primary-color);
-    }
-    
-    .notification-badge {
-      position: absolute;
-      top: -5px;
-      right: -5px;
-      background: #f94144;
-      color: white;
-      border-radius: 50%;
-      width: 20px;
-      height: 20px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.7rem;
-      font-weight: 600;
-    }
-    
-    .notification-dropdown {
-      position: absolute;
-      top: 50px;
-      right: 0;
-      width: 350px;
-      background: white;
-      border-radius: 12px;
-      box-shadow: 0 5px 25px rgba(0, 0, 0, 0.1);
-      opacity: 0;
-      visibility: hidden;
-      transform: translateY(10px);
-      transition: all 0.3s ease;
-      z-index: 1000;
-    }
-    
-    .notification-wrapper:hover .notification-dropdown {
-      opacity: 1;
-      visibility: visible;
-      transform: translateY(0);
-    }
-    
-    .notification-header {
-      padding: 15px;
-      border-bottom: 1px solid #eee;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    
-    .notification-header h5 {
-      margin: 0;
-      font-size: 1rem;
-      color: #2b2d42;
-    }
-    
-    .mark-all-read {
-      background: none;
-      border: none;
-      color: var(--primary-color);
-      font-size: 0.8rem;
-      cursor: pointer;
-    }
-    
-    .notification-content {
-      max-height: 400px;
-      overflow-y: auto;
-      padding: 10px;
-    }
-    
-    .empty-notifications {
-      padding: 20px;
-      text-align: center;
-      color: #888;
-    }
-    .notification-item {
-        padding: 10px;
-        border-bottom: 1px solid #eee;
-        transition: background 0.2s;
-    }
-    
-    .notification-item:hover {
-        background: #f9f9f9;
-    }
-    
-    .notification-title {
-        font-weight: 600;
-        color: #2b2d42;
-        margin-bottom: 5px;
-    }
-    
-    .notification-text {
-        color: #4a4a6a;
-        font-size: 0.9rem;
-        margin-bottom: 8px;
-    }
-    
-    .mark-as-read {
-        background: none;
-        border: none;
-        color: var(--primary-color);
-        font-size: 0.8rem;
+    .buoy-icon {
+        background: #007bff;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        border: 2px solid white;
+        font-weight: bold;
         cursor: pointer;
-        padding: 0;
     }
     
-    .mark-as-read:hover {
-        text-decoration: underline;
+    .current-arrow-icon {
+        cursor: pointer;
     }
-        /* Mobile Navigation */
-        .mobile-nav-toggle {
-          color: white;
-          font-size: 1.5rem;
-          cursor: pointer;
-          display: none;
-        }
-        
-        /* Responsive */
-        @media (max-width: 768px) {
-          .header .logo h1 {
-            font-size: 1.3rem;
-          }
-          
-          .mobile-nav-toggle {
-            display: block;
-          }
-          
-          .navmenu {
-            position: fixed;
-            top: 70px;
-            right: -100%;
-            width: 80%;
-            height: calc(100vh - 70px);
-            background: white;
-            transition: 0.3s;
-            z-index: 999;
-          }
-          
-          .navmenu ul {
-            flex-direction: column;
-            padding: 1rem;
-          }
-          
-          .navmenu ul li a {
-            color: var(--dark-color) !important;
-            padding: 1rem 0;
-            border-bottom: 1px solid #eee;
-          }
-          
-          .navmenu.active {
-            right: 0;
-          }
-        }
-        :root {
-          --primary-color: #005baa; /* Bleu marine */
-          --secondary-color: #003366; /* Bleu foncé */
-          --accent-color: #00a1e0; /* Bleu clair */
-          --light-color: #f8f9fa;
-          --dark-color: #212529;
-          --success-color: #28a745;
-          --warning-color: #ffc107;
-          --danger-color: #dc3545;
-        }
-        
-        .hero {
-          background: linear-gradient(rgba(0, 91, 170, 0.8), rgba(0, 51, 102, 0.8)), url('img/hero-bg-rescue.jpg');
-          background-size: cover;
-          background-position: center;
-          color: white;
-        }
-        
-        .feature-card {
-          border-left: 4px solid var(--accent-color);
-          transition: transform 0.3s;
-        }
-        
-        .feature-card:hover {
-          transform: translateY(-5px);
-          box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-        }
-        
-        .real-time-map {
-          height: 400px;
-          background: #f0f0f0;
-          border-radius: 8px;
-          overflow: hidden;
-        }
-        
-        .emergency-btn {
-          background-color: var(--danger-color);
-          color: white;
-          font-weight: bold;
-          padding: 12px 24px;
-          border-radius: 30px;
-          transition: all 0.3s;
-        }
-        
-        .emergency-btn:hover {
-          background-color: #c82333;
-          transform: scale(1.05);
-        }
-        
-        .status-badge {
-          position: absolute;
-          top: 10px;
-          right: 10px;
-          padding: 5px 10px;
-          border-radius: 20px;
-          font-size: 0.8rem;
-          font-weight: bold;
-        }
-        
-        .status-active {
-          background-color: var(--success-color);
-          color: white;
-        }
-        
-        .status-warning {
-          background-color: var(--warning-color);
-          color: var(--dark-color);
-        }
-      </style>
-       <style>
-        #ocean-map { height: 600px; }
-        .data-card { transition: all 0.3s; }
-        .data-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
-        .ocean-stats { background: linear-gradient(135deg, #1a2980 0%, #26d0ce 100%); color: white; }
-        .current-arrow { display: inline-block; transition: transform 0.5s; }
-        .legend { padding: 10px; background: white; border-radius: 5px; box-shadow: 0 0 15px rgba(0,0,0,0.2); }
-        .temperature-gradient { background: linear-gradient(to right, #313695, #4575b4, #74add1, #abd9e9, #e0f3f8, #ffffbf, #fee090, #fdae61, #f46d43, #d73027, #a50026); }
-    </style>
-</head>
+    
+    .btn-group .dropdown-toggle::after {
+        margin-left: 0.5rem;
+    }
+</style>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.min.css">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
+{% endblock %}
 
-<body class="dashboard-page">
-
-  <header id="header" class="header d-flex align-items-center fixed-top">
-    <div class="container-fluid container-xl position-relative d-flex align-items-center">
-      <a href="index.html" class="logo d-flex align-items-center me-auto">
-        <img src="{{ url_for('static', filename='img/mrcc-logo.png') }}" alt=""> 
-        <h1>MRCC</h1>
-      </a>
-
-      <nav id="navmenu" class="navmenu">
-        <ul>
-            <li><a href="{{ url_for('index') }}">Accueil</a></li>
-            <li><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
-            <li><a href="http://geoai-solutions.ddns.net:8888/MRCC/">Géoportail</a></li>
-            <li><a href="{{ url_for('marine') }}">Flotte maritime</a></li>
-            <li><a href="{{ url_for('moyens') }}">Moyens de secours</a></li>
-            <li><a href="{{ url_for('alerte') }}">Alertes</a></li>
-            <li><a href="{{ url_for('api') }}">API</a></li>
-        </ul>
-      </nav>
-
-      <div class="user-menu ms-auto">
-        {% if current_user.is_authenticated %}
-          <span class="username">{{ current_user.username }}</span>
-          <a href="{{ url_for('logout') }}" class="btn btn-sm btn-primary-custom">Déconnexion</a>
-        {% else %}
-          <a href="{{ url_for('login') }}" class="btn btn-sm btn-primary-custom">Connexion</a>
-          <a href="{{ url_for('register') }}" class="btn btn-sm btn-secondary-custom">Inscription</a>
-        {% endif %}
-      </div>
-      
-      <div class="notification-wrapper ms-3">
-        <button id="notification-icon" class="notification-icon" aria-label="Notifications">
-          <i class="bi bi-bell"></i>
-          <span id="notification-count" class="notification-badge">3</span>
-        </button>
-        <div id="notification-list" class="notification-dropdown">
-          <div class="notification-header">
-            <h5>Alertes récentes</h5>
-            <button class="mark-all-read">Tout marquer comme lu</button>
-          </div>
-          <div class="notification-content">
-            <div class="notification-item">
-              <div class="notification-title">Alerte détresse</div>
-              <div class="notification-text">Signal de détresse reçu à 12:34 - Position: 33.5°N, 7.6°W</div>
-              <button class="mark-as-read" data-id="1">Marquer comme lu</button>
-            </div>
-            <div class="notification-item">
-              <div class="notification-title">Météo</div>
-              <div class="notification-text">Avertissement de tempête pour la zone Atlantique Nord</div>
-              <button class="mark-as-read" data-id="2">Marquer comme lu</button>
-            </div>
-          </div>
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1><i class="bi bi-water"></i> Dashboard Océanographique</h1>
+            <p class="text-muted">Données en temps réel des courants, marées et paramètres physiques | MAJ: <span id="update-time"></span></p>
         </div>
-      </div>
-    </div>
-
-    <button class="mobile-nav-toggle d-xl-none">
-      <i class="bi bi-list"></i>
-    </button>
-  </header>
-
-  <main class="main">
-    
-    <div class="container-fluid py-4">
-        <!-- Header -->
-        <div class="row mb-4">
-            <div class="col-md-8">
-                <h1><i class="bi bi-water"></i> Dashboard Océanographique</h1>
-                <p class="text-muted">Données en temps réel des courants, marées et paramètres physiques | MAJ: <span id="update-time"></span></p>
-            </div>
-            <div class="col-md-4 text-end">
+        <div class="col-md-4 text-end">
+            <div class="btn-group">
+                <button class="btn btn-outline-primary" id="refresh-btn">
+                    <i class="bi bi-arrow-clockwise"></i> Actualiser
+                </button>
                 <div class="btn-group">
-                    <button class="btn btn-outline-primary" id="refresh-btn">
-                        <i class="bi bi-arrow-clockwise"></i> Actualiser
+                    <button type="button" class="btn btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bi bi-layers"></i> Couches
                     </button>
-                    <div class="btn-group">
-                        <button type="button" class="btn btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                            <i class="bi bi-layers"></i> Couches
-                        </button>
-                        <ul class="dropdown-menu dropdown-menu-end">
-                            <li><h6 class="dropdown-header">Variables océaniques</h6></li>
-                            <li><a class="dropdown-item" href="#" data-layer="temperature">Température</a></li>
-                            <li><a class="dropdown-item" href="#" data-layer="currents">Courants</a></li>
-                            <li><a class="dropdown-item" href="#" data-layer="salinity">Salinité</a></li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li><h6 class="dropdown-header">Marées</h6></li>
-                            <li><a class="dropdown-item" href="#" data-layer="tide">Hauteur des marées</a></li>
-                        </ul>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><h6 class="dropdown-header">Variables océaniques</h6></li>
+                        <li><a class="dropdown-item" href="#" data-layer="temperature">Température</a></li>
+                        <li><a class="dropdown-item" href="#" data-layer="currents">Courants</a></li>
+                        <li><a class="dropdown-item" href="#" data-layer="salinity">Salinité</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><h6 class="dropdown-header">Marées</h6></li>
+                        <li><a class="dropdown-item" href="#" data-layer="tide">Hauteur des marées</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="row mb-4">
+        <!-- Ocean Map -->
+        <div class="col-lg-8 mb-4">
+            <div class="card h-100">
+                <div class="card-header bg-primary text-white">
+                    <i class="bi bi-map"></i> Carte des Données Océanographiques
+                </div>
+                <div class="card-body p-0 position-relative">
+                    <div id="ocean-map"></div>
+                    <div id="map-legend" class="legend position-absolute bottom-0 end-0 mb-4 me-4" style="display: none;">
+                        <h6 id="legend-title">Légende</h6>
+                        <div id="legend-content"></div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Main Content -->
-        <div class="row mb-4">
-            <!-- Ocean Map -->
-            <div class="col-lg-8 mb-4">
-                <div class="card h-100">
-                    <div class="card-header bg-primary text-white">
-                        <i class="bi bi-map"></i> Carte des Données Océanographiques
-                    </div>
-                    <div class="card-body p-0 position-relative">
-                        <div id="ocean-map"></div>
-                        <div id="map-legend" class="legend position-absolute bottom-0 end-0 mb-4 me-4" style="display: none;">
-                            <h6 id="legend-title">Légende</h6>
-                            <div id="legend-content"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Data Stats -->
-            <div class="col-lg-4 mb-4">
-                <div class="card ocean-stats h-100">
-                    <div class="card-body">
-                        <h5 class="card-title text-white"><i class="bi bi-speedometer2"></i> Conditions Actuelles</h5>
-                        <div id="current-conditions">
-                            <div class="row mt-3">
-                                <div class="col-md-6 mb-3">
-                                    <div class="data-card card bg-dark text-white p-3">
-                                        <div class="d-flex align-items-center">
-                                            <i class="bi bi-thermometer-snow fs-1 me-3"></i>
-                                            <div>
-                                                <h5>Température</h5>
-                                                <h2 id="current-temp">--</h2>
-                                                <small>°C à 1m de profondeur</small>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <div class="data-card card bg-dark text-white p-3">
-                                        <div class="d-flex align-items-center">
-                                            <i class="bi bi-droplet fs-1 me-3"></i>
-                                            <div>
-                                                <h5>Salinité</h5>
-                                                <h2 id="current-salinity">--</h2>
-                                                <small>PSU</small>
-                                            </div>
+        <!-- Data Stats -->
+        <div class="col-lg-4 mb-4">
+            <div class="card ocean-stats h-100">
+                <div class="card-body">
+                    <h5 class="card-title text-white"><i class="bi bi-speedometer2"></i> Conditions Actuelles</h5>
+                    <div id="current-conditions">
+                        <div class="row mt-3">
+                            <div class="col-md-6 mb-3">
+                                <div class="data-card card bg-dark text-white p-3">
+                                    <div class="d-flex align-items-center">
+                                        <i class="bi bi-thermometer-snow fs-1 me-3"></i>
+                                        <div>
+                                            <h5>Température</h5>
+                                            <h2 id="current-temp">--</h2>
+                                            <small>°C à 1m de profondeur</small>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <div class="data-card card bg-dark text-white p-3">
-                                        <div class="d-flex align-items-center">
-                                            <i class="bi bi-wind fs-1 me-3"></i>
-                                            <div>
-                                                <h5>Courant</h5>
-                                                <h2 id="current-speed">--</h2>
-                                                <small>cm/s</small>
-                                                <div id="current-direction" class="current-arrow">
-                                                    <i class="bi bi-arrow-up"></i>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <div class="data-card card bg-dark text-white p-3">
-                                        <div class="d-flex align-items-center">
-                                            <i class="bi bi-tides fs-1 me-3"></i>
-                                            <div>
-                                                <h5>Marée</h5>
-                                                <h2 id="current-tide">--</h2>
-                                                <small>mètre</small>
-                                                <small id="tide-status"></small>
-                                            </div>
+                            <div class="col-md-6 mb-3">
+                                <div class="data-card card bg-dark text-white p-3">
+                                    <div class="d-flex align-items-center">
+                                        <i class="bi bi-droplet fs-1 me-3"></i>
+                                        <div>
+                                            <h5>Salinité</h5>
+                                            <h2 id="current-salinity">--</h2>
+                                            <small>PSU</small>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Charts Section -->
-        <div class="row mb-4">
-            <div class="col-md-6 mb-4">
-                <div class="card h-100">
-                    <div class="card-header bg-primary text-white">
-                        <i class="bi bi-thermometer-sun"></i> Température de l'eau
-                    </div>
-                    <div class="card-body">
-                        <canvas id="temperature-chart"></canvas>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-6 mb-4">
-                <div class="card h-100">
-                    <div class="card-header bg-primary text-white">
-                        <i class="bi bi-tides"></i> Prévisions de Marée
-                    </div>
-                    <div class="card-body">
-                        <canvas id="tide-chart"></canvas>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Data Table -->
-        <div class="row">
-            <div class="col">
-                <div class="card">
-                    <div class="card-header bg-primary text-white">
-                        <i class="bi bi-table"></i> Données des Bouées Océanographiques
-                    </div>
-                    <div class="card-body">
-                        <div class="table-responsive">
-                            <table class="table table-hover" id="buoys-table">
-                                <thead>
-                                    <tr>
-                                        <th>Bouée</th>
-                                        <th>Position</th>
-                                        <th>Température</th>
-                                        <th>Salinité</th>
-                                        <th>Courant</th>
-                                        <th>Direction</th>
-                                        <th>Hauteur vague</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <!-- Filled by JavaScript -->
-                                </tbody>
-                            </table>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <div class="data-card card bg-dark text-white p-3">
+                                    <div class="d-flex align-items-center">
+                                        <i class="bi bi-wind fs-1 me-3"></i>
+                                        <div>
+                                            <h5>Courant</h5>
+                                            <h2 id="current-speed">--</h2>
+                                            <small>cm/s</small>
+                                            <div id="current-direction" class="current-arrow">
+                                                <i class="bi bi-arrow-up"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <div class="data-card card bg-dark text-white p-3">
+                                    <div class="d-flex align-items-center">
+                                        <i class="bi bi-tides fs-1 me-3"></i>
+                                        <div>
+                                            <h5>Marée</h5>
+                                            <h2 id="current-tide">--</h2>
+                                            <small>mètre</small>
+                                            <small id="tide-status"></small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    <footer id="footer" class="footer">
-        <div class="container footer-top">
-          <div class="row gy-4">
-            <div class="col-lg-4 col-md-6 footer-about">
-              <a href="index.html" class="logo d-flex align-items-center">
-                <img src="{{ url_for('static', filename='img/mrcc-logo.png') }}" alt=""> 
-                <span class="ms-2">MRCC Maroc</span>
-              </a>
-              <p>Centre de Coordination des Sauvetages Maritimes du Royaume du Maroc. Service public de recherche et sauvetage en mer.</p>
-              <div class="social-links d-flex mt-4">
-                <a href="#"><i class="bi bi-twitter"></i></a>
-                <a href="#"><i class="bi bi-facebook"></i></a>
-                <a href="#"><i class="bi bi-linkedin"></i></a>
-              </div>
+
+    <!-- Charts Section -->
+    <div class="row mb-4">
+        <div class="col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header bg-primary text-white">
+                    <i class="bi bi-thermometer-sun"></i> Température de l'eau
+                </div>
+                <div class="card-body">
+                    <canvas id="temperature-chart"></canvas>
+                </div>
             </div>
-    
-            <div class="col-lg-2 col-md-3 footer-links">
-              <h4>Liens utiles</h4>
-              <ul>
-                <li><a href="#">Marine Royale</a></li>
-                <li><a href="#">Direction de la Météorologie</a></li>
-                <li><a href="#">Ports Nationaux</a></li>
-                <li><a href="#">Gendarmerie Royale</a></li>
-                <li><a href="#">Protection Civile</a></li>
-              </ul>
-            </div>
-    
-            <div class="col-lg-2 col-md-3 footer-links">
-              <h4>Nos services</h4>
-              <ul>
-                <li><a href="#">Coordination SAR</a></li>
-                <li><a href="#">Surveillance maritime</a></li>
-                <li><a href="#">Prévention des pollutions</a></li>
-                <li><a href="#">Formation maritime</a></li>
-                <li><a href="#">Coopération internationale</a></li>
-              </ul>
-            </div>
-    
-            <div class="col-lg-4 col-md-12 footer-newsletter">
-              <h4>Bulletin d'information</h4>
-              <p>Abonnez-vous à notre newsletter pour recevoir les dernières actualités et alertes.</p>
-              <form action="#" method="post">
-                <input type="email" name="email" placeholder="Votre email">
-                <input type="submit" value="S'abonner">
-              </form>
-            </div>
-          </div>
         </div>
-    
-        <div class="container copyright text-center mt-4">
-          <p>&copy; <span id="year"></span> <strong>MRCC Maroc</strong>. Tous droits réservés.</p>
-          <div class="credits">
-            Développé par <a href="#">Centre Royal de Télédétection Spatiale</a>
-          </div>
+        <div class="col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header bg-primary text-white">
+                    <i class="bi bi-tides"></i> Prévisions de Marée
+                </div>
+                <div class="card-body">
+                    <canvas id="tide-chart"></canvas>
+                </div>
+            </div>
         </div>
-      </footer>
-    <!-- JavaScript Libraries -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
-    <script src="https://unpkg.com/leaflet.vectorgrid@latest/dist/Leaflet.VectorGrid.bundled.min.js"></script>
+    </div>
 
-    <script>
-        // Global variables
-        let oceanMap;
-        let temperatureChart;
-        let tideChart;
-        let currentLayer = null;
-        let activeLayer = null;
-        let currentPosition = [33.5, -7.5]; // Default position (Casablanca offshore)
+    <!-- Data Table -->
+    <div class="row">
+        <div class="col">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <i class="bi bi-table"></i> Données des Bouées Océanographiques
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover" id="buoys-table">
+                            <thead>
+                                <tr>
+                                    <th>Bouée</th>
+                                    <th>Position</th>
+                                    <th>Température</th>
+                                    <th>Salinité</th>
+                                    <th>Courant</th>
+                                    <th>Direction</th>
+                                    <th>Hauteur vague</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Filled by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
 
-        // Simulated ocean data
-        const oceanData = {
-            last_updated: new Date().toLocaleString(),
-            buoys: [
-                {
-                    id: "bouy-1",
-                    name: "Bouée Atlantique A1",
-                    lat: 33.6,
-                    lon: -7.8,
-                    temperature: 18.5,
-                    salinity: 36.2,
-                    current_speed: 25,
-                    current_direction: 45,
-                    wave_height: 1.2
-                },
-                {
-                    id: "bouy-2",
-                    name: "Bouée Méditerranée M1",
-                    lat: 35.2,
-                    lon: -5.1,
-                    temperature: 21.3,
-                    salinity: 38.1,
-                    current_speed: 15,
-                    current_direction: 120,
-                    wave_height: 0.8
-                },
-                {
-                    id: "bouy-3",
-                    name: "Bouée Atlantique A2",
-                    lat: 34.1,
-                    lon: -8.5,
-                    temperature: 17.8,
-                    salinity: 35.9,
-                    current_speed: 32,
-                    current_direction: 210,
-                    wave_height: 2.1
-                }
-            ],
-            temperatureGrid: generateTemperatureGrid(33, 36, -10, -5, 0.5),
-            currentGrid: generateCurrentGrid(33, 36, -10, -5, 0.5),
-            salinityGrid: generateSalinityGrid(33, 36, -10, -5, 0.5),
-            tideData: generateTideData()
-        };
+{% block extra_js %}
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
+<script src="https://unpkg.com/leaflet.vectorgrid@latest/dist/Leaflet.VectorGrid.bundled.min.js"></script>
 
-        // Generate simulated temperature grid data
-        function generateTemperatureGrid(minLat, maxLat, minLon, maxLon, step) {
-            const grid = [];
-            for (let lat = minLat; lat <= maxLat; lat += step) {
-                for (let lon = minLon; lon <= maxLon; lon += step) {
-                    // Base temperature with latitudinal gradient
-                    let temp = 25 - (lat - minLat) * 2;
-                    // Add some randomness and coastal effects
-                    temp += Math.random() * 2;
-                    if (lon > -7.5) temp += 1; // Warmer near coast
-                    grid.push({ lat, lon, temperature: temp.toFixed(1) });
-                }
+<script>
+    // Global variables
+    let oceanMap;
+    let temperatureChart;
+    let tideChart;
+    let currentLayer = null;
+    let activeLayer = null;
+    let currentPosition = [33.5, -7.5]; // Default position (Casablanca offshore)
+
+    // Simulated ocean data
+    const oceanData = {
+        last_updated: new Date().toLocaleString(),
+        buoys: [
+            {
+                id: "bouy-1",
+                name: "Bouée Atlantique A1",
+                lat: 33.6,
+                lon: -7.8,
+                temperature: 18.5,
+                salinity: 36.2,
+                current_speed: 25,
+                current_direction: 45,
+                wave_height: 1.2
+            },
+            {
+                id: "bouy-2",
+                name: "Bouée Méditerranée M1",
+                lat: 35.2,
+                lon: -5.1,
+                temperature: 21.3,
+                salinity: 38.1,
+                current_speed: 15,
+                current_direction: 120,
+                wave_height: 0.8
+            },
+            {
+                id: "bouy-3",
+                name: "Bouée Atlantique A2",
+                lat: 34.1,
+                lon: -8.5,
+                temperature: 17.8,
+                salinity: 35.9,
+                current_speed: 32,
+                current_direction: 210,
+                wave_height: 2.1
             }
-            return grid;
-        }
+        ],
+        temperatureGrid: generateTemperatureGrid(33, 36, -10, -5, 0.5),
+        currentGrid: generateCurrentGrid(33, 36, -10, -5, 0.5),
+        salinityGrid: generateSalinityGrid(33, 36, -10, -5, 0.5),
+        tideData: generateTideData()
+    };
 
-        // Generate simulated current grid data
-        function generateCurrentGrid(minLat, maxLat, minLon, maxLon, step) {
-            const grid = [];
-            for (let lat = minLat; lat <= maxLat; lat += step) {
-                for (let lon = minLon; lon <= maxLon; lon += step) {
-                    // Simulate general current direction (NE to SW)
-                    let speed = 10 + Math.random() * 30;
-                    let direction = 45 + (lon - minLon) * 5;
-                    grid.push({ lat, lon, speed: speed.toFixed(1), direction: direction.toFixed(1) });
-                }
+    // Generate simulated temperature grid data
+    function generateTemperatureGrid(minLat, maxLat, minLon, maxLon, step) {
+        const grid = [];
+        for (let lat = minLat; lat <= maxLat; lat += step) {
+            for (let lon = minLon; lon <= maxLon; lon += step) {
+                let temp = 25 - (lat - minLat) * 2;
+                temp += Math.random() * 2;
+                if (lon > -7.5) temp += 1;
+                grid.push({ lat, lon, temperature: temp.toFixed(1) });
             }
-            return grid;
         }
+        return grid;
+    }
 
-        // Generate simulated salinity grid data
-        function generateSalinityGrid(minLat, maxLat, minLon, maxLon, step) {
-            const grid = [];
-            for (let lat = minLat; lat <= maxLat; lat += step) {
-                for (let lon = minLon; lon <= maxLon; lon += step) {
-                    // Higher salinity in Mediterranean, lower near coasts
-                    let salinity = 36.0;
-                    if (lon > -5.5) salinity = 38.0; // Mediterranean
-                    salinity += (Math.random() - 0.5) * 0.5;
-                    if (Math.abs(lon + 7.5) < 1) salinity -= 1; // Near Casablanca
-                    grid.push({ lat, lon, salinity: salinity.toFixed(1) });
-                }
+    // Generate simulated current grid data
+    function generateCurrentGrid(minLat, maxLat, minLon, maxLon, step) {
+        const grid = [];
+        for (let lat = minLat; lat <= maxLat; lat += step) {
+            for (let lon = minLon; lon <= maxLon; lon += step) {
+                let speed = 10 + Math.random() * 30;
+                let direction = 45 + (lon - minLon) * 5;
+                grid.push({ lat, lon, speed: speed.toFixed(1), direction: direction.toFixed(1) });
             }
-            return grid;
         }
+        return grid;
+    }
 
-        // Generate simulated tide data
-        function generateTideData() {
-            const tide = [];
-            const now = new Date();
-            for (let i = 0; i < 48; i++) {
-                const time = new Date(now.getTime() + i * 3600000);
-                // Simulate semi-diurnal tide
-                const tideHeight = 1.5 + Math.sin(i * Math.PI / 6) * 1.2 + Math.random() * 0.2;
-                tide.push({
-                    time: time.toISOString(),
-                    height: tideHeight.toFixed(2)
-                });
+    // Generate simulated salinity grid data
+    function generateSalinityGrid(minLat, maxLat, minLon, maxLon, step) {
+        const grid = [];
+        for (let lat = minLat; lat <= maxLat; lat += step) {
+            for (let lon = minLon; lon <= maxLon; lon += step) {
+                let salinity = 36.0;
+                if (lon > -5.5) salinity = 38.0;
+                salinity += (Math.random() - 0.5) * 0.5;
+                if (Math.abs(lon + 7.5) < 1) salinity -= 1;
+                grid.push({ lat, lon, salinity: salinity.toFixed(1) });
             }
-            return tide;
         }
+        return grid;
+    }
 
-        // Initialize the dashboard
-        document.addEventListener('DOMContentLoaded', function() {
-            initMap();
-            updateDashboard(oceanData);
-            
-            // Refresh button
-            document.getElementById('refresh-btn').addEventListener('click', function() {
-                updateDashboard(oceanData);
-                document.getElementById('update-time').textContent = new Date().toLocaleString();
+    // Generate simulated tide data
+    function generateTideData() {
+        const tide = [];
+        const now = new Date();
+        for (let i = 0; i < 48; i++) {
+            const time = new Date(now.getTime() + i * 3600000);
+            const tideHeight = 1.5 + Math.sin(i * Math.PI / 6) * 1.2 + Math.random() * 0.2;
+            tide.push({
+                time: time.toISOString(),
+                height: tideHeight.toFixed(2)
             });
-            
-            // Layer controls
-            document.querySelectorAll('[data-layer]').forEach(item => {
-                item.addEventListener('click', event => {
-                    event.preventDefault();
-                    const layer = event.target.getAttribute('data-layer');
-                    updateMapLayer(layer);
-                });
+        }
+        return tide;
+    }
+
+    // Initialize the dashboard
+    document.addEventListener('DOMContentLoaded', function() {
+        initMap();
+        updateDashboard(oceanData);
+        
+        document.getElementById('refresh-btn').addEventListener('click', function() {
+            updateDashboard(oceanData);
+            document.getElementById('update-time').textContent = new Date().toLocaleString();
+        });
+        
+        document.querySelectorAll('[data-layer]').forEach(item => {
+            item.addEventListener('click', event => {
+                event.preventDefault();
+                const layer = event.target.getAttribute('data-layer');
+                updateMapLayer(layer);
             });
         });
+    });
 
-        // Initialize Leaflet map
-        function initMap() {
-            oceanMap = L.map('ocean-map').setView(currentPosition, 7);
-            
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-            }).addTo(oceanMap);
-            
-            // Add scale
-            L.control.scale({imperial: false}).addTo(oceanMap);
-            
-            // Add click handler to update current position
-            oceanMap.on('click', function(e) {
-                currentPosition = [e.latlng.lat, e.latlng.lng];
-                updateCurrentConditions();
-            });
-        }
-
-        // Update all dashboard components
-        function updateDashboard(data) {
-            // Update time
-            document.getElementById('update-time').textContent = data.last_updated;
-            
-            // Update map with buoys and data
-            updateMap(data);
-            
-            // Update current conditions
+    // Initialize Leaflet map
+    function initMap() {
+        oceanMap = L.map('ocean-map').setView(currentPosition, 7);
+        
+        L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', {
+            attribution: 'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ, TomTom, Intermap, iPC, USGS, FAO, NPS, NRCAN, GeoBase, Kadaster NL, Ordnance Survey, Esri Japan, METI, Esri China (Hong Kong), Esri Korea, Esri (Thailand), GEBCO, NGS'
+        }).addTo(oceanMap);
+        
+        L.control.scale({imperial: false}).addTo(oceanMap);
+        
+        oceanMap.on('click', function(e) {
+            currentPosition = [e.latlng.lat, e.latlng.lng];
             updateCurrentConditions();
-            
-            // Update charts
-            updateCharts(data);
-            
-            // Update buoys table
-            updateBuoysTable(data.buoys);
-        }
+        });
+    }
 
-        // Update map with buoys and data layers
-        function updateMap(data) {
-            // Clear existing buoys
-            oceanMap.eachLayer(layer => {
-                if (layer instanceof L.Marker) {
-                    oceanMap.removeLayer(layer);
-                }
-            });
-            
-            // Add buoys
-            data.buoys.forEach(buoy => {
-                const icon = L.divIcon({
-                    className: 'buoy-icon',
-                    html: `<div style="background: #007bff; width: 24px; height: 24px; border-radius: 50%; 
-                           display: flex; align-items: center; justify-content: center; color: white;
-                           border: 2px solid white; font-weight: bold;">
-                            <i class="bi bi-bullseye"></i>
-                          </div>`,
-                    iconSize: [24, 24],
-                    iconAnchor: [12, 12]
-                });
-                
-                const marker = L.marker([buoy.lat, buoy.lon], { icon: icon })
-                    .addTo(oceanMap)
-                    .bindPopup(`
-                        <b>${buoy.name}</b><br>
-                        Temp: ${buoy.temperature}°C<br>
-                        Salinité: ${buoy.salinity} PSU<br>
-                        Courant: ${buoy.current_speed} cm/s<br>
-                        <button class="btn btn-sm btn-primary mt-2" onclick="focusOnBuoy('${buoy.id}')">Détails</button>
-                    `);
-                
-                marker.buoyId = buoy.id;
-            });
-            
-            // Show temperature layer by default
-            updateMapLayer('temperature');
-        }
+    // Update all dashboard components
+    function updateDashboard(data) {
+        document.getElementById('update-time').textContent = data.last_updated;
+        updateMap(data);
+        updateCurrentConditions();
+        updateCharts(data);
+        updateBuoysTable(data.buoys);
+    }
 
-        // Update the active map layer
-        function updateMapLayer(layerType) {
-            // Remove previous layer if exists
-            if (activeLayer) {
-                oceanMap.removeLayer(activeLayer);
-                document.getElementById('map-legend').style.display = 'none';
+    // Update map with buoys and data layers
+    function updateMap(data) {
+        oceanMap.eachLayer(layer => {
+            if (layer instanceof L.Marker && layer.buoyId) {
+                oceanMap.removeLayer(layer);
             }
+        });
+        
+        data.buoys.forEach(buoy => {
+            const icon = L.divIcon({
+                className: 'buoy-icon',
+                html: `<div style="background: #007bff; width: 24px; height: 24px; border-radius: 50%; 
+                       display: flex; align-items: center; justify-content: center; color: white;
+                       border: 2px solid white; font-weight: bold;">
+                        <i class="bi bi-bullseye"></i>
+                      </div>`,
+                iconSize: [24, 24],
+                iconAnchor: [12, 12]
+            });
             
-            // Create new layer based on type
-            switch(layerType) {
-                case 'temperature':
-                    activeLayer = createTemperatureLayer();
-                    updateLegend('Température (°C)', [
-                        { color: '#313695', value: '10' },
-                        { color: '#74add1', value: '15' },
-                        { color: '#ffffbf', value: '20' },
-                        { color: '#fdae61', value: '25' },
-                        { color: '#a50026', value: '30' }
-                    ]);
-                    break;
-                    
-                case 'currents':
-                    activeLayer = createCurrentsLayer();
-                    updateLegend('Courants (cm/s)', [
-                        { color: '#f7fbff', value: '0-10' },
-                        { color: '#c6dbef', value: '10-20' },
-                        { color: '#6baed6', value: '20-30' },
-                        { color: '#2171b5', value: '30-40' },
-                        { color: '#08306b', value: '40+' }
-                    ]);
-                    break;
-                    
-                case 'salinity':
-                    activeLayer = createSalinityLayer();
-                    updateLegend('Salinité (PSU)', [
-                        { color: '#ffffcc', value: '<35' },
-                        { color: '#a1dab4', value: '35-36' },
-                        { color: '#41b6c4', value: '36-37' },
-                        { color: '#2c7fb8', value: '37-38' },
-                        { color: '#253494', value: '>38' }
-                    ]);
-                    break;
-                    
-                case 'tide':
-                    activeLayer = createTideLayer();
-                    updateLegend('Marée (m)', [
-                        { color: '#f7fcf5', value: '<1' },
-                        { color: '#bae4b3', value: '1-2' },
-                        { color: '#74c476', value: '2-3' },
-                        { color: '#238b45', value: '3-4' },
-                        { color: '#005a32', value: '>4' }
-                    ]);
-                    break;
-            }
+            const marker = L.marker([buoy.lat, buoy.lon], { icon: icon })
+                .addTo(oceanMap)
+                .bindPopup(`
+                    <b>${buoy.name}</b><br>
+                    Temp: ${buoy.temperature}°C<br>
+                    Salinité: ${buoy.salinity} PSU<br>
+                    Courant: ${buoy.current_speed} cm/s<br>
+                    <button class="btn btn-sm btn-primary mt-2" onclick="focusOnBuoy('${buoy.id}')">Détails</button>
+                `);
             
-            // Add new layer to map
-            if (activeLayer) {
-                activeLayer.addTo(oceanMap);
-                document.getElementById('map-legend').style.display = 'block';
-            }
-        }
+            marker.buoyId = buoy.id;
+        });
+        
+        updateMapLayer('temperature');
+    }
 
-        // Create temperature grid layer
-        function createTemperatureLayer() {
-            const points = oceanData.temperatureGrid.map(point => {
-                return {
-                    type: 'Feature',
-                    geometry: {
-                        type: 'Point',
-                        coordinates: [point.lon, point.lat]
-                    },
-                    properties: {
-                        temperature: point.temperature
-                    }
-                };
-            });
-            
-            return L.vectorGrid.slicer({
-                type: 'FeatureCollection',
-                features: points
-            }, {
-                rendererFactory: L.canvas.tile,
-                interactive: true,
-                getFeatureId: f => f.properties.temperature,
-                vectorTileLayerStyles: {
-                    sliced: properties => {
-                        const temp = parseFloat(properties.temperature);
-                        return {
-                            fillColor: getTemperatureColor(temp),
-                            fillOpacity: 0.8,
-                            radius: 3,
-                            fill: true,
-                            stroke: false
-                        };
-                    }
-                },
-                onEachFeature: (f, l) => {
-                    l.bindPopup(`Temp: ${f.properties.temperature}°C`);
-                }
-            });
+    // Update the active map layer
+    function updateMapLayer(layerType) {
+        if (activeLayer) {
+            oceanMap.removeLayer(activeLayer);
+            document.getElementById('map-legend').style.display = 'none';
         }
+        
+        switch(layerType) {
+            case 'temperature':
+                activeLayer = createTemperatureLayer();
+                updateLegend('Température (°C)', [
+                    { color: '#313695', value: '10' },
+                    { color: '#74add1', value: '15' },
+                    { color: '#ffffbf', value: '20' },
+                    { color: '#fdae61', value: '25' },
+                    { color: '#a50026', value: '30' }
+                ]);
+                break;
+            case 'currents':
+                activeLayer = createCurrentsLayer();
+                updateLegend('Courants (cm/s)', [
+                    { color: '#f7fbff', value: '0-10' },
+                    { color: '#c6dbef', value: '10-20' },
+                    { color: '#6baed6', value: '20-30' },
+                    { color: '#2171b5', value: '30-40' },
+                    { color: '#08306b', value: '40+' }
+                ]);
+                break;
+            case 'salinity':
+                activeLayer = createSalinityLayer();
+                updateLegend('Salinité (PSU)', [
+                    { color: '#ffffcc', value: '<35' },
+                    { color: '#a1dab4', value: '35-36' },
+                    { color: '#41b6c4', value: '36-37' },
+                    { color: '#2c7fb8', value: '37-38' },
+                    { color: '#253494', value: '>38' }
+                ]);
+                break;
+            case 'tide':
+                activeLayer = createTideLayer();
+                updateLegend('Marée (m)', [
+                    { color: '#f7fcf5', value: '<1' },
+                    { color: '#bae4b3', value: '1-2' },
+                    { color: '#74c476', value: '2-3' },
+                    { color: '#238b45', value: '3-4' },
+                    { color: '#005a32', value: '>4' }
+                ]);
+                break;
+        }
+        
+        if (activeLayer) {
+            activeLayer.addTo(oceanMap);
+            document.getElementById('map-legend').style.display = 'block';
+        }
+    }
 
-        // Create currents grid layer
-        function createCurrentsLayer() {
-            const arrows = oceanData.currentGrid.map(point => {
-                return {
-                    type: 'Feature',
-                    geometry: {
-                        type: 'Point',
-                        coordinates: [point.lon, point.lat]
-                    },
-                    properties: {
-                        speed: point.speed,
-                        direction: point.direction
-                    }
-                };
-            });
+    // Create temperature grid layer
+    function createTemperatureLayer() {
+        const points = oceanData.temperatureGrid.map(point => ({
+            type: 'Feature',
+            geometry: { type: 'Point', coordinates: [point.lon, point.lat] },
+            properties: { temperature: point.temperature }
+        }));
+        
+        return L.vectorGrid.slicer({
+            type: 'FeatureCollection',
+            features: points
+        }, {
+            rendererFactory: L.canvas.tile,
+            interactive: true,
+            vectorTileLayerStyles: {
+                sliced: properties => ({
+                    fillColor: getTemperatureColor(parseFloat(properties.temperature)),
+                    fillOpacity: 0.8,
+                    radius: 3,
+                    fill: true,
+                    stroke: false
+                })
+            },
+            onEachFeature: (f, l) => l.bindPopup(`Temp: ${f.properties.temperature}°C`)
+        });
+    }
+
+    // Create currents grid layer
+    function createCurrentsLayer() {
+        const arrows = oceanData.currentGrid.map(point => ({
+            type: 'Feature',
+            geometry: { type: 'Point', coordinates: [point.lon, point.lat] },
+            properties: { speed: point.speed, direction: point.direction }
+        }));
+        
+        return L.layerGroup(arrows.map(arrow => {
+            const speed = parseFloat(arrow.properties.speed);
+            const dir = parseFloat(arrow.properties.direction);
             
-            return L.layerGroup(arrows.map(arrow => {
-                const speed = parseFloat(arrow.properties.speed);
-                const dir = parseFloat(arrow.properties.direction);
-                
-                const icon = L.divIcon({
-                    className: 'current-arrow-icon',
-                    html: `
-                        <div style="transform: rotate(${dir}deg); color: ${getCurrentColor(speed)};">
+            const icon = L.divIcon({
+                className: 'current-arrow-icon',
+                html: `<div style="transform: rotate(${dir}deg); color: ${getCurrentColor(speed)};">
                             <i class="bi bi-arrow-up" style="font-size: ${Math.min(20, speed/2)}px;"></i>
-                        </div>
-                    `,
-                    iconSize: [20, 20],
-                    iconAnchor: [10, 10]
-                });
-                
-                return L.marker([arrow.geometry.coordinates[1], arrow.geometry.coordinates[0]], {
-                    icon: icon
-                }).bindPopup(`Courant: ${speed} cm/s à ${dir}°`);
-            }));
-        }
-
-        // Create salinity grid layer
-        function createSalinityLayer() {
-            const points = oceanData.salinityGrid.map(point => {
-                return {
-                    type: 'Feature',
-                    geometry: {
-                        type: 'Point',
-                        coordinates: [point.lon, point.lat]
-                    },
-                    properties: {
-                        salinity: point.salinity
-                    }
-                };
+                        </div>`,
+                iconSize: [20, 20],
+                iconAnchor: [10, 10]
             });
             
-            return L.vectorGrid.slicer({
-                type: 'FeatureCollection',
-                features: points
-            }, {
-                rendererFactory: L.canvas.tile,
-                interactive: true,
-                getFeatureId: f => f.properties.salinity,
-                vectorTileLayerStyles: {
-                    sliced: properties => {
-                        const salinity = parseFloat(properties.salinity);
-                        return {
-                            fillColor: getSalinityColor(salinity),
-                            fillOpacity: 0.8,
-                            radius: 3,
-                            fill: true,
-                            stroke: false
-                        };
-                    }
+            return L.marker([arrow.geometry.coordinates[1], arrow.geometry.coordinates[0]], {
+                icon: icon
+            }).bindPopup(`Courant: ${speed} cm/s à ${dir}°`);
+        }));
+    }
+
+    // Create salinity grid layer
+    function createSalinityLayer() {
+        const points = oceanData.salinityGrid.map(point => ({
+            type: 'Feature',
+            geometry: { type: 'Point', coordinates: [point.lon, point.lat] },
+            properties: { salinity: point.salinity }
+        }));
+        
+        return L.vectorGrid.slicer({
+            type: 'FeatureCollection',
+            features: points
+        }, {
+            rendererFactory: L.canvas.tile,
+            interactive: true,
+            vectorTileLayerStyles: {
+                sliced: properties => ({
+                    fillColor: getSalinityColor(parseFloat(properties.salinity)),
+                    fillOpacity: 0.8,
+                    radius: 3,
+                    fill: true,
+                    stroke: false
+                })
+            },
+            onEachFeature: (f, l) => l.bindPopup(`Salinité: ${f.properties.salinity} PSU`)
+        });
+    }
+
+    // Create tide layer
+    function createTideLayer() {
+        return L.rectangle([
+            [33.0, -8.0],
+            [36.0, -5.0]
+        ], {
+            color: '#238b45',
+            fillColor: '#74c476',
+            fillOpacity: 0.5,
+            weight: 1
+        }).bindPopup("Zone côtière - données de marée");
+    }
+
+    // Update legend
+    function updateLegend(title, items) {
+        document.getElementById('legend-title').textContent = title;
+        const legendContent = document.getElementById('legend-content');
+        legendContent.innerHTML = '';
+        
+        items.forEach(item => {
+            const itemDiv = document.createElement('div');
+            itemDiv.className = 'd-flex align-items-center mb-1';
+            itemDiv.innerHTML = `
+                <div style="width: 20px; height: 20px; background: ${item.color}; margin-right: 5px;"></div>
+                <span>${item.value}</span>
+            `;
+            legendContent.appendChild(itemDiv);
+        });
+    }
+
+    function getTemperatureColor(temp) {
+        const colors = ['#313695', '#4575b4', '#74add1', '#abd9e9', '#e0f3f8', '#ffffbf', '#fee090', '#fdae61', '#f46d43', '#d73027', '#a50026'];
+        const index = Math.min(Math.floor((temp - 10) / 2), colors.length - 1);
+        return colors[Math.max(0, index)];
+    }
+
+    function getCurrentColor(speed) {
+        if (speed < 10) return '#f7fbff';
+        if (speed < 20) return '#c6dbef';
+        if (speed < 30) return '#6baed6';
+        if (speed < 40) return '#2171b5';
+        return '#08306b';
+    }
+
+    function getSalinityColor(salinity) {
+        if (salinity < 35) return '#ffffcc';
+        if (salinity < 36) return '#a1dab4';
+        if (salinity < 37) return '#41b6c4';
+        if (salinity < 38) return '#2c7fb8';
+        return '#253494';
+    }
+
+    // Update current conditions panel
+    function updateCurrentConditions() {
+        const nearestBuoy = findNearestBuoy(currentPosition[0], currentPosition[1]);
+        
+        if (nearestBuoy) {
+            document.getElementById('current-temp').textContent = nearestBuoy.temperature;
+            document.getElementById('current-salinity').textContent = nearestBuoy.salinity;
+            document.getElementById('current-speed').textContent = nearestBuoy.current_speed;
+            document.getElementById('current-direction').style.transform = `rotate(${nearestBuoy.current_direction}deg)`;
+            
+            const now = new Date();
+            const currentTide = oceanData.tideData.find(t => {
+                const tideTime = new Date(t.time);
+                return Math.abs(tideTime - now) < 1800000;
+            });
+            
+            if (currentTide) {
+                document.getElementById('current-tide').textContent = currentTide.height;
+                const tideHeight = parseFloat(currentTide.height);
+                const tideStatus = document.getElementById('tide-status');
+                
+                if (tideHeight > 2.5) {
+                    tideStatus.textContent = "Marée haute";
+                    tideStatus.className = "text-warning";
+                } else if (tideHeight < 0.5) {
+                    tideStatus.textContent = "Marée basse";
+                    tideStatus.className = "text-info";
+                } else {
+                    tideStatus.textContent = "Marée montante/descendante";
+                    tideStatus.className = "text-success";
+                }
+            }
+        }
+    }
+
+    function findNearestBuoy(lat, lon) {
+        let nearest = null;
+        let minDist = Infinity;
+        
+        oceanData.buoys.forEach(buoy => {
+            const dist = Math.sqrt(Math.pow(buoy.lat - lat, 2) + Math.pow(buoy.lon - lon, 2));
+            if (dist < minDist) {
+                minDist = dist;
+                nearest = buoy;
+            }
+        });
+        
+        return nearest;
+    }
+
+    // Update charts
+    function updateCharts(data) {
+        updateTemperatureChart(data);
+        updateTideChart(data.tideData);
+    }
+
+    function updateTemperatureChart(data) {
+        const ctx = document.getElementById('temperature-chart').getContext('2d');
+        const labels = data.buoys.map(b => b.name);
+        const tempData = data.buoys.map(b => b.temperature);
+        const salinityData = data.buoys.map(b => b.salinity);
+        
+        if (temperatureChart) {
+            temperatureChart.data.labels = labels;
+            temperatureChart.data.datasets[0].data = tempData;
+            temperatureChart.data.datasets[1].data = salinityData;
+            temperatureChart.update();
+        } else {
+            temperatureChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Température (°C)',
+                            data: tempData,
+                            backgroundColor: 'rgba(255, 99, 132, 0.7)',
+                            borderColor: 'rgba(255, 99, 132, 1)',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Salinité (PSU)',
+                            data: salinityData,
+                            backgroundColor: 'rgba(54, 162, 235, 0.7)',
+                            borderColor: 'rgba(54, 162, 235, 1)',
+                            borderWidth: 1,
+                            type: 'line',
+                            yAxisID: 'y1'
+                        }
+                    ]
                 },
-                onEachFeature: (f, l) => {
-                    l.bindPopup(`Salinité: ${f.properties.salinity} PSU`);
-                }
-            });
-        }
-
-        // Create tide layer (simplified)
-        function createTideLayer() {
-            // For demo, we'll just show coastal areas
-            return L.rectangle([
-                [33.0, -8.0],
-                [36.0, -5.0]
-            ], {
-                color: '#238b45',
-                fillColor: '#74c476',
-                fillOpacity: 0.5,
-                weight: 1
-            }).bindPopup("Zone côtière - données de marée");
-        }
-
-        // Update legend
-        function updateLegend(title, items) {
-            document.getElementById('legend-title').textContent = title;
-            const legendContent = document.getElementById('legend-content');
-            legendContent.innerHTML = '';
-            
-            items.forEach(item => {
-                const itemDiv = document.createElement('div');
-                itemDiv.className = 'd-flex align-items-center mb-1';
-                itemDiv.innerHTML = `
-                    <div style="width: 20px; height: 20px; background: ${item.color}; margin-right: 5px;"></div>
-                    <span>${item.value}</span>
-                `;
-                legendContent.appendChild(itemDiv);
-            });
-        }
-
-        // Get color for temperature value
-        function getTemperatureColor(temp) {
-            const colors = [
-                '#313695', '#4575b4', '#74add1', '#abd9e9', '#e0f3f8', 
-                '#ffffbf', '#fee090', '#fdae61', '#f46d43', '#d73027', '#a50026'
-            ];
-            
-            const index = Math.min(Math.floor((temp - 10) / 2), colors.length - 1);
-            return colors[Math.max(0, index)];
-        }
-
-        // Get color for current speed
-        function getCurrentColor(speed) {
-            if (speed < 10) return '#f7fbff';
-            if (speed < 20) return '#c6dbef';
-            if (speed < 30) return '#6baed6';
-            if (speed < 40) return '#2171b5';
-            return '#08306b';
-        }
-
-        // Get color for salinity value
-        function getSalinityColor(salinity) {
-            if (salinity < 35) return '#ffffcc';
-            if (salinity < 36) return '#a1dab4';
-            if (salinity < 37) return '#41b6c4';
-            if (salinity < 38) return '#2c7fb8';
-            return '#253494';
-        }
-
-        // Update current conditions panel
-        function updateCurrentConditions() {
-            // Find nearest buoy data (simplified)
-            const nearestBuoy = findNearestBuoy(currentPosition[0], currentPosition[1]);
-            
-            if (nearestBuoy) {
-                document.getElementById('current-temp').textContent = nearestBuoy.temperature;
-                document.getElementById('current-salinity').textContent = nearestBuoy.salinity;
-                document.getElementById('current-speed').textContent = nearestBuoy.current_speed;
-                document.getElementById('current-direction').style.transform = `rotate(${nearestBuoy.current_direction}deg)`;
-                
-                // Get tide data for current time
-                const now = new Date();
-                const currentTide = oceanData.tideData.find(t => {
-                    const tideTime = new Date(t.time);
-                    return Math.abs(tideTime - now) < 1800000; // Within 30 minutes
-                });
-                
-                if (currentTide) {
-                    document.getElementById('current-tide').textContent = currentTide.height;
-                    const tideHeight = parseFloat(currentTide.height);
-                    const tideStatus = document.getElementById('tide-status');
-                    
-                    if (tideHeight > 2.5) {
-                        tideStatus.textContent = "Marée haute";
-                        tideStatus.className = "text-warning";
-                    } else if (tideHeight < 0.5) {
-                        tideStatus.textContent = "Marée basse";
-                        tideStatus.className = "text-info";
-                    } else {
-                        tideStatus.textContent = "Marée montante/descendante";
-                        tideStatus.className = "text-success";
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: { beginAtZero: false, title: { display: true, text: 'Température (°C)' } },
+                        y1: { position: 'right', beginAtZero: false, title: { display: true, text: 'Salinité (PSU)' }, grid: { drawOnChartArea: false } }
                     }
                 }
-            }
+            });
         }
+    }
 
-        // Find nearest buoy to given coordinates
-        function findNearestBuoy(lat, lon) {
-            let nearest = null;
-            let minDist = Infinity;
-            
-            oceanData.buoys.forEach(buoy => {
-                const dist = Math.sqrt(Math.pow(buoy.lat - lat, 2) + Math.pow(buoy.lon - lon, 2));
-                if (dist < minDist) {
-                    minDist = dist;
-                    nearest = buoy;
+    function updateTideChart(tideData) {
+        const ctx = document.getElementById('tide-chart').getContext('2d');
+        const labels = tideData.map(t => new Date(t.time));
+        const heights = tideData.map(t => parseFloat(t.height));
+        
+        if (tideChart) {
+            tideChart.data.labels = labels;
+            tideChart.data.datasets[0].data = heights;
+            tideChart.update();
+        } else {
+            tideChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Hauteur de marée (m)',
+                        data: heights,
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        borderWidth: 2,
+                        tension: 0.1,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        x: { type: 'time', time: { unit: 'hour', displayFormats: { hour: 'HH:mm' } }, title: { display: true, text: 'Heure' } },
+                        y: { beginAtZero: true, title: { display: true, text: 'Hauteur (m)' } }
+                    }
                 }
             });
-            
-            return nearest;
         }
+    }
 
-        // Update charts
-        function updateCharts(data) {
-            updateTemperatureChart(data);
-            updateTideChart(data.tideData);
-        }
+    // Update buoys table
+    function updateBuoysTable(buoys) {
+        const tbody = document.querySelector('#buoys-table tbody');
+        tbody.innerHTML = '';
+        
+        buoys.forEach(buoy => {
+            const row = document.createElement('tr');
+            row.style.cursor = 'pointer';
+            row.className = 'data-card';
+            row.innerHTML = `
+                <td><strong>${buoy.name}</strong></td>
+                <td>${buoy.lat.toFixed(2)}°, ${buoy.lon.toFixed(2)}°</td>
+                <td>${buoy.temperature} °C</td>
+                <td>${buoy.salinity} PSU</td>
+                <td>${buoy.current_speed} cm/s</td>
+                <td>
+                    <span class="current-arrow" style="transform: rotate(${buoy.current_direction}deg)">
+                        <i class="bi bi-arrow-up"></i>
+                    </span>
+                    ${buoy.current_direction}°
+                </td>
+                <td>${buoy.wave_height} m</td>
+            `;
+            row.addEventListener('click', () => focusOnBuoy(buoy.id));
+            tbody.appendChild(row);
+        });
+    }
 
-        // Update temperature chart
-        function updateTemperatureChart(data) {
-            const ctx = document.getElementById('temperature-chart').getContext('2d');
-            
-            // Prepare data for chart
-            const labels = data.buoys.map(b => b.name);
-            const tempData = data.buoys.map(b => b.temperature);
-            const salinityData = data.buoys.map(b => b.salinity);
-            
-            if (temperatureChart) {
-                temperatureChart.data.labels = labels;
-                temperatureChart.data.datasets[0].data = tempData;
-                temperatureChart.data.datasets[1].data = salinityData;
-                temperatureChart.update();
-            } else {
-                temperatureChart = new Chart(ctx, {
-                    type: 'bar',
-                    data: {
-                        labels: labels,
-                        datasets: [
-                            {
-                                label: 'Température (°C)',
-                                data: tempData,
-                                backgroundColor: 'rgba(255, 99, 132, 0.7)',
-                                borderColor: 'rgba(255, 99, 132, 1)',
-                                borderWidth: 1
-                            },
-                            {
-                                label: 'Salinité (PSU)',
-                                data: salinityData,
-                                backgroundColor: 'rgba(54, 162, 235, 0.7)',
-                                borderColor: 'rgba(54, 162, 235, 1)',
-                                borderWidth: 1,
-                                type: 'line',
-                                yAxisID: 'y1'
-                            }
-                        ]
-                    },
-                    options: {
-                        responsive: true,
-                        scales: {
-                            y: {
-                                beginAtZero: false,
-                                title: {
-                                    display: true,
-                                    text: 'Température (°C)'
-                                }
-                            },
-                            y1: {
-                                position: 'right',
-                                beginAtZero: false,
-                                title: {
-                                    display: true,
-                                    text: 'Salinité (PSU)'
-                                },
-                                grid: {
-                                    drawOnChartArea: false
-                                }
-                            }
-                        }
-                    }
-                });
-            }
+    // Focus on a specific buoy
+    window.focusOnBuoy = function(buoyId) {
+        const buoy = oceanData.buoys.find(b => b.id === buoyId);
+        if (buoy) {
+            currentPosition = [buoy.lat, buoy.lon];
+            oceanMap.setView(currentPosition, 9);
+            updateCurrentConditions();
         }
-
-        // Update tide chart
-        function updateTideChart(tideData) {
-            const ctx = document.getElementById('tide-chart').getContext('2d');
-            
-            // Prepare data for chart
-            const labels = tideData.map(t => new Date(t.time));
-            const heights = tideData.map(t => parseFloat(t.height));
-            
-            if (tideChart) {
-                tideChart.data.labels = labels;
-                tideChart.data.datasets[0].data = heights;
-                tideChart.update();
-            } else {
-                tideChart = new Chart(ctx, {
-                    type: 'line',
-                    data: {
-                        labels: labels,
-                        datasets: [{
-                            label: 'Hauteur de marée (m)',
-                            data: heights,
-                            borderColor: 'rgba(75, 192, 192, 1)',
-                            backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                            borderWidth: 2,
-                            tension: 0.1,
-                            fill: true
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        scales: {
-                            x: {
-                                type: 'time',
-                                time: {
-                                    unit: 'hour',
-                                    displayFormats: {
-                                        hour: 'HH:mm'
-                                    }
-                                },
-                                title: {
-                                    display: true,
-                                    text: 'Heure'
-                                }
-                            },
-                            y: {
-                                beginAtZero: true,
-                                title: {
-                                    display: true,
-                                    text: 'Hauteur (m)'
-                                }
-                            }
-                        }
-                    }
-                });
-            }
-        }
-
-        // Update buoys table
-        function updateBuoysTable(buoys) {
-            const tbody = document.querySelector('#buoys-table tbody');
-            tbody.innerHTML = '';
-            
-            buoys.forEach(buoy => {
-                const row = document.createElement('tr');
-                row.className = 'data-card';
-                
-                row.innerHTML = `
-                    <td><strong>${buoy.name}</strong></td>
-                    <td>${buoy.lat.toFixed(2)}°, ${buoy.lon.toFixed(2)}°</td>
-                    <td>${buoy.temperature} °C</td>
-                    <td>${buoy.salinity} PSU</td>
-                    <td>${buoy.current_speed} cm/s</td>
-                    <td>
-                        <span class="current-arrow" style="transform: rotate(${buoy.current_direction}deg)">
-                            <i class="bi bi-arrow-up"></i>
-                        </span>
-                        ${buoy.current_direction}°
-                    </td>
-                    <td>${buoy.wave_height} m</td>
-                `;
-                
-                row.addEventListener('click', () => {
-                    focusOnBuoy(buoy.id);
-                });
-                
-                tbody.appendChild(row);
-            });
-        }
-
-        // Focus on a specific buoy
-        function focusOnBuoy(buoyId) {
-            const buoy = oceanData.buoys.find(b => b.id === buoyId);
-            if (buoy) {
-                currentPosition = [buoy.lat, buoy.lon];
-                oceanMap.setView(currentPosition, 9);
-                updateCurrentConditions();
-            }
-        }
-    </script>
-</body>
-</html>
+    };
+</script>
+{% endblock %}

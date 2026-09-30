@@ -636,6 +636,26 @@
           maxZoom: 19
         }).addTo(map);
         
+        // Désactive complètement le zoom molette au départ
+        map.scrollWheelZoom.disable();
+
+        let isCtrlPressed = false;
+
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey) {
+                isCtrlPressed = true;
+                map.scrollWheelZoom.enable(); // active le zoom avec la molette
+            }
+        });
+
+        document.addEventListener('keyup', function(e) {
+            // Teste n’importe quelle touche, si CTRL n’est pas enfoncé
+            if (!e.ctrlKey) {
+                isCtrlPressed = false;
+                map.scrollWheelZoom.disable(); // desactive la molette
+            }
+        });
+
         // Contrôles de zoom
         L.control.zoom({ position: 'topright' }).addTo(map);
       }

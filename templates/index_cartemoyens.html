@@ -1,0 +1,1675 @@
+{% extends "base.html" %}
+
+{% block title %}Titre de ma page - MRCC Maroc{% endblock %}
+
+{% block extra_css %}
+<style>
+  :root {
+    --primary-color: #001F4D; /* Bleu marine */
+    --secondary-color: #0a2d6d; /* Bleu marine plus clair */
+    --accent-color: #C9A94A; /* Doré principal */
+    --gold-light: #FFD700; /* Doré secondaire */
+    --light-color: #f8f9fa;
+    --dark-color: #212529;
+    --success-color: #28a745;
+    --warning-color: #ffc107;
+    --danger-color: #dc3545;
+  }
+  
+  body {
+    background-color: #f5f7fb;
+    font-family: 'Inter', sans-serif;
+    color: var(--dark-color);
+    padding-top: 70px;
+  }
+  
+  /* Header Styles - Nouveau design avec couleurs demandées */
+  .header {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    box-shadow: 0 2px 20px rgba(0, 31, 77, 0.3);
+    height: 80px; /* Légèrement plus haut pour le logo agrandi */
+  }
+  
+  .header .logo h1 {
+    color: var(--gold-light);
+    font-weight: 700;
+    font-size: 1.8rem; /* Taille augmentée */
+    margin-left: 10px;
+  }
+  
+  .header .logo img {
+    height: 60px; /* Logo plus grand */
+    width: auto;
+  }
+  
+  .header .navmenu ul li a {
+    color: rgba(255, 255, 255, 0.9);
+    font-weight: 500;
+    transition: all 0.3s;
+  }
+  
+  .header .navmenu ul li a:hover,
+  .header .navmenu ul li a.active {
+    color: var(--gold-light);
+    border-bottom: 2px solid var(--gold-light);
+  }
+  
+  .user-menu {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+  }
+  
+  .username {
+    color: white;
+    font-weight: 500;
+    margin-right: 10px;
+  }
+  
+  .btn-custom {
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-weight: 500;
+    transition: 0.3s ease-in-out;
+  }
+  
+  .btn-primary-custom {
+    background: var(--gold-light);
+    color: var(--primary-color);
+    border: none;
+  }
+  
+  .btn-primary-custom:hover {
+    background: #e6c200;
+    transform: translateY(-2px);
+  }
+  
+  .btn-secondary-custom {
+    background: rgba(201, 169, 74, 0.1);
+    border: 1px solid var(--accent-color);
+    color: var(--gold-light);
+  }
+  
+  .btn-secondary-custom:hover {
+    background: rgba(201, 169, 74, 0.2);
+  }
+  
+  /* Notifications */
+  .notification-wrapper {
+    position: relative;
+    margin-left: 10px;
+  }
+
+  .notification-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 215, 0, 0.15);
+    color: var(--gold-light);
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+  }
+
+  .notification-icon:hover {
+    background: rgba(255, 215, 0, 0.25);
+    color: white;
+  }
+
+  .notification-badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background: #f94144;
+    color: white;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.7rem;
+    font-weight: 600;
+  }
+
+  .notification-dropdown {
+    position: absolute;
+    top: 50px;
+    right: 0;
+    width: 350px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 5px 25px rgba(0, 0, 0, 0.1);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(10px);
+    transition: all 0.3s ease;
+    z-index: 1000;
+    border-top: 3px solid var(--accent-color);
+  }
+
+  .notification-wrapper:hover .notification-dropdown {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+  }
+
+  .notification-header {
+    padding: 15px;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: var(--primary-color);
+    color: white;
+    border-radius: 12px 12px 0 0;
+  }
+
+  .notification-header h5 {
+    margin: 0;
+    font-size: 1rem;
+    color: white;
+  }
+
+  .mark-all-read {
+    background: none;
+    border: none;
+    color: var(--gold-light);
+    font-size: 0.8rem;
+    cursor: pointer;
+  }
+
+  .notification-content {
+    max-height: 400px;
+    overflow-y: auto;
+    padding: 10px;
+  }
+
+  .empty-notifications {
+    padding: 20px;
+    text-align: center;
+    color: #888;
+  }
+  
+  .notification-item {
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+    transition: background 0.2s;
+  }
+
+  .notification-item:hover {
+    background: #f9f9f9;
+  }
+
+  .notification-title {
+    font-weight: 600;
+    color: var(--primary-color);
+    margin-bottom: 5px;
+  }
+
+  .notification-text {
+    color: #4a4a6a;
+    font-size: 0.9rem;
+    margin-bottom: 8px;
+  }
+
+  .mark-as-read {
+    background: none;
+    border: none;
+    color: var(--primary-color);
+    font-size: 0.8rem;
+    cursor: pointer;
+    padding: 0;
+  }
+
+  .mark-as-read:hover {
+    text-decoration: underline;
+  }
+  
+  /* Mobile Navigation */
+  .mobile-nav-toggle {
+    color: var(--gold-light);
+    font-size: 1.5rem;
+    cursor: pointer;
+    display: none;
+  }
+  
+  /* Responsive */
+  @media (max-width: 768px) {
+    .header .logo h1 {
+      font-size: 1.5rem;
+    }
+    
+    .header .logo img {
+      height: 50px;
+    }
+    
+    .mobile-nav-toggle {
+      display: block;
+    }
+    
+    .navmenu {
+      position: fixed;
+      top: 80px;
+      right: -100%;
+      width: 80%;
+      height: calc(100vh - 80px);
+      background: var(--primary-color);
+      transition: 0.3s;
+      z-index: 999;
+    }
+    
+    .navmenu ul {
+      flex-direction: column;
+      padding: 1rem;
+    }
+    
+    .navmenu ul li a {
+      color: white !important;
+      padding: 1rem 0;
+      border-bottom: 1px solid rgba(255, 215, 0, 0.2);
+    }
+    
+    .navmenu.active {
+      right: 0;
+    }
+  }
+  
+  /* Hero Section */
+  .hero {
+    background: linear-gradient(rgba(0, 31, 77, 0.85), rgba(0, 31, 77, 0.9)), url('static/img/rescue-boat.jpg');
+    background-size: cover;
+    background-position: center;
+    color: white;
+    padding: 100px 0;
+    text-align: center;
+  }
+  
+  .hero h1 {
+    font-size: 2.8rem;
+    font-weight: 700;
+    color: white;
+    margin-bottom: 20px;
+  }
+  
+  .hero h1 span {
+    color: var(--gold-light);
+  }
+  
+  .hero p {
+    font-size: 1.2rem;
+    margin-bottom: 30px;
+    max-width: 700px;
+    margin-left: auto;
+    margin-right: auto;
+    color: white;
+  }
+  
+  .btn-get-started {
+    display: inline-block;
+    padding: 12px 30px;
+    background: var(--accent-color);
+    color: var(--primary-color);
+    border-radius: 30px;
+    font-weight: 600;
+    transition: all 0.3s;
+    text-decoration: none;
+  }
+  
+  .btn-get-started:hover {
+    background: var(--gold-light);
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    color: var(--primary-color);
+  }
+  
+  .emergency-btn {
+    background-color: var(--danger-color);
+    color: white;
+    font-weight: bold;
+    padding: 12px 24px;
+    border-radius: 30px;
+    transition: all 0.3s;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+  }
+  
+  .emergency-btn:hover {
+    background-color: #c82333;
+    transform: scale(1.05);
+    color: white;
+  }
+  
+  /* Feature Cards */
+  .feature-card {
+    border-left: 4px solid var(--accent-color);
+    transition: transform 0.3s;
+    height: 100%;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+  }
+  
+  .feature-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.12);
+    border-left: 4px solid var(--gold-light);
+  }
+  
+  .real-time-map {
+    height: 400px;
+    background: #f0f0f0;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  }
+  
+  .status-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: bold;
+  }
+  
+  .status-active {
+    background-color: var(--success-color);
+    color: white;
+  }
+  
+  .status-warning {
+    background-color: var(--warning-color);
+    color: var(--dark-color);
+  }
+  
+  #map-container {
+    width: 100%;
+    height: 400px;
+  }
+  
+  /* Section headers */
+  .section-header {
+    text-align: center;
+    margin-bottom: 50px;
+  }
+  
+  .section-header h2 {
+    color: var(--primary-color);
+    font-weight: 700;
+    margin-bottom: 15px;
+    position: relative;
+    display: inline-block;
+  }
+  
+  .section-header h2:after {
+    content: '';
+    position: absolute;
+    width: 60px;
+    height: 3px;
+    background: var(--accent-color);
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  
+  .section-header p {
+    color: #666;
+    max-width: 700px;
+    margin: 0 auto;
+  }
+  
+  /* Cards */
+  .card {
+    border: none;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s;
+  }
+  
+  .card:hover {
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.12);
+  }
+  
+  .card-header {
+    border-radius: 10px 10px 0 0 !important;
+    font-weight: 600;
+  }
+  
+  /* Buttons */
+  .btn-primary {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+  }
+  
+  .btn-primary:hover {
+    background-color: #001235;
+    border-color: #001235;
+  }
+  
+  .btn-outline-primary {
+    color: var(--primary-color);
+    border-color: var(--primary-color);
+  }
+  
+  .btn-outline-primary:hover {
+    background-color: var(--primary-color);
+    color: white;
+  }
+  
+  /* Alerts */
+  .alert-warning {
+    background-color: rgba(255, 193, 7, 0.15);
+    border-left: 4px solid var(--warning-color);
+  }
+  
+  .alert-info {
+    background-color: rgba(23, 162, 184, 0.15);
+    border-left: 4px solid #17a2b8;
+  }
+  
+  /* Icon boxes */
+  .icon-box {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+  }
+  
+  .bg-primary-light {
+    background: rgba(0, 31, 77, 0.1);
+  }
+  
+  /* Footer */
+  .footer {
+    background: var(--primary-color);
+    color: white;
+    padding: 60px 0 30px;
+  }
+  
+  .footer h4 {
+    color: var(--gold-light);
+    margin-bottom: 20px;
+    font-weight: 600;
+  }
+  
+  .footer a {
+    color: rgba(255, 255, 255, 0.8);
+    transition: all 0.3s;
+  }
+  
+  .footer a:hover {
+    color: var(--gold-light);
+  }
+  
+  .footer-newsletter input[type="email"] {
+    border: none;
+    padding: 10px 15px;
+    border-radius: 4px;
+    width: 100%;
+    margin-bottom: 10px;
+  }
+  
+  .footer-newsletter input[type="submit"] {
+    background: var(--accent-color);
+    color: var(--primary-color);
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+  
+  .footer-newsletter input[type="submit"]:hover {
+    background: var(--gold-light);
+  }
+  
+  .social-links a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    margin-right: 8px;
+  }
+  
+  .social-links a:hover {
+    background: var(--accent-color);
+    color: var(--primary-color);
+  }
+  
+  .copyright {
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding-top: 30px;
+    margin-top: 30px;
+  }
+  
+  /* Form styles */
+  .info-box {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 20px;
+  }
+  
+  .info-box i {
+    color: var(--accent-color);
+    font-size: 24px;
+    margin-right: 15px;
+    flex-shrink: 0;
+  }
+  
+  .info-box h3 {
+    font-size: 18px;
+    margin-bottom: 5px;
+    color: var(--primary-color);
+  }
+  
+  .form-control {
+    border-radius: 4px;
+    border: 1px solid #ddd;
+    padding: 12px 15px;
+    margin-bottom: 15px;
+  }
+  
+  .form-control:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.2rem rgba(0, 31, 77, 0.25);
+  }
+  
+  /* Animations */
+  [data-aos] {
+    transition: all 0.6s ease;
+  }
+  .footer a {
+  color: rgba(255, 255, 255, 0.9) !important;
+ 
+}
+
+</style>
+
+{% endblock %}
+
+{% block content %}
+
+<main class="main">
+
+  <!-- Hero Section -->
+  <section id="hero" class="hero section">
+    <div class="container text-center">
+      <div class="d-flex flex-column justify-content-center align-items-center">
+        <h1 data-aos="fade-up" data-translate="hero_title">Plateforme Nationale de <span>Sauvetage Maritime</span></h1>
+        <p data-aos="fade-up" data-aos-delay="100" data-translate="hero_subtitle">Système intégré de coordination des opérations de sauvetage en mer et de gestion des données maritimes</p>
+        <div class="d-flex" data-aos="fade-up" data-aos-delay="200">
+          <a href="{{ url_for('marine') }}" class="btn-get-started" data-translate="dashboard">Tableau de bord</a>
+          <a href="tel:0539777777" class="emergency-btn d-flex align-items-center ms-3"><i class="bi bi-telephone-fill me-2"></i> <span data-translate="maritime_emergency">Urgence maritime</span></a>
+        </div>
+      </div>
+    </div>
+  </section><!-- /Hero Section -->
+
+  <!-- Real-time Map Section -->
+  <section id="operations" class="section pt-0">
+    <div class="container" data-aos="fade-up">
+      <div class="section-header">
+        <h2 data-translate="ongoing_operations">Opérations en cours</h2>
+        <p data-translate="operations_subtitle">Visualisation en temps réel des incidents et moyens engagés</p>
+      </div>
+      
+      <div class="real-time-map" data-aos="zoom-in">
+        <div id="map-container"></div>
+      </div>
+      
+      <div class="row mt-4">
+        <div class="col-md-4" data-aos="fade-up" data-aos-delay="100">
+          <div class="card feature-card h-100">
+            <div class="card-body">
+              <h5 class="card-title"><i class="bi bi-geo-alt-fill text-primary me-2"></i> <span data-translate="precise_location">Localisation précise</span></h5>
+              <p class="card-text" data-translate="location_description">Système de géolocalisation des incidents avec coordonnées exactes et historique des positions.</p>
+            </div>
+          </div>
+        </div>
+        
+        <div class="col-md-4" data-aos="fade-up" data-aos-delay="200">
+          <div class="card feature-card h-100">
+            <div class="card-body">
+              <h5 class="card-title"><i class="bi bi-speedometer2 text-primary me-2"></i> <span data-translate="real_time">Temps réel</span></h5>
+              <p class="card-text" data-translate="real_time_description">Suivi en direct des vedettes de sauvetage et des navires en détresse avec mise à jour automatique.</p>
+            </div>
+          </div>
+        </div>
+        
+        <div class="col-md-4" data-aos="fade-up" data-aos-delay="300">
+          <div class="card feature-card h-100">
+            <div class="card-body">
+              <h5 class="card-title"><i class="bi bi-layers text-primary me-2"></i> <span data-translate="integrated_data">Données intégrées</span></h5>
+              <p class="card-text" data-translate="data_description">Superposition des données météo, courants marins et obstacles pour une meilleure prise de décision.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section><!-- /Real-time Map Section -->
+
+  <!-- Emergency Resources Section -->
+  <section id="resources" class="section bg-light">
+    <div class="container">
+      <div class="section-header" data-aos="fade-up">
+        <h2 data-translate="rescue_resources">Moyens de secours disponibles</h2>
+        <p data-translate="resources_subtitle">Ressources opérationnelles pour les interventions de sauvetage</p>
+      </div>
+      
+      <div class="row gy-4">
+        <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="100">
+          <div class="card h-100 position-relative">
+            <span class="status-badge status-active" data-translate="available">Disponible</span>
+            <img src="{{ url_for('static', filename='img/rescue-boat.jpg') }}" class="card-img-top" alt="Vedette de sauvetage"> 
+            <div class="card-body">
+              <h5 class="card-title">Vedette SNS 123</h5>
+              <p class="card-text" data-translate="rescue_boat_desc">Vedette de sauvetage hauturière - Rayon d'action: 200 miles - Capacité: 20 personnes</p>
+              <div class="d-flex justify-content-between align-items-center">
+                <small class="text-muted" data-translate="base_casablanca">Base: Casablanca</small>
+                <a href="#" class="btn btn-sm btn-outline-primary" data-translate="details">Détails</a>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="200">
+          <div class="card h-100 position-relative">
+            <span class="status-badge status-active" data-translate="available">Disponible</span>
+             <img src="{{ url_for('static', filename='img/helicopter.jpg') }}" class="card-img-top" alt="Hélicoptère de sauvetage">
+            <div class="card-body">
+              <h5 class="card-title">Hélicoptère SAR 456</h5>
+              <p class="card-text" data-translate="helicopter_desc">Hélicoptère de recherche et sauvetage - Autonomie: 4h - Capacité: 6 personnes</p>
+              <div class="d-flex justify-content-between align-items-center">
+                <small class="text-muted" data-translate="base_rabat">Base: Rabat-Salé</small>
+                <a href="#" class="btn btn-sm btn-outline-primary" data-translate="details">Détails</a>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="300">
+          <div class="card h-100 position-relative">
+            <span class="status-badge status-warning" data-translate="maintenance">Maintenance</span>
+         <img src="{{ url_for('static', filename='img/rescue-boat.jpg') }}" class="card-img-top" alt="Patrouilleur maritime">
+            <div class="card-body">
+              <h5 class="card-title">Patrouilleur RMN 789</h5>
+              <p class="card-text" data-translate="patrol_boat_desc">Navire de patrouille et sauvetage - Rayon d'action: 500 miles - Capacité: 50 personnes</p>
+              <div class="d-flex justify-content-between align-items-center">
+                <small class="text-muted" data-translate="base_tangier">Base: Tanger</small>
+                <a href="#" class="btn btn-sm btn-outline-primary" data-translate="details">Détails</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="text-center mt-4" data-aos="fade-up" data-aos-delay="400">
+        <a href="resources.html" class="btn btn-primary" data-translate="view_all_resources">Voir tous les moyens</a>
+      </div>
+    </div>
+  </section><!-- /Emergency Resources Section -->
+
+  <!-- Weather Section -->
+  <section id="weather" class="section">
+    <div class="container">
+      <div class="section-header" data-aos="fade-up">
+        <h2 data-translate="weather_conditions">Conditions météorologiques</h2>
+        <p data-translate="weather_subtitle">Données météo en temps réel et prévisions pour les zones maritimes</p>
+      </div>
+      
+      <div class="row gy-4">
+        <div class="col-lg-6" data-aos="fade-up" data-aos-delay="100">
+          <div class="card h-100">
+            <div class="card-header bg-primary text-white">
+              <h5 class="mb-0"><i class="bi bi-cloud-sun-fill me-2"></i> <span data-translate="marine_forecast">Prévisions maritimes</span></h5>
+            </div>
+            <div class="card-body">
+              <div class="table-responsive">
+                <table class="table table-hover">
+                  <thead>
+                    <tr>
+                      <th data-translate="zone">Zone</th>
+                      <th data-translate="wind_knots">Vent (noeuds)</th>
+                      <th data-translate="swell_meters">Houle (m)</th>
+                      <th data-translate="visibility">Visibilité</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td data-translate="north_atlantic">Atlantique Nord</td>
+                      <td>25-30</td>
+                      <td>3-4</td>
+                      <td data-translate="good">Bonne</td>
+                    </tr>
+                    <tr>
+                      <td data-translate="gibraltar_strait">Détroit de Gibraltar</td>
+                      <td>15-20</td>
+                      <td>1-2</td>
+                      <td data-translate="average">Moyenne</td>
+                    </tr>
+                    <tr>
+                      <td data-translate="mediterranean">Méditerranée</td>
+                      <td>10-15</td>
+                      <td>0.5-1</td>
+                      <td data-translate="excellent">Excellente</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="col-lg-6" data-aos="fade-up" data-aos-delay="200">
+          <div class="card h-100">
+            <div class="card-header bg-primary text-white">
+              <h5 class="mb-0"><i class="bi bi-exclamation-triangle-fill me-2"></i> <span data-translate="weather_alerts">Alertes météo</span></h5>
+            </div>
+            <div class="card-body">
+              <div class="alert alert-warning">
+                <h6><i class="bi bi-wind me-2"></i> <span data-translate="strong_wind_warning">Avertissement de vent fort</span></h6>
+                <p data-translate="wind_warning_desc">Vents de 30-35 noeuds attendus dans la zone Atlantique Nord dans les prochaines 12 heures.</p>
+              </div>
+              
+              <div class="alert alert-info">
+                <h6><i class="bi bi-cloud-fog2-fill me-2"></i> <span data-translate="fog_alert">Brouillard localisé</span></h6>
+                <p data-translate="fog_alert_desc">Brouillard réduisant la visibilité à moins de 500m près des côtes entre Safi et Essaouira.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="text-center mt-4" data-aos="fade-up" data-aos-delay="300">
+        <a href="{{ url_for('meteo') }}"class="btn btn-primary" data-translate="access_full_weather">Accéder aux données météo complètes</a>
+      </div>
+    </div>
+  </section><!-- /Weather Section -->
+
+  <!-- Data Integration Section -->
+  <section id="data" class="section bg-light">
+    <div class="container">
+      <div class="section-header" data-aos="fade-up">
+        <h2 data-translate="maritime_data_integration">Intégration des données maritimes</h2>
+        <p data-translate="data_subtitle">Système unifié pour la gestion et le partage des informations maritimes</p>
+      </div>
+      
+      <div class="row gy-4">
+        <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="100">
+          <div class="card h-100">
+            <div class="card-body text-center">
+              <div class="icon-box bg-primary-light">
+                <i class="bi bi-ship text-primary" style="font-size: 2rem;"></i>
+              </div>
+              <h5 class="mt-3" data-translate="maritime_traffic">Trafic maritime</h5>
+              <p data-translate="traffic_description">Suivi en temps réel des navires de commerce et de pêche dans les eaux marocaines.</p>
+              <a href="{{ url_for('marine') }}" class="btn btn-sm btn-outline-primary" data-translate="access">Accéder</a>
+            </div>
+          </div>
+        </div>
+        
+        <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="200">
+          <div class="card h-100">
+            <div class="card-body text-center">
+              <div class="icon-box bg-primary-light">
+                <i class="bi bi-lightning-charge text-primary" style="font-size: 2rem;"></i>
+              </div>
+              <h5 class="mt-3" data-translate="offshore_installations">Installations offshore</h5>
+              <p data-translate="offshore_description">Localisation des plateformes pétrolières, gazoducs et autres installations en mer.</p>
+              <a href="{{ url_for('offshore') }}"  class="btn btn-sm btn-outline-primary" data-translate="access">Accéder</a>
+            </div>
+          </div>
+        </div>
+        
+        <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="300">
+          <div class="card h-100">
+            <div class="card-body text-center">
+              <div class="icon-box bg-primary-light">
+                <i class="bi bi-water text-primary" style="font-size: 2rem;"></i>
+              </div>
+              <h5 class="mt-3" data-translate="oceanographic_data">Données océanographiques</h5>
+              <p data-translate="oceanographic_description">Courants, marées, température de l'eau et autres données essentielles.</p>
+              <a href="{{ url_for('ocean') }}" class="btn btn-sm btn-outline-primary" data-translate="access">Accéder</a>
+            </div>
+          </div>
+        </div>
+        
+        <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="100">
+          <div class="card h-100">
+            <div class="card-body text-center">
+              <div class="icon-box bg-primary-light">
+                <i class="bi bi-hospital text-primary" style="font-size: 2rem;"></i>
+              </div>
+              <h5 class="mt-3" data-translate="medical_resources">Moyens médicaux</h5>
+              <p data-translate="medical_description">Liste des hôpitaux, centres de soins et moyens d'évacuation disponibles.</p>
+              <a href="http://geoai-solutions.ddns.net:9999/evacuations" class="btn btn-sm btn-outline-primary" data-translate="access">Accéder</a>
+            </div>
+          </div>
+        </div>
+        
+        <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="200">
+          <div class="card h-100">
+            <div class="card-body text-center">
+              <div class="icon-box bg-primary-light">
+                <i class="bi bi-map text-primary" style="font-size: 2rem;"></i>
+              </div>
+              <h5 class="mt-3" data-translate="nautical_charts">Cartes marines</h5>
+              <p data-translate="charts_description">Cartes officielles avec profondeurs, dangers et aides à la navigation.</p>
+              <a href="{{ url_for('cartes') }}" class="btn btn-sm btn-outline-primary" data-translate="access">Accéder</a>
+            </div>
+          </div>
+        </div>
+        
+        <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="300">
+          <div class="card h-100">
+            <div class="card-body text-center">
+              <div class="icon-box bg-primary-light">
+                <i class="bi bi-database text-primary" style="font-size: 2rem;"></i>
+              </div>
+              <h5 class="mt-3" data-translate="integration_api">API d'intégration</h5>
+              <p data-translate="api_description">Connectez vos systèmes à notre plateforme via notre API sécurisée.</p>
+              <a href="{{ url_for('api') }}" class="btn btn-sm btn-outline-primary" data-translate="documentation">Documentation</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section><!-- /Data Integration Section -->
+
+  <!-- Emergency Procedures Section -->
+  <section id="procedures" class="section">
+    <div class="container">
+      <div class="section-header" data-aos="fade-up">
+        <h2 data-translate="emergency_procedures">Procédures d'urgence</h2>
+        <p data-translate="procedures_subtitle">Protocoles et ressources pour la gestion des situations d'urgence</p>
+      </div>
+      
+      <div class="row gy-4">
+        <div class="col-lg-6" data-aos="fade-up" data-aos-delay="100">
+          <div class="card h-100">
+            <div class="card-header bg-danger text-white">
+              <h5 class="mb-0"><i class="bi bi-exclamation-octagon-fill me-2"></i> <span data-translate="distress_signal">Signal de détresse</span></h5>
+            </div>
+            <div class="card-body">
+              <h6 data-translate="emergency_procedure">Procédure d'urgence</h6>
+              <ol>
+                <li data-translate="procedure_step1">Vérifier la position exacte du navire en détresse</li>
+                <li data-translate="procedure_step2">Contacter immédiatement le MRCC au 0539 777 777</li>
+                <li data-translate="procedure_step3">Fournir les informations suivantes :</li>
+                <ul>
+                  <li data-translate="info_position">Position (coordonnées GPS)</li>
+                  <li data-translate="info_nature">Nature de l'urgence</li>
+                  <li data-translate="info_people">Nombre de personnes à bord</li>
+                  <li data-translate="info_weather">Conditions météorologiques locales</li>
+                </ul>
+                <li data-translate="procedure_step4">Rester en contact jusqu'à l'arrivée des secours</li>
+              </ol>
+            </div>
+          </div>
+        </div>
+        
+        <div class="col-lg-6" data-aos="fade-up" data-aos-delay="200">
+          <div class="card h-100">
+            <div class="card-header bg-danger text-white">
+              <h5 class="mb-0"><i class="bi bi-people-fill me-2"></i> <span data-translate="medical_evacuation">Évacuation médicale</span></h5>
+            </div>
+            <div class="card-body">
+              <h6 data-translate="medevac_protocol">Protocole MEDEVAC</h6>
+              <ol>
+                <li data-translate="medevac_step1">Évaluer l'état du patient et les besoins médicaux</li>
+                <li data-translate="medevac_step2">Contacter le médecin du MRCC pour conseil médical</li>
+                <li data-translate="medevac_step3">Déterminer le moyen d'évacuation le plus approprié :</li>
+                <ul>
+                  <li data-translate="evac_helicopter">Hélicoptère SAR</li>
+                  <li data-translate="evac_boat">Vedette de sauvetage</li>
+                  <li data-translate="evac_ship">Navire le plus proche</li>
+                </ul>
+                <li data-translate="medevac_step4">Préparer le patient pour l'évacuation</li>
+                <li data-translate="medevac_step5">Coordonner le transfert vers l'hôpital désigné</li>
+              </ol>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="text-center mt-4" data-aos="fade-up" data-aos-delay="300">
+        <a href="procedures.html" class="btn btn-primary" data-translate="view_all_procedures">Voir toutes les procédures</a>
+      </div>
+    </div>
+  </section><!-- /Emergency Procedures Section -->
+
+  <!-- Contact Section -->
+  <section id="contact" class="section bg-light">
+    <div class="container">
+      <div class="section-header" data-aos="fade-up">
+        <h2 data-translate="contact_mrcc">Contactez le MRCC Maroc</h2>
+        <p data-translate="contact_subtitle">Coordination des opérations de recherche et sauvetage en mer</p>
+      </div>
+      
+      <div class="row gy-4">
+        <div class="col-lg-6" data-aos="fade-up" data-aos-delay="100">
+          <div class="info-box">
+            <i class="bi bi-geo-alt-fill"></i>
+            <h3 data-translate="address">Adresse</h3>
+            <p>MRCC Maroc<br>Quartier Administratif, Hay Riad<br>Rabat, Maroc</p>
+          </div>
+          
+          <div class="info-box mt-4">
+            <i class="bi bi-telephone-fill"></i>
+            <h3 data-translate="emergency_numbers">Numéros d'urgence</h3>
+            <p>Standard : +212 539 777 777<br>Urgence maritime : 161</p>
+          </div>
+          
+          <div class="info-box mt-4">
+            <i class="bi bi-envelope-fill"></i>
+            <h3 data-translate="email">Email</h3>
+            <p>mrcc@marinemaroc.ma<br>operations@mrcc.ma</p>
+          </div>
+        </div>
+        
+        <div class="col-lg-6" data-aos="fade-up" data-aos-delay="200">
+          <form action="#" method="post" class="php-email-form">
+            <div class="row gy-4">
+              <div class="col-md-6">
+                <input type="text" name="name" class="form-control" placeholder="Votre nom" data-translate-placeholder="your_name" required>
+              </div>
+              
+              <div class="col-md-6">
+                <input type="email" class="form-control" name="email" placeholder="Votre email" data-translate-placeholder="your_email" required>
+              </div>
+              
+              <div class="col-md-12">
+                <input type="text" class="form-control" name="subject" placeholder="Sujet" data-translate-placeholder="subject" required>
+              </div>
+              
+              <div class="col-md-12">
+                <textarea class="form-control" name="message" rows="6" placeholder="Message" data-translate-placeholder="message" required></textarea>
+              </div>
+              
+              <div class="col-md-12 text-center">
+                <div class="loading" data-translate="loading">Chargement</div>
+                <div class="error-message"></div>
+                <div class="sent-message" data-translate="message_sent">Votre message a été envoyé. Merci !</div>
+                
+                <button type="submit" data-translate="send_message">Envoyer le message</button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section><!-- /Contact Section -->
+
+</main>
+
+
+
+
+ 
+  {% endblock %}
+
+  {% block extra_js %}
+  <script>
+    // Set current year in footer
+    document.getElementById('year').textContent = new Date().getFullYear();
+    
+    // Notification system
+    document.addEventListener('DOMContentLoaded', function() {
+      const notificationIcon = document.getElementById('notification-icon');
+      const notificationList = document.getElementById('notification-list');
+      
+      notificationIcon.addEventListener('click', function(e) {
+        e.stopPropagation();
+        notificationList.style.display = notificationList.style.display === 'block' ? 'none' : 'block';
+      });
+      
+      document.addEventListener('click', function(e) {
+        if (!notificationIcon.contains(e.target)) {
+          notificationList.style.display = 'none';
+        }
+      });
+      
+      // Mark as read functionality
+      document.querySelectorAll('.mark-as-read').forEach(button => {
+        button.addEventListener('click', function() {
+          const notificationItem = this.closest('.notification-item');
+          notificationItem.style.opacity = '0.5';
+          // Here you would typically send an AJAX request to mark the notification as read
+        });
+      });
+      
+      // Mark all as read
+      document.querySelector('.mark-all-read').addEventListener('click', function() {
+        document.querySelectorAll('.notification-item').forEach(item => {
+          item.style.opacity = '0.5';
+        });
+        document.getElementById('notification-count').textContent = '0';
+        // Here you would typically send an AJAX request to mark all notifications as read
+      });
+    });
+    // Initialisation de la carte
+    function initMap() {
+      // Centrer sur le Maroc
+      const map = L.map('map-container').setView([31.7917, -7.0926], 6);
+
+      // Couche de tuiles OpenStreetMap
+     L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', {
+      attribution: 'Tiles © Esri — Source: Esri, Garmin, USGS, NGA, and others'
+      }).addTo(map);
+
+      // Exemple de récupération de ressources
+      fetch('/resources')
+      .then((response) => {
+          console.log('Response status:', response.status);
+          return response.json();
+        })
+        .then((data) => {
+          console.log('Received data:', data);  // Ajoutez ce log
+          if (Array.isArray(data.data)) {
+            data.data.forEach((resource) => {
+              if (
+                resource.current_position &&
+                resource.current_position.latitude &&
+                resource.current_position.longitude
+              ) {
+                addResourceToMap(map, resource);
+              }
+            });
+          }
+        })
+        .catch((error) => {
+          console.error('Error loading resources:', error);
+          addDemoResources(map);
+        });
+    }
+
+    // Fonction pour ajouter un marqueur
+    function addResourceToMap(map, resource) {
+      const statusColors = {
+        available: '#28a745',
+        on_mission: '#ffc107',
+        maintenance: '#fd7e14',
+        out_of_service: '#dc3545'
+      };
+      const color = statusColors[resource.operational_status] || '#007bff';
+
+      const marker = L.marker([resource.current_position.latitude, resource.current_position.longitude], {
+        icon: L.divIcon({
+          html: `
+            <svg viewBox="0 0 24 24" fill="${color}">
+              <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+            </svg>
+          `,
+          className: 'resource-marker',
+          iconSize: [24, 24],
+          iconAnchor: [12, 24]
+        })
+      }).addTo(map);
+
+      marker.bindPopup(`
+        <b>${resource.resource_name}</b><br>
+        <small>${resource.identifier_code}</small><br>
+        Type: ${resource.type_name}<br>
+        Base: ${resource.base_name}<br>
+        Statut: <span class="badge" style="background-color: ${color}">${resource.operational_status}</span>
+      `);
+    }
+
+    // Marqueurs de démo si l’API échoue
+    function addDemoResources(map) {
+      const demoResources = [
+        {
+          resource_name: 'Vedette SNS 123',
+          identifier_code: 'VS-123-22',
+          type_name: 'Vedette de sauvetage',
+          base_name: 'Casablanca',
+          operational_status: 'available',
+          current_position: { latitude: 33.5731, longitude: -7.5898 }
+        },
+        {
+          resource_name: 'Hélicoptère SAR 456',
+          identifier_code: 'HS-456-21',
+          type_name: 'Hélicoptère SAR',
+          base_name: 'Rabat-Salé',
+          operational_status: 'on_mission',
+          current_position: { latitude: 34.0333, longitude: -6.8333 }
+        },
+        {
+          resource_name: 'Patrouilleur RMN 789',
+          identifier_code: 'PR-789-20',
+          type_name: 'Patrouilleur',
+          base_name: 'Tanger',
+          operational_status: 'out_of_service',
+          current_position: { latitude: 35.7595, longitude: -5.8340 }
+        }
+      ];
+
+      demoResources.forEach((resource) => addResourceToMap(map, resource));
+    }
+
+    // Attendre que DOM soit prêt pour initialiser la carte
+    document.addEventListener('DOMContentLoaded', initMap);
+ 
+
+  </script>
+    <script>
+      // Dictionnaire des traductions
+      const translations = {
+        'fr': {
+          // Navigation
+          'home': 'Accueil',
+          'geoportal': 'Géoportail',
+          'weather': 'Météo',
+          'marine_fleet': 'Flotte maritime',
+          'rescue_means': 'Moyens de secours',
+          'drift': 'Dérives',
+          'alerts': 'Alertes',
+          'login': 'Connexion',
+          'register': 'Inscription',
+          'logout': 'Déconnexion',
+          
+          // Hero section
+          'hero_title': 'Plateforme Nationale de <span>Sauvetage Maritime</span>',
+          'hero_subtitle': 'Système intégré de coordination des opérations de sauvetage en mer et de gestion des données maritimes',
+          'dashboard': 'Tableau de bord',
+          'maritime_emergency': 'Urgence maritime',
+          
+          // Operations section
+          'ongoing_operations': 'Opérations en cours',
+          'operations_subtitle': 'Visualisation en temps réel des incidents et moyens engagés',
+          'precise_location': 'Localisation précise',
+          'location_description': 'Système de géolocalisation des incidents avec coordonnées exactes et historique des positions.',
+          'real_time': 'Temps réel',
+          'real_time_description': 'Suivi en direct des vedettes de sauvetage et des navires en détresse avec mise à jour automatique.',
+          'integrated_data': 'Données intégrées',
+          'data_description': 'Superposition des données météo, courants marins et obstacles pour une meilleure prise de décision.',
+          
+          // Resources section
+          'rescue_resources': 'Moyens de secours disponibles',
+          'resources_subtitle': 'Ressources opérationnelles pour les interventions de sauvetage',
+          'available': 'Disponible',
+          'maintenance': 'Maintenance',
+          'rescue_boat_desc': 'Vedette de sauvetage hauturière - Rayon d\'action: 200 miles - Capacité: 20 personnes',
+          'base_casablanca': 'Base: Casablanca',
+          'helicopter_desc': 'Hélicoptère de recherche et sauvetage - Autonomie: 4h - Capacité: 6 personnes',
+          'base_rabat': 'Base: Rabat-Salé',
+          'patrol_boat_desc': 'Navire de patrouille et sauvetage - Rayon d\'action: 500 miles - Capacité: 50 personnes',
+          'base_tangier': 'Base: Tanger',
+          'details': 'Détails',
+          'view_all_resources': 'Voir tous les moyens',
+          
+          // Weather section
+          'weather_conditions': 'Conditions météorologiques',
+          'weather_subtitle': 'Données météo en temps réel et prévisions pour les zones maritimes',
+          'marine_forecast': 'Prévisions maritimes',
+          'zone': 'Zone',
+          'wind_knots': 'Vent (noeuds)',
+          'swell_meters': 'Houle (m)',
+          'visibility': 'Visibilité',
+          'north_atlantic': 'Atlantique Nord',
+          'good': 'Bonne',
+          'gibraltar_strait': 'Détroit de Gibraltar',
+          'average': 'Moyenne',
+          'mediterranean': 'Méditerranée',
+          'excellent': 'Excellente',
+          'weather_alerts': 'Alertes météo',
+          'strong_wind_warning': 'Avertissement de vent fort',
+          'wind_warning_desc': 'Vents de 30-35 noeuds attendus dans la zone Atlantique Nord dans les prochaines 12 heures.',
+          'fog_alert': 'Brouillard localisé',
+          'fog_alert_desc': 'Brouillard réduisant la visibilité à moins de 500m près des côtes entre Safi et Essaouira.',
+          'access_full_weather': 'Accéder aux données météo complètes',
+          
+          // Data integration section
+          'maritime_data_integration': 'Intégration des données maritimes',
+          'data_subtitle': 'Système unifié pour la gestion et le partage des informations maritimes',
+          'maritime_traffic': 'Trafic maritime',
+          'traffic_description': 'Suivi en temps réel des navires de commerce et de pêche dans les eaux marocaines.',
+          'offshore_installations': 'Installations offshore',
+          'offshore_description': 'Localisation des plateformes pétrolières, gazoducs et autres installations en mer.',
+          'oceanographic_data': 'Données océanographiques',
+          'oceanographic_description': 'Courants, marées, température de l\'eau et autres données essentielles.',
+          'medical_resources': 'Moyens médicaux',
+          'medical_description': 'Liste des hôpitaux, centres de soins et moyens d\'évacuation disponibles.',
+          'nautical_charts': 'Cartes marines',
+          'charts_description': 'Cartes officielles avec profondeurs, dangers et aides à la navigation.',
+          'integration_api': 'API d\'intégration',
+          'api_description': 'Connectez vos systèmes à notre plateforme via notre API sécurisée.',
+          'access': 'Accéder',
+          'documentation': 'Documentation',
+          
+          // Emergency procedures section
+          'emergency_procedures': 'Procédures d\'urgence',
+          'procedures_subtitle': 'Protocoles et ressources pour la gestion des situations d\'urgence',
+          'distress_signal': 'Signal de détresse',
+          'emergency_procedure': 'Procédure d\'urgence',
+          'procedure_step1': 'Vérifier la position exacte du navire en détresse',
+          'procedure_step2': 'Contacter immédiatement le MRCC au 0539 777 777',
+          'procedure_step3': 'Fournir les informations suivantes :',
+          'info_position': 'Position (coordonnées GPS)',
+          'info_nature': 'Nature de l\'urgence',
+          'info_people': 'Nombre de personnes à bord',
+          'info_weather': 'Conditions météorologiques locales',
+          'procedure_step4': 'Rester en contact jusqu\'à l\'arrivée des secours',
+          'medical_evacuation': 'Évacuation médicale',
+          'medevac_protocol': 'Protocole MEDEVAC',
+          'medevac_step1': 'Évaluer l\'état du patient et les besoins médicaux',
+          'medevac_step2': 'Contacter le médecin du MRCC pour conseil médical',
+          'medevac_step3': 'Déterminer le moyen d\'évacuation le plus approprié :',
+          'evac_helicopter': 'Hélicoptère SAR',
+          'evac_boat': 'Vedette de sauvetage',
+          'evac_ship': 'Navire le plus proche',
+          'medevac_step4': 'Préparer le patient pour l\'évacuation',
+          'medevac_step5': 'Coordonner le transfert vers l\'hôpital désigné',
+          'view_all_procedures': 'Voir toutes les procédures',
+          
+          // Contact section
+          'contact_mrcc': 'Contactez le MRCC Maroc',
+          'contact_subtitle': 'Coordination des opérations de recherche et sauvetage en mer',
+          'address': 'Adresse',
+          'emergency_numbers': 'Numéros d\'urgence',
+          'email': 'Email',
+          'your_name': 'Votre nom',
+          'your_email': 'Votre email',
+          'subject': 'Sujet',
+          'message': 'Message',
+          'loading': 'Chargement',
+          'message_sent': 'Votre message a été envoyé. Merci !',
+          'send_message': 'Envoyer le message',
+          
+          // Footer
+          'footer_description': 'Centre de Coordination des Sauvetages Maritimes du Royaume du Maroc. Service public de recherche et sauvetage en mer.',
+          'useful_links': 'Liens utiles',
+          'royal_navy': 'Marine Royale',
+          'meteorology_department': 'Direction de la Météorologie',
+          'national_ports': 'Ports Nationaux',
+          'royal_gendarmerie': 'Gendarmerie Royale',
+          'civil_protection': 'Protection Civile',
+          'our_services': 'Nos services',
+          'sar_coordination': 'Coordination SAR',
+          'maritime_surveillance': 'Surveillance maritime',
+          'pollution_prevention': 'Prévention des pollutions',
+          'maritime_training': 'Formation maritime',
+          'international_cooperation': 'Coopération internationale',
+          'newsletter': 'Bulletin d\'information',
+          'newsletter_description': 'Abonnez-vous à notre newsletter pour recevoir les dernières actualités et alertes.',
+          'subscribe': 'S\'abonner',
+          'all_rights_reserved': 'Tous droits réservés.',
+          'developed_by': 'Développé par',
+          
+          // Notifications
+          'recent_alerts': 'Alertes récentes',
+          'mark_all_read': 'Tout marquer comme lu',
+          'distress_alert': 'Alerte détresse',
+          'distress_signal_received': 'Signal de détresse reçu à 12:34 - Position: 33.5°N, 7.6°W',
+          'storm_warning': 'Avertissement de tempête pour la zone Atlantique Nord',
+          'mark_as_read': 'Marquer comme lu'
+        },
+        'en': {
+          // Navigation
+          'home': 'Home',
+          'geoportal': 'Geoportal',
+          'weather': 'Weather',
+          'marine_fleet': 'Marine Fleet',
+          'rescue_means': 'Rescue Means',
+          'drift': 'Drift',
+          'alerts': 'Alerts',
+          'login': 'Login',
+          'register': 'Register',
+          'logout': 'Logout',
+          
+          // Hero section
+          'hero_title': 'National Maritime <span>Rescue Platform</span>',
+          'hero_subtitle': 'Integrated system for coordinating sea rescue operations and managing maritime data',
+          'dashboard': 'Dashboard',
+          'maritime_emergency': 'Maritime Emergency',
+          
+          // Operations section
+          'ongoing_operations': 'Ongoing Operations',
+          'operations_subtitle': 'Real-time visualization of incidents and engaged resources',
+          'precise_location': 'Precise Location',
+          'location_description': 'Incident geolocation system with exact coordinates and position history.',
+          'real_time': 'Real Time',
+          'real_time_description': 'Live tracking of rescue boats and distressed vessels with automatic updates.',
+          'integrated_data': 'Integrated Data',
+          'data_description': 'Overlay of weather data, sea currents and obstacles for better decision making.',
+          
+          // Resources section
+          'rescue_resources': 'Available Rescue Resources',
+          'resources_subtitle': 'Operational resources for rescue interventions',
+          'available': 'Available',
+          'maintenance': 'Maintenance',
+          'rescue_boat_desc': 'Offshore rescue boat - Range: 200 miles - Capacity: 20 people',
+          'base_casablanca': 'Base: Casablanca',
+          'helicopter_desc': 'Search and rescue helicopter - Endurance: 4h - Capacity: 6 people',
+          'base_rabat': 'Base: Rabat-Salé',
+          'patrol_boat_desc': 'Patrol and rescue vessel - Range: 500 miles - Capacity: 50 people',
+          'base_tangier': 'Base: Tangier',
+          'details': 'Details',
+          'view_all_resources': 'View all resources',
+          
+          // Weather section
+          'weather_conditions': 'Weather Conditions',
+          'weather_subtitle': 'Real-time weather data and forecasts for maritime areas',
+          'marine_forecast': 'Marine Forecast',
+          'zone': 'Zone',
+          'wind_knots': 'Wind (knots)',
+          'swell_meters': 'Swell (m)',
+          'visibility': 'Visibility',
+          'north_atlantic': 'North Atlantic',
+          'good': 'Good',
+          'gibraltar_strait': 'Strait of Gibraltar',
+          'average': 'Average',
+          'mediterranean': 'Mediterranean',
+          'excellent': 'Excellent',
+          'weather_alerts': 'Weather Alerts',
+          'strong_wind_warning': 'Strong wind warning',
+          'wind_warning_desc': 'Winds of 30-35 knots expected in the North Atlantic area in the next 12 hours.',
+          'fog_alert': 'Localized fog',
+          'fog_alert_desc': 'Fog reducing visibility to less than 500m near the coast between Safi and Essaouira.',
+          'access_full_weather': 'Access complete weather data',
+          
+          // Data integration section
+          'maritime_data_integration': 'Maritime Data Integration',
+          'data_subtitle': 'Unified system for managing and sharing maritime information',
+          'maritime_traffic': 'Maritime Traffic',
+          'traffic_description': 'Real-time tracking of commercial and fishing vessels in Moroccan waters.',
+          'offshore_installations': 'Offshore Installations',
+          'offshore_description': 'Location of oil platforms, gas pipelines and other offshore installations.',
+          'oceanographic_data': 'Oceanographic Data',
+          'oceanographic_description': 'Currents, tides, water temperature and other essential data.',
+          'medical_resources': 'Medical Resources',
+          'medical_description': 'List of available hospitals, care centers and evacuation means.',
+          'nautical_charts': 'Nautical Charts',
+          'charts_description': 'Official charts with depths, hazards and navigation aids.',
+          'integration_api': 'Integration API',
+          'api_description': 'Connect your systems to our platform through our secure API.',
+          'access': 'Access',
+          'documentation': 'Documentation',
+          
+          // Emergency procedures section
+          'emergency_procedures': 'Emergency Procedures',
+          'procedures_subtitle': 'Protocols and resources for emergency management',
+          'distress_signal': 'Distress Signal',
+          'emergency_procedure': 'Emergency Procedure',
+          'procedure_step1': 'Verify the exact position of the vessel in distress',
+          'procedure_step2': 'Immediately contact MRCC at 0539 777 777',
+          'procedure_step3': 'Provide the following information:',
+          'info_position': 'Position (GPS coordinates)',
+          'info_nature': 'Nature of the emergency',
+          'info_people': 'Number of people on board',
+          'info_weather': 'Local weather conditions',
+          'procedure_step4': 'Maintain contact until help arrives',
+          'medical_evacuation': 'Medical Evacuation',
+          'medevac_protocol': 'MEDEVAC Protocol',
+          'medevac_step1': 'Assess the patient\'s condition and medical needs',
+          'medevac_step2': 'Contact the MRCC doctor for medical advice',
+          'medevac_step3': 'Determine the most appropriate evacuation method:',
+          'evac_helicopter': 'SAR Helicopter',
+          'evac_boat': 'Rescue boat',
+          'evac_ship': 'Nearest ship',
+          'medevac_step4': 'Prepare the patient for evacuation',
+          'medevac_step5': 'Coordinate transfer to the designated hospital',
+          'view_all_procedures': 'View all procedures',
+          
+          // Contact section
+          'contact_mrcc': 'Contact MRCC Morocco',
+          'contact_subtitle': 'Coordination of search and rescue operations at sea',
+          'address': 'Address',
+          'emergency_numbers': 'Emergency Numbers',
+          'email': 'Email',
+          'your_name': 'Your name',
+          'your_email': 'Your email',
+          'subject': 'Subject',
+          'message': 'Message',
+          'loading': 'Loading',
+          'message_sent': 'Your message has been sent. Thank you!',
+          'send_message': 'Send message',
+          
+          // Footer
+          'footer_description': 'Maritime Rescue Coordination Center of the Kingdom of Morocco. Public service for search and rescue at sea.',
+          'useful_links': 'Useful Links',
+          'royal_navy': 'Royal Navy',
+          'meteorology_department': 'Meteorology Department',
+          'national_ports': 'National Ports',
+          'royal_gendarmerie': 'Royal Gendarmerie',
+          'civil_protection': 'Civil Protection',
+          'our_services': 'Our Services',
+          'sar_coordination': 'SAR Coordination',
+          'maritime_surveillance': 'Maritime Surveillance',
+          'pollution_prevention': 'Pollution Prevention',
+          'maritime_training': 'Maritime Training',
+          'international_cooperation': 'International Cooperation',
+          'newsletter': 'Newsletter',
+          'newsletter_description': 'Subscribe to our newsletter to receive the latest news and alerts.',
+          'subscribe': 'Subscribe',
+          'all_rights_reserved': 'All rights reserved.',
+          'developed_by': 'Developed by',
+          
+          // Notifications
+          'recent_alerts': 'Recent Alerts',
+          'mark_all_read': 'Mark all as read',
+          'distress_alert': 'Distress Alert',
+          'distress_signal_received': 'Distress signal received at 12:34 - Position: 33.5°N, 7.6°W',
+          'storm_warning': 'Storm warning for the North Atlantic area',
+          'mark_as_read': 'Mark as read'
+        },
+        'ar': {
+          // Navigation
+          'home': 'الصفحة الرئيسية',
+          'geoportal': 'البوابة الجغرافية',
+          'weather': 'الطقس',
+          'marine_fleet': 'الأسطول البحري',
+          'rescue_means': 'وسائل الإنقاذ',
+          'drift': 'الانجراف',
+          'alerts': 'التنبيهات',
+          'login': 'تسجيل الدخول',
+          'register': 'التسجيل',
+          'logout': 'تسجيل الخروج',
+          
+          // Hero section
+          'hero_title': 'المنصة الوطنية <span>للإنقاذ البحري</span>',
+          'hero_subtitle': 'نظام متكامل لتنسيق عمليات الإنقاذ في البحر وإدارة البيانات البحرية',
+          'dashboard': 'لوحة التحكم',
+          'maritime_emergency': 'طوارئ بحرية',
+          
+          // Operations section
+          'ongoing_operations': 'العمليات الجارية',
+          'operations_subtitle': 'تصور في الوقت الحقيقي للحوادث والوسائل المشغلة',
+          'precise_location': 'تحديد موقع دقيق',
+          'location_description': 'نظام تحديد المواقع الجغرافية للحوادث بإحداثيات دقيقة وتاريخ المواقع.',
+          'real_time': 'زمن حقيقي',
+          'real_time_description': 'تتبع مباشر لقوارب الإنقاذ والسفن المتعثرة مع تحديث تلقائي.',
+          'integrated_data': 'بيانات متكاملة',
+          'data_description': 'تراكب بيانات الطقس والتيارات البحرية والعوائق لاتخاذ قرار أفضل.',
+          
+          // Resources section
+          'rescue_resources': 'وسائل الإنقاذ المتاحة',
+          'resources_subtitle': 'موارد تشغيلية لتدخلات الإنقاذ',
+          'available': 'متاح',
+          'maintenance': 'صيانة',
+          'rescue_boat_desc': 'قارب إنقاذ بعيد المدى - مدى: 200 ميل - سعة: 20 شخص',
+          'base_casablanca': 'القاعدة: الدار البيضاء',
+          'helicopter_desc': 'هليكوبتر بحث وإنقاذ - تحمل: 4 ساعات - سعة: 6 أشخاص',
+          'base_rabat': 'القاعدة: الرباط-سلا',
+          'patrol_boat_desc': 'سفينة دورية وإنقاذ - مدى: 500 ميل - سعة: 50 شخص',
+          'base_tangier': 'القاعدة: طنجة',
+          'details': 'تفاصيل',
+          'view_all_resources': 'عرض جميع الوسائل',
+          
+          // Weather section
+          'weather_conditions': 'الظروف الجوية',
+          'weather_subtitle': 'بيانات الطقس في الوقت الحقيقي وتوقعات للمناطق البحرية',
+          'marine_forecast': 'توقعات بحرية',
+          'zone': 'المنطقة',
+          'wind_knots': 'الرياح (عقدة)',
+          'swell_meters': 'الأمواج (م)',
+          'visibility': 'الرؤية',
+          'north_atlantic': 'شمال المحيط الأطلسي',
+          'good': 'جيدة',
+          'gibraltar_strait': 'مضيق جبل طارق',
+          'average': 'متوسطة',
+          'mediterranean': 'البحر الأبيض المتوسط',
+          'excellent': 'ممتازة',
+          'weather_alerts': 'تنبيهات الطقس',
+          'strong_wind_warning': 'تحذير من رياح قوية',
+          'wind_warning_desc': 'رياح من 30-35 عقدة متوقعة في منطقة شمال المحيط الأطلسي خلال الـ 12 ساعة القادمة.',
+          'fog_alert': 'ضباب موضعي',
+          'fog_alert_desc': 'ضباب يقلل الرؤية إلى أقل من 500 متر قرب الساحل بين آسفي والصويرة.',
+          'access_full_weather': 'الوصول إلى بيانات الطقس الكاملة',
+          
+          // Data integration section
+          'maritime_data_integration': 'تكامل البيانات البحرية',
+          'data_subtitle': 'نظام موحد لإدارة ومشاركة المعلومات البحرية',
+          'maritime_traffic': 'الحركة البحرية',
+          'traffic_description': 'تتبع في الوقت الحقيقي للسفن التجارية والصيد في المياه المغربية.',
+          'offshore_installations': 'المنشآت البحرية',
+          'offshore_description': 'موقع منصات النفط وخطوط الغاز والمنشآت البحرية الأخرى.',
+          'oceanographic_data': 'بيانات oceanographic',
+          'oceanographic_description': 'تيارات، مد وجزر، درجة حرارة الماء وبيانات أساسية أخرى.',
+          'medical_resources': 'الوسائل الطبية',
+          'medical_description': 'قائمة المستشفيات ومراكز الرعاية ووسائل الإخلاء المتاحة.',
+          'nautical_charts': 'الخرائط البحرية',
+          'charts_description': 'خرائط رسمية بعمق المياه والمخاطر ومساعدات الملاحة.',
+          'integration_api': 'واجهة برمجة التطبيقات للتكامل',
+          'api_description': 'قم بتوصيل أنظمتك بمنصتنا عبر واجهة برمجة التطبيقات الآمنة.',
+          'access': 'الوصول',
+          'documentation': 'التوثيق',
+          
+          // Emergency procedures section
+          'emergency_procedures': 'إجراءات الطوارئ',
+          'procedures_subtitle': 'بروتوكولات وموارد لإدارة حالات الطوارئ',
+          'distress_signal': 'إشارة الاستغاثة',
+          'emergency_procedure': 'إجراء الطوارئ',
+          'procedure_step1': 'التحقق من الموقع الدقيق للسفينة في محنة',
+          'procedure_step2': 'الاتصال فورًا بالمركز الوطني للإنقاذ البحري على الرقم 0539 777 777',
+          'procedure_step3': 'تقديم المعلومات التالية:',
+          'info_position': 'الموقع (إحداثيات GPS)',
+          'info_nature': 'طبيعة الطوارئ',
+          'info_people': 'عدد الأشخاص على متن السفينة',
+          'info_weather': 'الظروف الجوية المحلية',
+          'procedure_step4': 'البقاء على اتصال حتى وصول المساعدة',
+          'medical_evacuation': 'الإخلاء الطبي',
+          'medevac_protocol': 'بروتوكول MEDEVAC',
+          'medevac_step1': 'تقييم حالة المريض والاحتياجات الطبية',
+          'medevac_step2': 'الاتصال بطبيب المركز الوطني للإنقاذ البحري للحصول على المشورة الطبية',
+          'medevac_step3': 'تحديد وسيلة الإخلاء الأنسب:',
+          'evac_helicopter': 'هليكوبتر بحث وإنقاذ',
+          'evac_boat': 'قارب إنقاذ',
+          'evac_ship': 'أقرب سفينة',
+          'medevac_step4': 'تحضير المريض للإخلاء',
+          'medevac_step5': 'تنسيق النقل إلى المستشفى المحدد',
+          'view_all_procedures': 'عرض جميع الإجراءات',
+          
+          // Contact section
+          'contact_mrcc': 'اتصل بالمركز الوطني للإنقاذ البحري المغرب',
+          'contact_subtitle': 'تنسيق عمليات البحث والإنقاذ في البحر',
+          'address': 'العنوان',
+          'emergency_numbers': 'أرقام الطوارئ',
+          'email': 'البريد الإلكتروني',
+          'your_name': 'اسمك',
+          'your_email': 'بريدك الإلكتروني',
+          'subject': 'الموضوع',
+          'message': 'الرسالة',
+          'loading': 'جاري التحميل',
+          'message_sent': 'تم إرسال رسالتك. شكرًا!',
+          'send_message': 'إرسال الرسالة',
+          
+          // Footer
+          'footer_description': 'مركز تنسيق عمليات الإنقاذ البحري للمملكة المغربية. خدمة عمومية للبحث والإنقاذ في البحر.',
+          'useful_links': 'روابط مفيدة',
+          'royal_navy': 'البحرية الملكية',
+          'meteorology_department': 'مديرية الأرصاد الجوية',
+          'national_ports': 'الموانئ الوطنية',
+          'royal_gendarmerie': 'الدرك الملكي',
+          'civil_protection': 'الحماية المدنية',
+          'our_services': 'خدماتنا',
+          'sar_coordination': 'تنسيق البحث والإنقاذ',
+          'maritime_surveillance': 'المراقبة البحرية',
+          'pollution_prevention': 'منع التلوث',
+          'maritime_training': 'التكوين البحري',
+          'international_cooperation': 'التعاون الدولي',
+          'newsletter': 'النشرة الإخبارية',
+          'newsletter_description': 'اشترك في نشرتنا الإخبارية لتلقي آخر الأخبار والتنبيهات.',
+          'subscribe': 'اشتراك',
+          'all_rights_reserved': 'جميع الحقوق محفوظة.',
+          'developed_by': 'طور بواسطة',
+          
+          // Notifications
+          'recent_alerts': 'التنبيهات الحديثة',
+          'mark_all_read': '标记所有为已读',
+          'distress_alert': 'تنبيه استغاثة',
+          'distress_signal_received': 'تم استقبال إشارة استغاثة على الساعة 12:34 - الموقع: 33.5°N, 7.6°W',
+          'storm_warning': 'تحذير من عاصفة لمنطقة شمال المحيط الأطلسي',
+          'mark_as_read': '标记为已读'
+        }
+      };
+  
+      // Fonction pour changer la langue
+      function changeLanguage(lang) {
+        // Mettre à jour l'affichage de la langue courante
+        document.getElementById('current-language').textContent = lang.toUpperCase();
+        
+        // Stocker la préférence de langue
+        localStorage.setItem('preferred-language', lang);
+        
+        // Mettre à jour la direction du texte pour l'arabe
+        if (lang === 'ar') {
+          document.documentElement.dir = 'rtl';
+          document.documentElement.lang = 'ar';
+        } else {
+          document.documentElement.dir = 'ltr';
+          document.documentElement.lang = lang;
+        }
+        
+        // Traduire tous les éléments avec l'attribut data-translate
+        document.querySelectorAll('[data-translate]').forEach(element => {
+          const key = element.getAttribute('data-translate');
+          if (translations[lang][key]) {
+            if (element.tagName === 'INPUT' || element.tagName === 'TEXTAREA') {
+              element.placeholder = translations[lang][key];
+            } else {
+              element.innerHTML = translations[lang][key];
+            }
+          }
+        });
+        
+        // Traduire les placeholders
+        document.querySelectorAll('[data-translate-placeholder]').forEach(element => {
+          const key = element.getAttribute('data-translate-placeholder');
+          if (translations[lang][key]) {
+            element.placeholder = translations[lang][key];
+          }
+        });
+      }
+  
+      // Initialiser la langue au chargement de la page
+      document.addEventListener('DOMContentLoaded', function() {
+        // Récupérer la langue préférée depuis le stockage local ou utiliser le français par défaut
+        const preferredLang = localStorage.getItem('preferred-language') || 'fr';
+        changeLanguage(preferredLang);
+        
+        // Ajouter les écouteurs d'événements pour les boutons de langue
+        document.querySelectorAll('.language-options a').forEach(link => {
+          link.addEventListener('click', function(e) {
+            e.preventDefault();
+            const lang = this.getAttribute('data-lang');
+            changeLanguage(lang);
+          });
+        });
+      });
+    </script>
+  {% endblock %}

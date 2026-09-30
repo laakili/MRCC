@@ -1,0 +1,1256 @@
+{% extends "base.html" %}
+
+{% block title %}MRCC - Mes Alertes de Sauvetage{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css">
+
+<!-- Leaflet Draw CSS -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css"/>
+<!-- Leaflet Measure Control CSS -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet-measure/3.1.0/leaflet-measure.css"/>
+
+<style>
+  :root {
+    --primary-blue: #005baa;
+    --secondary-blue: #003366;
+    --accent-blue: #00a1e0;
+    --success-green: #28a745;
+    --warning-yellow: #ffc107;
+    --danger-red: #dc3545;
+    --light-gray: #f8f9fa;
+    --dark-gray: #212529;
+  }
+  
+  .dashboard-header {
+    background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+    color: white;
+    padding: 2rem 0;
+    margin-bottom: 2rem;
+  }
+  
+  .stat-card {
+    border-radius: 10px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    transition: transform 0.3s;
+    background: white;
+    cursor: pointer;
+  }
+  
+  .stat-card:hover {
+    transform: translateY(-5px);
+  }
+  
+  .stat-value {
+    font-size: 2.5rem;
+    font-weight: 700;
+  }
+  
+  .stat-label {
+    font-size: 1rem;
+    color: #6c757d;
+  }
+  
+  .badge-statut {
+    padding: 0.35em 0.65em;
+    font-weight: 500;
+  }
+  
+  .statut-nouvelle {
+    background-color: #e2e3e5;
+    color: #383d41;
+  }
+  
+  .statut-en_cours {
+    background-color: #d1ecf1;
+    color: #0c5460;
+  }
+  
+  .statut-terminee {
+    background-color: #d4edda;
+    color: #155724;
+  }
+  
+  .statut-annulee {
+    background-color: #f8d7da;
+    color: #721c24;
+  }
+  
+  .map-container {
+    height: 400px;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  }
+  
+  .dataTables_wrapper .dataTables_filter input {
+    margin-left: 0.5em;
+    border-radius: 4px;
+    border: 1px solid #ced4da;
+    padding: 0.375rem 0.75rem;
+  }
+  
+  .dataTables_wrapper .dataTables_length select {
+    border-radius: 4px;
+    border: 1px solid #ced4da;
+    padding: 0.375rem 0.75rem;
+  }
+  
+  .pagination .page-item.active .page-link {
+    background-color: var(--primary-blue);
+    border-color: var(--primary-blue);
+  }
+  
+  .pagination .page-link {
+    color: var(--primary-blue);
+  }
+  
+  @media (max-width: 768px) {
+    .map-container {
+      height: 300px;
+    }
+    
+    .stat-value {
+      font-size: 2rem;
+    }
+  }
+
+
+  /* Styles pour les outils de dessin et mesure */
+.leaflet-draw-toolbar a {
+    background-size: 30px !important;
+}
+
+.measure-control {
+    background-color: white;
+    border-radius: 4px;
+    box-shadow: 0 1px 5px rgba(0,0,0,0.4);
+}
+
+.measure-control a {
+    background-position: 50% 50%;
+    background-repeat: no-repeat;
+    display: block;
+    width: 30px;
+    height: 30px;
+    text-align: center;
+    line-height: 30px;
+    text-decoration: none;
+    color: #333;
+}
+
+.coordinates-panel {
+    background: white;
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    margin-bottom: 10px;
+}
+
+.coordinates-panel input {
+    font-size: 12px;
+    font-family: monospace;
+}
+
+.drawing-tools-panel {
+    background: white;
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    margin-top: 10px;
+}
+
+.calcul-result {
+    background: #f8f9fa;
+    padding: 8px;
+    border-radius: 4px;
+    margin-top: 8px;
+    font-size: 12px;
+    border-left: 3px solid #005baa;
+}
+
+.coord-input-group {
+    margin-bottom: 8px;
+}
+
+.coord-input-group label {
+    font-size: 12px;
+    font-weight: 600;
+    margin-bottom: 3px;
+    display: block;
+}
+
+/* Styles pour le modal d'export */
+.export-modal .modal-dialog {
+    max-width: 600px;
+}
+
+.export-options {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.column-selector {
+    border: 1px solid #dee2e6;
+    border-radius: 5px;
+    padding: 10px;
+    margin-bottom: 15px;
+}
+
+.column-selector h6 {
+    margin-bottom: 10px;
+    color: #005baa;
+}
+
+.column-checkbox {
+    margin-bottom: 8px;
+}
+
+.column-checkbox input {
+    margin-right: 8px;
+}
+
+.column-checkbox label {
+    cursor: pointer;
+    margin-bottom: 0;
+}
+
+.filter-group {
+    margin-bottom: 15px;
+}
+
+.filter-group label {
+    font-weight: 600;
+    margin-bottom: 5px;
+    display: block;
+}
+
+.preview-table {
+    font-size: 12px;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.preview-table table {
+    margin-bottom: 0;
+}
+
+.preview-table th, .preview-table td {
+    padding: 4px 8px;
+    font-size: 11px;
+}
+
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Header -->
+<header class="dashboard-header">
+  <div class="container">
+    <div class="row align-items-center">
+      <div class="col-md-8">
+        <h1><i class="bi bi-life-preserver me-2"></i> Gestion des Alertes de Sauvetage</h1>
+        <p class="lead mb-0">Suivi et coordination des opérations de sauvetage maritime</p>
+      </div>
+      <div class="col-md-4 text-md-end mt-3 mt-md-0">
+        <a href="{{ url_for('add_alerte') }}" class="btn btn-light btn-lg">
+          <i class="bi bi-plus-circle me-2"></i> Nouvelle alerte
+        </a>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- Main Content -->
+<div class="container py-4">
+  <!-- Stats Row -->
+  <div class="row mb-4" id="stats-container">
+    <div class="col-md-3">
+      <div class="stat-card" onclick="filterByStatut('all')">
+        <div class="stat-value text-primary" id="stat-total">0</div>
+        <div class="stat-label">Alertes totales</div>
+        <div class="text-muted small mt-2"><i class="bi bi-calendar3 me-1"></i> Toutes alertes</div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="stat-card" onclick="filterByStatut('nouvelle')">
+        <div class="stat-value text-warning" id="stat-nouvelles">0</div>
+        <div class="stat-label">Nouvelles alertes</div>
+        <div class="text-muted small mt-2"><i class="bi bi-exclamation-triangle me-1"></i> En attente</div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="stat-card" onclick="filterByStatut('en_cours')">
+        <div class="stat-value text-info" id="stat-en_cours">0</div>
+        <div class="stat-label">Interventions en cours</div>
+        <div class="text-muted small mt-2"><i class="bi bi-activity me-1"></i> Actives</div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="stat-card" onclick="filterByStatut('critique')">
+        <div class="stat-value text-danger" id="stat-critiques">0</div>
+        <div class="stat-label">Alertes critiques</div>
+        <div class="text-muted small mt-2"><i class="bi bi-exclamation-octagon me-1"></i> Urgence maximale</div>
+      </div>
+    </div>
+  </div>
+  
+
+
+  <!-- Modal d'export -->
+<div class="modal fade" id="exportModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">
+                    <i class="bi bi-download me-2"></i> Exporter les alertes
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <ul class="nav nav-tabs" id="exportTab" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="filters-tab" data-bs-toggle="tab" data-bs-target="#filters" type="button" role="tab">
+                            <i class="bi bi-funnel"></i> Filtres
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="columns-tab" data-bs-toggle="tab" data-bs-target="#columns" type="button" role="tab">
+                            <i class="bi bi-table"></i> Colonnes
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="preview-tab" data-bs-toggle="tab" data-bs-target="#preview" type="button" role="tab">
+                            <i class="bi bi-eye"></i> Aperçu
+                        </button>
+                    </li>
+                </ul>
+                <div class="tab-content mt-3">
+                    <!-- Onglet Filtres -->
+                    <div class="tab-pane fade show active" id="filters" role="tabpanel">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="filter-group">
+                                    <label><i class="bi bi-calendar"></i> Période</label>
+                                    <select class="form-select" id="export-period">
+                                        <option value="all">Toutes les périodes</option>
+                                        <option value="today">Aujourd'hui</option>
+                                        <option value="week">Cette semaine</option>
+                                        <option value="month">Ce mois</option>
+                                        <option value="custom">Personnalisée</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="filter-group">
+                                    <label><i class="bi bi-exclamation-triangle"></i> Niveau d'urgence</label>
+                                    <select class="form-select" id="export-urgence">
+                                        <option value="all">Tous</option>
+                                        <option value="critique">Critique</option>
+                                        <option value="urgent">Urgent</option>
+                                        <option value="normal">Normal</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="filter-group">
+                                    <label><i class="bi bi-gear"></i> Statut</label>
+                                    <select class="form-select" id="export-statut">
+                                        <option value="all">Tous</option>
+                                        <option value="nouvelle">Nouvelle</option>
+                                        <option value="en_cours">En cours</option>
+                                        <option value="terminee">Terminée</option>
+                                        <option value="annulee">Annulée</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="filter-group">
+                                    <label><i class="bi bi-tag"></i> Type d'incident</label>
+                                    <select class="form-select" id="export-type">
+                                        <option value="all">Tous</option>
+                                        <!-- Les options seront remplies dynamiquement -->
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-12" id="custom-date-range" style="display: none;">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="filter-group">
+                                            <label>Date de début</label>
+                                            <input type="date" class="form-control" id="export-date-debut">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="filter-group">
+                                            <label>Date de fin</label>
+                                            <input type="date" class="form-control" id="export-date-fin">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Onglet Colonnes -->
+                    <div class="tab-pane fade" id="columns" role="tabpanel">
+                        <div class="column-selector">
+                            <h6><i class="bi bi-check2-square"></i> Sélectionnez les colonnes à exporter</h6>
+                            <div class="row" id="column-selector-container">
+                                <!-- Les colonnes seront générées dynamiquement -->
+                            </div>
+                            <div class="mt-2">
+                                <button class="btn btn-sm btn-outline-primary" onclick="selectAllColumns()">
+                                    <i class="bi bi-check-all"></i> Tout sélectionner
+                                </button>
+                                <button class="btn btn-sm btn-outline-secondary" onclick="deselectAllColumns()">
+                                    <i class="bi bi-x-circle"></i> Tout désélectionner
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Onglet Aperçu -->
+                    <div class="tab-pane fade" id="preview" role="tabpanel">
+                        <div class="preview-table">
+                            <div id="export-preview"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="bi bi-x-circle"></i> Annuler
+                </button>
+                <button type="button" class="btn btn-success" onclick="exportToExcel()">
+                    <i class="bi bi-file-excel"></i> Exporter Excel
+                </button>
+                <button type="button" class="btn btn-danger" onclick="exportToPDF()">
+                    <i class="bi bi-file-pdf"></i> Exporter PDF
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+  <!-- Charts and Map Row -->
+  <div class="row mb-4">
+    <div class="col-lg-8">
+      <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body">
+          <h5 class="card-title"><i class="bi bi-map me-2"></i> Carte des interventions actives</h5>
+          <div id="map" class="map-container"></div>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-4">
+      <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body">
+          <h5 class="card-title"><i class="bi bi-pie-chart me-2"></i> Types d'incidents</h5>
+          <canvas id="incidentChart"></canvas>
+        </div>
+      </div>
+      <div class="card border-0 shadow-sm">
+        <div class="card-body">
+          <h5 class="card-title"><i class="bi bi-graph-up me-2"></i> Activité mensuelle</h5>
+          <canvas id="monthlyChart"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Alertes récentes -->
+  <div class="card border-0 shadow-sm mb-4">
+    <div class="card-body">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+    <h5 class="card-title mb-0"><i class="bi bi-list-ul me-2"></i> Liste des alertes</h5>
+    <div>
+        <button class="btn btn-sm btn-success me-2" onclick="openExportModal()">
+            <i class="bi bi-download"></i> Exporter
+        </button>
+        <button class="btn btn-sm btn-outline-primary" onclick="refreshData()">
+            <i class="bi bi-arrow-clockwise"></i> Actualiser
+        </button>
+    </div>
+</div>
+      
+      <div class="table-responsive">
+        <table class="table table-hover" id="alertes-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Titre</th>
+              <th>Type</th>
+              <th>Urgence</th>
+              <th>Statut</th>
+              <th>Créée par</th>
+              <th>Date</th>
+              <th>Position</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="alertes-body">
+            <tr>
+              <td colspan="9" class="text-center">
+                <div class="spinner-border text-primary" role="status">
+                  <span class="visually-hidden">Chargement...</span>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<!-- jQuery d'abord -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<!-- DataTables -->
+<script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js"></script>
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+<!-- Leaflet Draw JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js"></script>
+<!-- Leaflet Measure Control JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-measure/3.1.0/leaflet-measure.js"></script>
+<!-- Leaflet Geometry Util -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-geometryutil/0.4.0/leaflet.geometryutil.js"></script>
+<!-- Leaflet -->
+<!--<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+-->
+
+
+<!-- Bibliothèques pour l'export -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+
+
+<script>
+  let alertesData = [];
+  let incidentChart = null;
+  let monthlyChart = null;
+  let dataTable = null;
+  let map = null;
+  let currentFilter = 'all';
+  
+  // Charger les alertes depuis l'API
+  async function loadAlertes() {
+    try {
+      const response = await fetch('/api/alertes');
+      if (!response.ok) throw new Error('Erreur réseau');
+      alertesData = await response.json();
+      updateStats();
+      displayAlertes();
+      updateCharts();
+      initMap();
+      return alertesData;
+    } catch (error) {
+      console.error('Erreur:', error);
+      document.getElementById('alertes-body').innerHTML = `
+        <tr>
+          <td colspan="9" class="text-center text-danger">
+            Erreur lors du chargement des alertes: ${error.message}
+          </td>
+        </tr>
+      `;
+      return [];
+    }
+  }
+  
+  // Mettre à jour les statistiques
+  function updateStats() {
+    const total = alertesData.length;
+    const nouvelles = alertesData.filter(a => a.statut === 'nouvelle').length;
+    const en_cours = alertesData.filter(a => a.statut === 'en_cours').length;
+    const critiques = alertesData.filter(a => a.niveau_urgence === 'critique').length;
+    
+    document.getElementById('stat-total').textContent = total;
+    document.getElementById('stat-nouvelles').textContent = nouvelles;
+    document.getElementById('stat-en_cours').textContent = en_cours;
+    document.getElementById('stat-critiques').textContent = critiques;
+  }
+  
+  // Filtrer les alertes
+  function filterByStatut(statut) {
+    currentFilter = statut;
+    if (dataTable) {
+      if (statut === 'all') {
+        dataTable.column(4).search('').draw();
+      } else if (statut === 'critique') {
+        dataTable.column(3).search('critique').draw();
+      } else {
+        dataTable.column(4).search(statut).draw();
+      }
+    }
+  }
+  
+  // Obtenir le badge d'urgence
+  function getUrgencyBadge(niveau) {
+    if (niveau === 'critique') {
+      return '<span class="badge bg-danger">🔴 Critique</span>';
+    } else if (niveau === 'urgent') {
+      return '<span class="badge bg-warning text-dark">🟡 Urgent</span>';
+    }
+    return '<span class="badge bg-primary">🟢 Normal</span>';
+  }
+  
+  // Obtenir le badge de statut
+  function getStatusBadge(statut) {
+    const badges = {
+      'nouvelle': '<span class="badge statut-nouvelle">🆕 Nouvelle</span>',
+      'en_cours': '<span class="badge statut-en_cours">🔄 En cours</span>',
+      'terminee': '<span class="badge statut-terminee">✅ Terminée</span>',
+      'annulee': '<span class="badge statut-annulee">❌ Annulée</span>'
+    };
+    return badges[statut] || `<span class="badge bg-secondary">${statut}</span>`;
+  }
+  
+  // Échapper le HTML
+  function escapeHtml(text) {
+    if (!text) return '';
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  }
+  
+  // Afficher les alertes dans le tableau
+  function displayAlertes() {
+    const tableBody = document.getElementById('alertes-body');
+    if (!tableBody) return;
+    
+    tableBody.innerHTML = '';
+    
+    if (alertesData.length === 0) {
+      tableBody.innerHTML = `
+        <tr>
+          <td colspan="9" class="text-center text-muted">
+            Aucune alerte trouvée
+          </td>
+        </tr>
+      `;
+      return;
+    }
+    
+    alertesData.forEach(alerte => {
+      const row = document.createElement('tr');
+      
+      const date = new Date(alerte.date_creation);
+      const dateStr = date.toLocaleDateString('fr-FR') + ' ' + date.toLocaleTimeString('fr-FR').slice(0, 5);
+      
+      let positionText = 'Non définie';
+      if (alerte.latitude && alerte.longitude) {
+        positionText = `${parseFloat(alerte.latitude).toFixed(2)}°N, ${parseFloat(alerte.longitude).toFixed(2)}°W`;
+      }
+      
+      row.innerHTML = `
+        <td>#${alerte.id}</td>
+        <td><strong>${escapeHtml(alerte.titre || 'Sans titre')}</strong></td>
+        <td>${escapeHtml(alerte.type_incident || 'Non spécifié')}</td>
+        <td>${getUrgencyBadge(alerte.niveau_urgence)}</td>
+        <td>${getStatusBadge(alerte.statut)}</td>
+        <td>${escapeHtml(alerte.createur_nom || 'N/A')}</td>
+        <td><small>${dateStr}</small></td>
+        <td><small>${positionText}</small></td>
+        <td>
+          <button class="btn btn-sm btn-outline-primary me-1" onclick="showAlertDetails(${alerte.id})">
+            <i class="bi bi-eye"></i>
+          </button>
+          <button class="btn btn-sm btn-outline-warning me-1" onclick="editAlerte(${alerte.id})">
+            <i class="bi bi-pencil"></i>
+          </button>
+          <button class="btn btn-sm btn-outline-danger" onclick="deleteAlerte(${alerte.id})">
+            <i class="bi bi-trash"></i>
+          </button>
+        </td>
+      `;
+      tableBody.appendChild(row);
+    });
+    
+    // Initialiser DataTable si jQuery est chargé
+    if (typeof $ !== 'undefined' && $.fn.DataTable) {
+      if (dataTable) {
+        dataTable.destroy();
+      }
+      dataTable = $('#alertes-table').DataTable({
+        language: {
+          url: '//cdn.datatables.net/plug-ins/1.13.4/i18n/fr-FR.json'
+        },
+        pageLength: 10,
+        order: [[0, 'desc']]
+      });
+    } else {
+      console.warn('DataTable non disponible');
+    }
+  }
+  
+  // Mettre à jour les graphiques
+  function updateCharts() {
+    // Graphique des types d'incidents
+    const typeCounts = {};
+    alertesData.forEach(alerte => {
+      const type = alerte.type_incident || 'Non spécifié';
+      typeCounts[type] = (typeCounts[type] || 0) + 1;
+    });
+    
+    const types = Object.keys(typeCounts);
+    const counts = Object.values(typeCounts);
+    
+    const incidentCtx = document.getElementById('incidentChart');
+    if (incidentCtx) {
+      if (incidentChart) incidentChart.destroy();
+      incidentChart = new Chart(incidentCtx, {
+        type: 'doughnut',
+        data: {
+          labels: types,
+          datasets: [{
+            data: counts,
+            backgroundColor: ['#005baa', '#00a1e0', '#003366', '#4cc9f0', '#4361ee', '#3f37c9', '#4895ef'],
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: true,
+          plugins: {
+            legend: { position: 'bottom' }
+          }
+        }
+      });
+    }
+    
+    // Graphique mensuel
+    const monthlyData = {};
+    alertesData.forEach(alerte => {
+      if (alerte.date_creation) {
+        const date = new Date(alerte.date_creation);
+        const month = date.toLocaleString('fr-FR', { month: 'short' });
+        monthlyData[month] = (monthlyData[month] || 0) + 1;
+      }
+    });
+    
+    const months = ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil', 'Août', 'Sep', 'Oct', 'Nov', 'Déc'];
+    const monthlyCounts = months.map(m => monthlyData[m] || 0);
+    
+    const monthlyCtx = document.getElementById('monthlyChart');
+    if (monthlyCtx) {
+      if (monthlyChart) monthlyChart.destroy();
+      monthlyChart = new Chart(monthlyCtx, {
+        type: 'line',
+        data: {
+          labels: months,
+          datasets: [{
+            label: 'Alertes par mois',
+            data: monthlyCounts,
+            borderColor: '#005baa',
+            backgroundColor: 'rgba(0, 91, 170, 0.1)',
+            tension: 0.3,
+            fill: true
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: true,
+          plugins: {
+            legend: { position: 'bottom' }
+          },
+          scales: {
+            y: { beginAtZero: true, title: { display: true, text: 'Nombre d\'alertes' } }
+          }
+        }
+      });
+    }
+  }
+  
+  // Initialiser la carte
+function initMap() {
+    if (map) map.remove();
+    
+    const mapContainer = document.getElementById('map');
+    if (!mapContainer) return;
+    
+    map = L.map('map').setView([32.0, -8.0], 6);
+    
+    // Basemaps Esri + OSM
+    const esri_topo = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', {
+        attribution: 'Tiles &copy; Esri',
+        maxZoom: 19
+    });
+    
+    const osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors',
+        maxZoom: 19
+    });
+    
+    // Ajoute Esri Topo par défaut
+    esri_topo.addTo(map);
+    
+    // Désactive complètement le zoom molette au départ
+    map.scrollWheelZoom.disable();
+
+    let isCtrlPressed = false;
+
+    document.addEventListener('keydown', function(e) {
+        if (e.ctrlKey) {
+            isCtrlPressed = true;
+            map.scrollWheelZoom.enable(); // active le zoom avec la molette
+        }
+    });
+
+    document.addEventListener('keyup', function(e) {
+        // Teste n’importe quelle touche, si CTRL n’est pas enfoncé
+        if (!e.ctrlKey) {
+            isCtrlPressed = false;
+            map.scrollWheelZoom.disable(); // desactive la molette
+        }
+    });
+
+
+    // Contrôle basemaps
+    const baseMaps = {
+        "Esri Topographie": esri_topo,
+        "OpenStreetMap": osm
+    };
+    L.control.layers(baseMaps).addTo(map);
+
+    
+    // Icônes personnalisées
+    const iconCritique = L.divIcon({
+      html: '<i class="bi bi-exclamation-octagon-fill" style="color: #dc3545; font-size: 24px;"></i>',
+      className: 'd-flex justify-content-center align-items-center',
+      iconSize: [24, 24],
+      iconAnchor: [12, 12]
+    });
+    
+    const iconUrgent = L.divIcon({
+      html: '<i class="bi bi-exclamation-triangle-fill" style="color: #ffc107; font-size: 24px;"></i>',
+      className: 'd-flex justify-content-center align-items-center',
+      iconSize: [24, 24],
+      iconAnchor: [12, 12]
+    });
+    
+    const iconNormal = L.divIcon({
+      html: '<i class="bi bi-info-circle-fill" style="color: #0d6efd; font-size: 24px;"></i>',
+      className: 'd-flex justify-content-center align-items-center',
+      iconSize: [24, 24],
+      iconAnchor: [12, 12]
+    });
+    
+    // Ajouter les marqueurs
+    alertesData.forEach(alerte => {
+      if (alerte.latitude && alerte.longitude && alerte.statut !== 'terminee') {
+        let icon;
+        if (alerte.niveau_urgence === 'critique') icon = iconCritique;
+        else if (alerte.niveau_urgence === 'urgent') icon = iconUrgent;
+        else icon = iconNormal;
+        
+        const marker = L.marker([parseFloat(alerte.latitude), parseFloat(alerte.longitude)], { icon: icon });
+        marker.addTo(map).bindPopup(`
+          <b>${escapeHtml(alerte.titre)}</b><br>
+          Type: ${escapeHtml(alerte.type_incident)}<br>
+          Urgence: ${alerte.niveau_urgence}<br>
+          Statut: ${alerte.statut}<br>
+          <a href="/alertes/${alerte.id}" class="btn btn-sm btn-primary mt-1">Voir détails</a>
+        `);
+      }
+    });
+  }
+  
+  // Afficher les détails d'une alerte
+  function showAlertDetails(alerteId) {
+    window.location.href = `/details_alerte/${alerteId}`;
+  }
+  
+  // Modifier une alerte
+  function editAlerte(alerteId) {
+    window.location.href = `/modifier_alerte/${alerteId}`;
+  }
+  
+  // Supprimer une alerte
+  function deleteAlerte(alerteId) {
+    if (confirm('Êtes-vous sûr de vouloir supprimer cette alerte ? Cette action est irréversible.')) {
+      fetch(`/supprimer_alerte/${alerteId}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        }
+      }).then(response => {
+        if (response.redirected) {
+          window.location.href = response.url;
+        } else {
+          refreshData();
+        }
+      }).catch(error => {
+        console.error('Erreur:', error);
+        alert('Erreur lors de la suppression');
+      });
+    }
+  }
+  
+  // Rafraîchir toutes les données
+  async function refreshData() {
+    await loadAlertes();
+  }
+  
+  // Initialisation au chargement
+  document.addEventListener('DOMContentLoaded', function() {
+    loadAlertes();
+  });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// Configuration des colonnes disponibles
+const availableColumns = [
+    { id: 'id', label: 'ID', visible: true },
+    { id: 'titre', label: 'Titre', visible: true },
+    { id: 'type_incident', label: "Type d'incident", visible: true },
+    { id: 'niveau_urgence', label: "Niveau d'urgence", visible: true },
+    { id: 'statut', label: 'Statut', visible: true },
+    { id: 'createur_nom', label: 'Créateur', visible: true },
+    { id: 'date_creation', label: 'Date de création', visible: true },
+    { id: 'latitude', label: 'Latitude', visible: false },
+    { id: 'longitude', label: 'Longitude', visible: false },
+    { id: 'description', label: 'Description', visible: false },
+    { id: 'nombre_personnes', label: 'Nombre de personnes', visible: false },
+    { id: 'conditions_meteo', label: 'Conditions météo', visible: false },
+    { id: 'navire_implique', label: 'Navire impliqué', visible: false },
+    { id: 'immatriculation_navire', label: 'Immatriculation', visible: false },
+    { id: 'notes_complementaires', label: 'Notes', visible: false }
+];
+
+// Ouvrir le modal d'export
+function openExportModal() {
+    // Remplir les types d'incidents
+    const types = [...new Set(alertesData.map(a => a.type_incident).filter(t => t))];
+    const typeSelect = document.getElementById('export-type');
+    typeSelect.innerHTML = '<option value="all">Tous</option>';
+    types.forEach(type => {
+        typeSelect.innerHTML += `<option value="${type}">${type}</option>`;
+    });
+    
+    // Remplir les colonnes
+    const columnContainer = document.getElementById('column-selector-container');
+    columnContainer.innerHTML = '';
+    availableColumns.forEach(col => {
+        columnContainer.innerHTML += `
+            <div class="col-md-4 column-checkbox">
+                <input type="checkbox" id="col-${col.id}" value="${col.id}" ${col.visible ? 'checked' : ''}>
+                <label for="col-${col.id}">${col.label}</label>
+            </div>
+        `;
+    });
+    
+    // Mettre à jour l'aperçu
+    updateExportPreview();
+    
+    // Afficher le modal
+    const modal = new bootstrap.Modal(document.getElementById('exportModal'));
+    modal.show();
+}
+
+// Sélectionner toutes les colonnes
+function selectAllColumns() {
+    document.querySelectorAll('#column-selector-container input[type="checkbox"]').forEach(cb => {
+        cb.checked = true;
+    });
+    updateExportPreview();
+}
+
+// Désélectionner toutes les colonnes
+function deselectAllColumns() {
+    document.querySelectorAll('#column-selector-container input[type="checkbox"]').forEach(cb => {
+        cb.checked = false;
+    });
+    updateExportPreview();
+}
+
+// Filtrer les données selon les critères
+function filterExportData() {
+    let filtered = [...alertesData];
+    
+    // Filtre période
+    const period = document.getElementById('export-period').value;
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    
+    if (period === 'today') {
+        filtered = filtered.filter(a => {
+            const date = new Date(a.date_creation);
+            return date >= today;
+        });
+    } else if (period === 'week') {
+        const weekAgo = new Date(today - 7 * 24 * 60 * 60 * 1000);
+        filtered = filtered.filter(a => new Date(a.date_creation) >= weekAgo);
+    } else if (period === 'month') {
+        const monthAgo = new Date(today.setMonth(today.getMonth() - 1));
+        filtered = filtered.filter(a => new Date(a.date_creation) >= monthAgo);
+    } else if (period === 'custom') {
+        const dateDebut = document.getElementById('export-date-debut').value;
+        const dateFin = document.getElementById('export-date-fin').value;
+        if (dateDebut && dateFin) {
+            const debut = new Date(dateDebut);
+            const fin = new Date(dateFin);
+            fin.setHours(23, 59, 59);
+            filtered = filtered.filter(a => {
+                const date = new Date(a.date_creation);
+                return date >= debut && date <= fin;
+            });
+        }
+    }
+    
+    // Filtre urgence
+    const urgence = document.getElementById('export-urgence').value;
+    if (urgence !== 'all') {
+        filtered = filtered.filter(a => a.niveau_urgence === urgence);
+    }
+    
+    // Filtre statut
+    const statut = document.getElementById('export-statut').value;
+    if (statut !== 'all') {
+        filtered = filtered.filter(a => a.statut === statut);
+    }
+    
+    // Filtre type
+    const type = document.getElementById('export-type').value;
+    if (type !== 'all') {
+        filtered = filtered.filter(a => a.type_incident === type);
+    }
+    
+    return filtered;
+}
+
+// Obtenir les colonnes sélectionnées
+function getSelectedColumns() {
+    const selected = [];
+    document.querySelectorAll('#column-selector-container input[type="checkbox"]:checked').forEach(cb => {
+        const colId = cb.value;
+        const col = availableColumns.find(c => c.id === colId);
+        if (col) selected.push(col);
+    });
+    return selected;
+}
+
+// Formater les données pour l'export
+function formatExportData(data, columns) {
+    return data.map(item => {
+        const row = {};
+        columns.forEach(col => {
+            let value = item[col.id];
+            if (col.id === 'date_creation' && value) {
+                value = new Date(value).toLocaleString('fr-FR');
+            } else if (col.id === 'niveau_urgence') {
+                const labels = { critique: 'Critique', urgent: 'Urgent', normal: 'Normal' };
+                value = labels[value] || value;
+            } else if (col.id === 'statut') {
+                const labels = { nouvelle: 'Nouvelle', en_cours: 'En cours', terminee: 'Terminée', annulee: 'Annulée' };
+                value = labels[value] || value;
+            } else if (col.id === 'latitude' && value) {
+                value = parseFloat(value).toFixed(6);
+            } else if (col.id === 'longitude' && value) {
+                value = parseFloat(value).toFixed(6);
+            }
+            row[col.label] = value || '';
+        });
+        return row;
+    });
+}
+
+// Mettre à jour l'aperçu
+function updateExportPreview() {
+    const filtered = filterExportData();
+    const columns = getSelectedColumns();
+    const formattedData = formatExportData(filtered, columns);
+    
+    const previewDiv = document.getElementById('export-preview');
+    
+    if (formattedData.length === 0 || columns.length === 0) {
+        previewDiv.innerHTML = '<div class="alert alert-warning">Aucune donnée à afficher</div>';
+        return;
+    }
+    
+    let html = '<table class="table table-sm table-bordered">';
+    html += '<thead><tr>';
+    columns.forEach(col => {
+        html += `<th>${col.label}</th>`;
+    });
+    html += '</tr></thead><tbody>';
+    
+    formattedData.slice(0, 10).forEach(row => {
+        html += '<tr>';
+        columns.forEach(col => {
+            html += `<td>${escapeHtml(String(row[col.label] || ''))}</td>`;
+        });
+        html += '</tr>';
+    });
+    html += '</tbody></table>';
+    
+    if (formattedData.length > 10) {
+        html += `<div class="text-muted mt-2">... et ${formattedData.length - 10} lignes supplémentaires</div>`;
+    }
+    
+    previewDiv.innerHTML = html;
+}
+
+// Exporter vers Excel
+function exportToExcel() {
+    const filtered = filterExportData();
+    const columns = getSelectedColumns();
+    const formattedData = formatExportData(filtered, columns);
+    
+    if (formattedData.length === 0) {
+        alert('Aucune donnée à exporter');
+        return;
+    }
+    
+    // Créer la feuille de calcul
+    const ws = XLSX.utils.json_to_sheet(formattedData);
+    
+    // Ajuster la largeur des colonnes
+    const colWidths = [];
+    columns.forEach(col => {
+        colWidths.push({ wch: Math.max(col.label.length, 15) });
+    });
+    ws['!cols'] = colWidths;
+    
+    // Créer le classeur
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Alertes Sauvetage');
+    
+    // Ajouter une feuille de résumé
+    const summary = [
+        ['Rapport des alertes de sauvetage'],
+        ['Date d\'export', new Date().toLocaleString('fr-FR')],
+        ['Total des alertes', alertesData.length],
+        ['Alertes filtrées', filtered.length],
+        ['Colonnes exportées', columns.map(c => c.label).join(', ')],
+        ['Filtres appliqués:', ''],
+        ['- Période', document.getElementById('export-period').options[document.getElementById('export-period').selectedIndex]?.text],
+        ['- Urgence', document.getElementById('export-urgence').options[document.getElementById('export-urgence').selectedIndex]?.text],
+        ['- Statut', document.getElementById('export-statut').options[document.getElementById('export-statut').selectedIndex]?.text],
+        ['- Type', document.getElementById('export-type').options[document.getElementById('export-type').selectedIndex]?.text]
+    ];
+    
+    const wsSummary = XLSX.utils.aoa_to_sheet(summary);
+    XLSX.utils.book_append_sheet(wb, wsSummary, 'Résumé');
+    
+    // Télécharger
+    const fileName = `alertes_sauvetage_${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.xlsx`;
+    XLSX.writeFile(wb, fileName);
+    
+    // Fermer le modal
+    bootstrap.Modal.getInstance(document.getElementById('exportModal')).hide();
+}
+
+// Exporter vers PDF
+async function exportToPDF() {
+    const { jsPDF } = window.jspdf;
+    const filtered = filterExportData();
+    const columns = getSelectedColumns();
+    const formattedData = formatExportData(filtered, columns);
+    
+    if (formattedData.length === 0) {
+        alert('Aucune donnée à exporter');
+        return;
+    }
+    
+    // Créer le PDF
+    const doc = new jsPDF({
+        orientation: 'landscape',
+        unit: 'mm',
+        format: 'a4'
+    });
+    
+    // Titre
+    doc.setFontSize(18);
+    doc.setTextColor(0, 91, 170);
+    doc.text('Rapport des Alertes de Sauvetage', 14, 20);
+    
+    // Informations
+    doc.setFontSize(10);
+    doc.setTextColor(100, 100, 100);
+    doc.text(`Date d'export: ${new Date().toLocaleString('fr-FR')}`, 14, 30);
+    doc.text(`Total des alertes: ${alertesData.length}`, 14, 36);
+    doc.text(`Alertes filtrées: ${filtered.length}`, 14, 42);
+    
+    // Tableau des données
+    const tableHeaders = columns.map(c => c.label);
+    const tableData = formattedData.map(row => columns.map(c => row[c.label] || ''));
+    
+    doc.autoTable({
+        head: [tableHeaders],
+        body: tableData,
+        startY: 50,
+        theme: 'striped',
+        headStyles: {
+            fillColor: [0, 91, 170],
+            textColor: 255,
+            fontSize: 8
+        },
+        bodyStyles: {
+            fontSize: 7
+        },
+        columnStyles: {
+            0: { cellWidth: 'auto' }
+        },
+        margin: { top: 50, left: 14, right: 14 },
+        didDrawPage: function(data) {
+            // Ajouter le numéro de page
+            doc.setFontSize(8);
+            doc.setTextColor(150, 150, 150);
+            doc.text(`Page ${data.pageNumber}`, doc.internal.pageSize.width - 20, doc.internal.pageSize.height - 10);
+        }
+    });
+    
+    // Télécharger
+    const fileName = `alertes_sauvetage_${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.pdf`;
+    doc.save(fileName);
+    
+    // Fermer le modal
+    bootstrap.Modal.getInstance(document.getElementById('exportModal')).hide();
+}
+
+// Écouter les changements de filtre
+document.addEventListener('DOMContentLoaded', function() {
+    // Écouteurs pour la période personnalisée
+    document.getElementById('export-period').addEventListener('change', function() {
+        const customRange = document.getElementById('custom-date-range');
+        customRange.style.display = this.value === 'custom' ? 'block' : 'none';
+        updateExportPreview();
+    });
+    
+    // Écouteurs pour les filtres
+    const filterElements = ['export-urgence', 'export-statut', 'export-type', 'export-date-debut', 'export-date-fin'];
+    filterElements.forEach(id => {
+        const element = document.getElementById(id);
+        if (element) {
+            element.addEventListener('change', () => updateExportPreview());
+        }
+    });
+    
+    // Écouteurs pour les colonnes
+    document.getElementById('column-selector-container')?.addEventListener('change', () => updateExportPreview());
+});
+
+</script>
+{% endblock %}

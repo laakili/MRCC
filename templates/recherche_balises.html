@@ -1,366 +1,1286 @@
-
-
-
 {% extends "base.html" %}
 
-{% block title %}Recherche de Balises - Système Maritime{% endblock %}
+{% block title %}Gestion des Balises PLB - MRCC Maroc{% endblock %}
 
 {% block extra_css %}
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 <style>
-    .table td {
+    /* Variables et styles modernes */
+    :root {
+        --primary: #0d6efd;
+        --primary-dark: #0a58ca;
+        --secondary: #6c757d;
+        --success: #198754;
+        --info: #0dcaf0;
+        --warning: #ffc107;
+        --danger: #dc3545;
+        --dark: #1a1e21;
+        --light: #f8f9fa;
+        --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        --shadow-sm: 0 2px 4px rgba(0,0,0,0.05);
+        --shadow-md: 0 4px 6px rgba(0,0,0,0.07);
+        --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1);
+        --shadow-xl: 0 20px 25px -5px rgba(0,0,0,0.1);
+    }
+
+    /* Animations */
+    @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(30px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes slideIn {
+        from { opacity: 0; transform: translateX(-20px); }
+        to { opacity: 1; transform: translateX(0); }
+    }
+
+    .chart-container {
+        background: white;
+        border-radius: 15px;
+        padding: 1rem;
+        box-shadow: var(--shadow-lg);
+        margin-bottom: 1.5rem;
+    }
+
+    .empty-chart {
+        text-align: center;
+        padding: 50px;
+        color: #6c757d;
+    }
+    
+    .chart-title {
+        font-size: 1rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        color: #1a1e21;
+        border-left: 4px solid var(--primary);
+        padding-left: 0.75rem;
+    }
+    /* Page header */
+    .page-header {
+        background: linear-gradient(135deg, #001F4D 0%, #003D82 100%);
+        border-radius: 20px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .page-header::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+        transform: rotate(45deg);
+    }
+
+    .page-header h1 {
+        color: white;
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        position: relative;
+    }
+
+    .page-header p {
+        color: rgba(255,255,255,0.8);
+        margin-bottom: 0;
+        position: relative;
+    }
+
+    /* Cartes statistiques */
+    .stat-card {
+        background: white;
+        border-radius: 20px;
+        padding: 1.5rem;
+        box-shadow: var(--shadow-lg);
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
         border: none;
-        padding: 0.5rem 0.75rem;
     }
-    
-    .table tr {
-        border-bottom: 1px solid #dee2e6;
+
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--shadow-xl);
     }
-    
-    .card-header {
-        border-bottom: 2px solid rgba(0,0,0,.125);
+
+    .stat-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 28px;
+        margin-bottom: 1rem;
     }
-    
-    .form-control:focus {
-        border-color: #0d6efd;
+
+    .stat-icon.primary { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
+    .stat-icon.success { background: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%); color: #198754; }
+    .stat-icon.warning { background: linear-gradient(135deg, #f6d365 0%, #fda085 100%); color: #ffc107; }
+    .stat-icon.danger { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: #dc3545; }
+
+    .stat-value {
+        font-size: 2.5rem;
+        font-weight: 800;
+        color: var(--dark);
+        line-height: 1;
+    }
+
+    .stat-label {
+        color: var(--secondary);
+        font-size: 0.9rem;
+        font-weight: 500;
+        margin-top: 0.5rem;
+    }
+
+    /* Onglets modernes */
+    .nav-modern {
+        background: white;
+        border-radius: 15px;
+        padding: 0.5rem;
+        margin-bottom: 2rem;
+        box-shadow: var(--shadow-sm);
+    }
+
+    .nav-modern .nav-link {
+        border: none;
+        padding: 0.75rem 1.5rem;
+        border-radius: 12px;
+        font-weight: 600;
+        color: var(--secondary);
+        transition: all 0.3s ease;
+    }
+
+    .nav-modern .nav-link:hover {
+        background: var(--light);
+        color: var(--primary);
+    }
+
+    .nav-modern .nav-link.active {
+        background: var(--gradient-primary);
+        color: white;
+        box-shadow: var(--shadow-md);
+    }
+
+    .nav-modern .nav-link i {
+        margin-right: 0.5rem;
+    }
+
+    /* Carte de recherche */
+    .search-card {
+        background: white;
+        border-radius: 20px;
+        padding: 2rem;
+        box-shadow: var(--shadow-lg);
+        border: none;
+    }
+
+    .search-input-group .form-control {
+        height: 60px;
+        border-radius: 15px;
+        border: 2px solid #e9ecef;
+        padding: 0 1.5rem;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+    }
+
+    .search-input-group .form-control:focus {
+        border-color: var(--primary);
         box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
     }
-    
-    #debugStatus {
-        max-height: 200px;
-        overflow-y: auto;
-        background: #f8f9fa;
-        padding: 10px;
-        border-radius: 4px;
-        font-family: monospace;
-        font-size: 0.8rem;
-    }
-    </style>
-      {% endblock %}
 
-      {% block content %}
-<div class="container mt-4">
-    <div class="row">
-        <div class="col-12">
-            <div class="d-flex align-items-center mb-4">
-                <img src="{{ url_for('static', filename='img/plb.jpg') }}" 
-                     alt="Logo PLB" 
-                     class="me-4 shadow-lg"
-                     style="height:900px; width:auto; border-radius:12px;">
-             
+    .search-btn {
+        height: 60px;
+        border-radius: 15px;
+        padding: 0 2rem;
+        font-weight: 600;
+        background: var(--gradient-primary);
+        border: none;
+    }
+
+    /* Container liste */
+    .list-container {
+        max-height: 600px;
+        overflow-y: auto;
+        position: relative;
+        border-radius: 15px;
+        background: white;
+    }
+
+    .balise-row {
+        padding: 1rem;
+        border-bottom: 1px solid #e9ecef;
+        transition: all 0.2s ease;
+        cursor: pointer;
+    }
+
+    .balise-row:hover {
+        background: rgba(13, 110, 253, 0.05);
+        transform: translateX(5px);
+    }
+
+    /* Badges de statut */
+    .badge-status {
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 0.75rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+    }
+
+    .badge-status.actif { background: #d4edda; color: #155724; }
+    .badge-status.inactif { background: #fff3cd; color: #856404; }
+    .badge-status.expire { background: #f8d7da; color: #721c24; }
+    .badge-status.maintenance { background: #d1ecf1; color: #0c5460; }
+
+    /* Loader */
+    .loader-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0,0,0,0.7);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+        backdrop-filter: blur(4px);
+    }
+
+    .loader {
+        width: 60px;
+        height: 60px;
+        border: 4px solid rgba(255,255,255,0.3);
+        border-top: 4px solid white;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    /* Toast notifications */
+    .toast-notification {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        z-index: 9998;
+        animation: slideIn 0.3s ease;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .page-header { padding: 1.5rem; }
+        .stat-card { margin-bottom: 1rem; }
+        .list-container { max-height: 400px; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4 py-4">
+    <!-- En-tête -->
+    <div class="page-header">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h1><i class="fas fa-satellite-dish me-3"></i>Gestion des Balises PLB</h1>
+                <p>Gestion de <strong id="totalCount">0</strong> balises - Système MRCC Maroc</p>
             </div>
-            
-       
-            
-            <!-- Carte de recherche -->
-            <div class="card shadow-sm">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="card-title mb-0">
-                        <i class="fas fa-search me-2"></i>
-                        Rechercher une Balise
-                    </h5>
+            <button class="btn btn-light btn-lg" data-bs-toggle="modal" data-bs-target="#addBaliseModal">
+                <i class="fas fa-plus-circle me-2"></i>Nouvelle Balise
+            </button>
+        </div>
+    </div>
+
+    <!-- Cartes statistiques -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-3">
+            <div class="stat-card">
+                <div class="stat-icon primary"><i class="fas fa-satellite-dish"></i></div>
+                <div class="stat-value" id="totalBalises">0</div>
+                <div class="stat-label">Total des balises</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card">
+                <div class="stat-icon success"><i class="fas fa-check-circle"></i></div>
+                <div class="stat-value text-success" id="balisesActives">0</div>
+                <div class="stat-label">Balises actives</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card">
+                <div class="stat-icon warning"><i class="fas fa-exclamation-triangle"></i></div>
+                <div class="stat-value text-warning" id="balisesExpirees">0</div>
+                <div class="stat-label">Batteries expirées</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card">
+                <div class="stat-icon danger"><i class="fas fa-tools"></i></div>
+                <div class="stat-value text-danger" id="balisesMaintenance">0</div>
+                <div class="stat-label">En maintenance</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Onglets -->
+    <ul class="nav nav-modern" id="baliseTabs" role="tablist">
+        <li class="nav-item">
+            <button class="nav-link active" id="search-tab" data-bs-toggle="tab" data-bs-target="#search" type="button">
+                <i class="fas fa-search"></i>Rechercher
+            </button>
+        </li>
+        <li class="nav-item">
+            <button class="nav-link" id="list-tab" data-bs-toggle="tab" data-bs-target="#list" type="button">
+                <i class="fas fa-list"></i>Liste des balises
+            </button>
+        </li>
+        <li class="nav-item">
+            <button class="nav-link" id="stats-tab" data-bs-toggle="tab" data-bs-target="#stats" type="button">
+                <i class="fas fa-chart-pie"></i>Statistiques
+            </button>
+        </li>
+    </ul>
+
+    <div class="tab-content">
+        <!-- Onglet Recherche -->
+        <div class="tab-pane fade show active" id="search" role="tabpanel">
+            <div class="search-card mb-4">
+                <form id="rechercheForm">
+                    <div class="row g-3">
+                        <div class="col-md-9">
+                            <div class="search-input-group">
+                                <input type="text" class="form-control form-control-lg" id="codeRecherche" 
+                                       placeholder="Entrez le numéro d'enregistrement, MMSI, UIN ou numéro de série..."
+                                       autocomplete="off">
+                            </div>
+                            <div class="form-text mt-2">
+                                <i class="fas fa-info-circle me-1"></i>
+                                Recherche par : Numéro d'enregistrement, MMSI, UIN, Numéro de série, Nom de l'unité
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <button type="submit" class="btn search-btn w-100">
+                                <i class="fas fa-search me-2"></i>Rechercher
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Résultats -->
+            <div id="resultats" style="display: none;">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i>Informations de la balise</h5>
+                        <div id="resultActions"></div>
+                    </div>
+                    <div class="card-body" id="baliseInfo">
+                        <div class="text-center py-4">
+                            <div class="spinner-border text-primary"></div>
+                        </div>
+                    </div>
                 </div>
-                <div class="card-body">
-                    <form id="rechercheForm">
-                        <div class="row">
-                            <div class="col-md-8">
-                                <div class="form-group">
-                                    <label for="codeRecherche" class="form-label">
-                                        <strong>Code de la Balise :</strong>
-                                    </label>
-                                    <input type="text" 
-                                           class="form-control form-control-lg" 
-                                           id="codeRecherche" 
-                                           placeholder="Entrez le numéro d'enregistrement, MMSI, UIN, numéro de série..."
-                                           autocomplete="off">
-                                    <div class="form-text">
-                                        Vous pouvez rechercher par : Numéro d'enregistrement, MMSI, UIN, Numéro de série, Nom de l'unité
-                                    </div>
+            </div>
+        </div>
+
+        <!-- Onglet Liste -->
+        <div class="tab-pane fade" id="list" role="tabpanel">
+            <!-- Filtres -->
+            <div class="row g-3 mb-4">
+                <div class="col-md-5">
+                    <input type="text" class="form-control" id="quickSearch" 
+                           placeholder="Recherche rapide..." autocomplete="off">
+                </div>
+                <div class="col-md-3">
+                    <select class="form-select" id="statusFilter">
+                        <option value="">Tous les statuts</option>
+                        <option value="Actif">Actif</option>
+                        <option value="Inactif">Inactif</option>
+                        <option value="Expiré">Expiré</option>
+                        <option value="Maintenance">Maintenance</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <select class="form-select" id="perPageSelect">
+                        <option value="25">25 par page</option>
+                        <option value="50" selected>50 par page</option>
+                        <option value="100">100 par page</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button class="btn btn-primary w-100" onclick="refreshList()">
+                        <i class="fas fa-sync-alt me-2"></i>Rafraîchir
+                    </button>
+                </div>
+            </div>
+
+            <!-- Liste -->
+            <div class="card shadow-sm">
+                <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="fas fa-list me-2"></i>Liste des balises</h5>
+                    <div>
+                        <span class="badge bg-light text-dark me-2" id="resultsCount">0 balises</span>
+                        <button class="btn btn-light btn-sm" onclick="exportBalises()">
+                            <i class="fas fa-download me-1"></i>Exporter
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    <div class="list-container" id="listContainer">
+                        <div id="balisesListContainer"></div>
+                    </div>
+                </div>
+                <div class="card-footer bg-white">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <button class="btn btn-outline-secondary" id="prevPage" disabled>
+                            <i class="fas fa-chevron-left me-1"></i>Précédent
+                        </button>
+                        <span id="paginationInfo">Page 1 / 1</span>
+                        <button class="btn btn-outline-secondary" id="nextPage">
+                            Suivant<i class="fas fa-chevron-right ms-1"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Onglet Statistiques -->
+        <div class="tab-pane fade" id="stats" role="tabpanel">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="chart-container">
+                        <div class="chart-title">
+                            <i class="fas fa-chart-pie me-2 text-primary"></i>Répartition par statut
+                        </div>
+                        <canvas id="statusChart" height="300"></canvas>
+                        <div id="statusChartEmpty" class="empty-chart" style="display: none;">
+                            <i class="fas fa-chart-pie fa-3x mb-3 text-muted"></i>
+                            <p>Aucune donnée disponible</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="chart-container">
+                        <div class="chart-title">
+                            <i class="fas fa-chart-bar me-2 text-primary"></i>Top fabricants
+                        </div>
+                        <canvas id="manufacturerChart" height="300"></canvas>
+                        <div id="manufacturerChartEmpty" class="empty-chart" style="display: none;">
+                            <i class="fas fa-chart-bar fa-3x mb-3 text-muted"></i>
+                            <p>Aucune donnée disponible</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+    </div>
+</div>
+
+<!-- Modals (Ajouter, Modifier, Supprimer, Détails) -->
+<!-- Modal Ajouter -->
+<div class="modal fade" id="addBaliseModal" tabindex="-1">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title"><i class="fas fa-plus-circle me-2"></i>Ajouter une balise PLB</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="addBaliseForm">
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6 class="border-bottom pb-2 mb-3"><i class="fas fa-info-circle text-primary me-2"></i>Informations Générales</h6>
+                            <div class="mb-3">
+                                <label class="form-label">Numéro d'enregistrement *</label>
+                                <input type="text" class="form-control" name="registration_number" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Nom de l'unité</label>
+                                <input type="text" class="form-control" name="unit_name">
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <label class="form-label">Port</label>
+                                    <input type="text" class="form-control" name="port">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">MMSI</label>
+                                    <input type="text" class="form-control" name="mmsi">
                                 </div>
                             </div>
-                            <div class="col-md-4 d-flex align-items-end">
-                                <button type="submit" class="btn btn-primary btn-lg w-100">
-                                    <i class="fas fa-search me-2"></i>
-                                    Rechercher
-                                </button>
+                            <div class="row mt-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">UIN</label>
+                                    <input type="text" class="form-control" name="uin">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">TAC</label>
+                                    <input type="number" class="form-control" name="tac">
+                                </div>
                             </div>
                         </div>
-                    </form>
-                </div>
-            </div>
-            
-            <!-- Résultats de recherche -->
-            <div id="resultats" class="mt-4" style="display: none;">
-                <div class="card shadow-sm">
-                    <div class="card-header bg-success text-white">
-                        <h5 class="card-title mb-0">
-                            <i class="fas fa-info-circle me-2"></i>
-                            Informations de la Balise
-                        </h5>
-                    </div>
-                    <div class="card-body">
-                        <div id="loading" class="text-center" style="display: none;">
-                            <div class="spinner-border text-primary" role="status">
-                                <span class="visually-hidden">Chargement...</span>
+                        <div class="col-md-6">
+                            <h6 class="border-bottom pb-2 mb-3"><i class="fas fa-microchip text-primary me-2"></i>Caractéristiques</h6>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <label class="form-label">N° série fabricant</label>
+                                    <input type="number" class="form-control" name="serial_number_manufacturer">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">N° série SAR</label>
+                                    <input type="number" class="form-control" name="serial_number_sar">
+                                </div>
                             </div>
-                            <p class="mt-2">Recherche en cours...</p>
+                            <div class="row mt-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">Fabricant</label>
+                                    <input type="text" class="form-control" name="manufacturer">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Modèle</label>
+                                    <input type="text" class="form-control" name="model">
+                                </div>
+                            </div>
+                            <div class="mt-3">
+                                <label class="form-label">Type de balise</label>
+                                <select class="form-control" name="beacon_type">
+                                    <option value="PLB">PLB - Personal Locator Beacon</option>
+                                    <option value="EPIRB">EPIRB - Emergency Position Indicating Radio Beacon</option>
+                                    <option value="ELT">ELT - Emergency Locator Transmitter</option>
+                                </select>
+                            </div>
+                            <div class="mt-3">
+                                <label class="form-label">Statut</label>
+                                <select class="form-control" name="beacon_status">
+                                    <option value="Actif">Actif</option>
+                                    <option value="Inactif">Inactif</option>
+                                    <option value="Maintenance">En maintenance</option>
+                                    <option value="Expiré">Expiré</option>
+                                </select>
+                            </div>
                         </div>
-                        <div id="baliseInfo"></div>
                     </div>
                 </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="submit" class="btn btn-primary">Ajouter la balise</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Détails -->
+<div class="modal fade" id="detailModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title"><i class="fas fa-info-circle me-2"></i>Détails de la balise</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
-            
-            <!-- Message d'erreur -->
-            <div id="erreur" class="alert alert-danger mt-4" style="display: none;">
-                <i class="fas fa-exclamation-triangle me-2"></i>
-                <span id="messageErreur"></span>
+            <div class="modal-body" id="detailModalBody"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Modifier -->
+<div class="modal fade" id="editBaliseModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-warning">
+                <h5 class="modal-title"><i class="fas fa-edit me-2"></i>Modifier la balise</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="editBaliseForm">
+                <input type="hidden" name="id" id="edit_id">
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Numéro d'enregistrement</label>
+                                <input type="text" class="form-control" name="registration_number" id="edit_registration_number">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Nom de l'unité</label>
+                                <input type="text" class="form-control" name="unit_name" id="edit_unit_name">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">MMSI</label>
+                                <input type="text" class="form-control" name="mmsi" id="edit_mmsi">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">UIN</label>
+                                <input type="text" class="form-control" name="uin" id="edit_uin">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Statut</label>
+                                <select class="form-control" name="beacon_status" id="edit_beacon_status">
+                                    <option value="Actif">Actif</option>
+                                    <option value="Inactif">Inactif</option>
+                                    <option value="Maintenance">En maintenance</option>
+                                    <option value="Expiré">Expiré</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Propriétaire</label>
+                                <input type="text" class="form-control" name="owner" id="edit_owner">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Email</label>
+                                <input type="email" class="form-control" name="email" id="edit_email">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Téléphone</label>
+                                <input type="text" class="form-control" name="phone_number" id="edit_phone_number">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="submit" class="btn btn-warning">Enregistrer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Supprimer -->
+<div class="modal fade" id="deleteBaliseModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title"><i class="fas fa-trash-alt me-2"></i>Confirmer la suppression</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Êtes-vous sûr de vouloir supprimer cette balise ?</p>
+                <div class="alert alert-warning" id="deleteBaliseInfo"></div>
+                <p class="text-danger mb-0"><i class="fas fa-exclamation-triangle me-2"></i>Cette action est irréversible !</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Supprimer</button>
             </div>
         </div>
     </div>
 </div>
-{% endblock %}
 
-{% block extra_js %}
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
 <script>
-// Debug global
-window.debugMode = true;
+// ============================================================================
+// VARIABLES GLOBALES
+// ============================================================================
+let currentPage = 1;
+let currentPerPage = 50;
+let currentSearch = '';
+let currentStatus = '';
+let totalPages = 0;
+let totalItems = 0;
+let isLoading = false;
+let statusChart = null;
+let manufacturerChart = null;
+let currentDeleteId = null;
+let searchDebounceTimer = null;
 
-function debugLog(message, data = null) {
-    if (window.debugMode) {
-        console.log(`[DEBUG] ${message}`, data || '');
-        // Afficher aussi dans le debug status
-        const statusEl = document.getElementById('debugStatus');
-        if (statusEl) {
-            statusEl.innerHTML += `<div class="text-muted">${new Date().toLocaleTimeString()}: ${message}</div>`;
-            statusEl.scrollTop = statusEl.scrollHeight;
-        }
+
+
+// ============================================================================
+// INITIALISATION
+// ============================================================================
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM chargé - initialisation');
+    loadStats();
+    loadList();
+    loadCharts();
+    initCharts();
+    bindEvents();
+});
+
+function bindEvents() {
+    // Recherche formulaire
+    const rechercheForm = document.getElementById('rechercheForm');
+    if (rechercheForm) {
+        rechercheForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const code = document.getElementById('codeRecherche').value.trim();
+            if (!code) {
+                showToast('Veuillez entrer un code', 'warning');
+                return;
+            }
+            
+            showLoader();
+            try {
+                const response = await fetch('/api/recherche-balise', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ code: code })
+                });
+                const data = await response.json();
+                hideLoader();
+                
+                if (data.error) {
+                    showToast(data.error, 'error');
+                } else {
+                    displayBaliseDetail(data);
+                    document.getElementById('resultats').style.display = 'block';
+                    document.querySelector('#search-tab').click();
+                }
+            } catch (error) {
+                hideLoader();
+                showToast('Erreur de connexion', 'error');
+            }
+        });
+    }
+    
+    // Recherche rapide
+    const quickSearch = document.getElementById('quickSearch');
+    if (quickSearch) {
+        let timeout;
+        quickSearch.addEventListener('input', function() {
+            clearTimeout(timeout);
+            timeout = setTimeout(() => {
+                currentSearch = this.value;
+                currentPage = 1;
+                loadList();
+            }, 500);
+        });
+    }
+    
+    // Filtre statut
+    const statusFilter = document.getElementById('statusFilter');
+    if (statusFilter) {
+        statusFilter.addEventListener('change', function() {
+            currentStatus = this.value;
+            currentPage = 1;
+            loadList();
+        });
+    }
+    
+    // Nombre par page
+    const perPageSelect = document.getElementById('perPageSelect');
+    if (perPageSelect) {
+        perPageSelect.addEventListener('change', function() {
+            currentPerPage = parseInt(this.value);
+            currentPage = 1;
+            loadList();
+        });
+    }
+    
+    // Pagination
+    document.getElementById('prevPage')?.addEventListener('click', () => {
+        if (currentPage > 1) { currentPage--; loadList(); }
+    });
+    document.getElementById('nextPage')?.addEventListener('click', () => {
+        if (currentPage < totalPages) { currentPage++; loadList(); }
+    });
+    
+    // Formulaire ajout
+    const addForm = document.getElementById('addBaliseForm');
+    if (addForm) {
+        addForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const formData = {};
+            new FormData(this).forEach((value, key) => { if (value) formData[key] = value; });
+            
+            showLoader();
+            try {
+                const response = await fetch('/api/balises', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(formData)
+                });
+                const data = await response.json();
+                hideLoader();
+                
+                if (data.success) {
+                    bootstrap.Modal.getInstance(document.getElementById('addBaliseModal')).hide();
+                    refreshList();
+                    showToast('Balise ajoutée', 'success');
+                    addForm.reset();
+                    loadStats();
+                    loadCharts();
+                } else {
+                    showToast(data.error || 'Erreur', 'error');
+                }
+            } catch (error) {
+                hideLoader();
+                showToast('Erreur de connexion', 'error');
+            }
+        });
     }
 }
 
-$(document).ready(function() {
-    debugLog("=== INIT RECHERCHE BALISES ===");
-    debugLog("jQuery version:", $.fn.jquery);
-    
-    // Test JavaScript
-    $('#testJs').on('click', function() {
-        debugLog("Test JavaScript...");
-        $('#debugStatus').html('<span class="text-info">✓ JavaScript fonctionne</span>');
-    });
-    
-    // Test API
-    $('#testApi').on('click', function() {
-        debugLog("Test API...");
-        $('#debugStatus').html('<span class="text-warning">Test API en cours...</span>');
+async function loadCharts() {
+    await loadStatusChart();
+    await loadManufacturerChart();
+}
+
+
+async function loadStatusChart() {
+    try {
+        const response = await fetch('/api/balises/status-distribution');
+        const data = await response.json();
         
-        $.get('/api/test')
-            .done(function(data) {
-                debugLog("Test API réussi:", data);
-                $('#debugStatus').html('<span class="text-success">✓ API OK - ' + data.timestamp + '</span>');
-            })
-            .fail(function(xhr) {
-                debugLog("Test API échoué:", xhr);
-                $('#debugStatus').html('<span class="text-danger">✗ API Erreur: ' + xhr.status + ' - ' + xhr.statusText + '</span>');
-            });
-    });
-    
-    // Test DB
-    $('#testDb').on('click', function() {
-        debugLog("Test DB...");
-        $('#debugStatus').html('<span class="text-warning">Test DB en cours...</span>');
+        const ctx = document.getElementById('statusChart').getContext('2d');
+        const emptyDiv = document.getElementById('statusChartEmpty');
         
-        $.get('/api/test-db')
-            .done(function(data) {
-                debugLog("Test DB réponse:", data);
-                if (data.status === 'success') {
-                    $('#debugStatus').html('<span class="text-success">✓ DB OK - ' + data.record_count + ' enregistrements</span>');
-                } else {
-                    $('#debugStatus').html('<span class="text-danger">✗ DB Erreur: ' + data.message + '</span>');
+        if (data.success && data.distribution && data.distribution.length > 0) {
+            ctx.canvas.style.display = 'block';
+            emptyDiv.style.display = 'none';
+            
+            const labels = data.distribution.map(d => d.status);
+            const counts = data.distribution.map(d => d.count);
+            const colors = data.distribution.map(d => d.color);
+            
+            if (statusChart) {
+                statusChart.destroy();
+            }
+            
+            statusChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: counts,
+                        backgroundColor: colors,
+                        borderWidth: 0,
+                        hoverOffset: 10
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: { font: { size: 12 } }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const label = context.label || '';
+                                    const value = context.raw || 0;
+                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    const percent = ((value / total) * 100).toFixed(1);
+                                    return `${label}: ${value} (${percent}%)`;
+                                }
+                            }
+                        }
+                    }
                 }
-            })
-            .fail(function(xhr) {
-                debugLog("Test DB échoué:", xhr);
-                $('#debugStatus').html('<span class="text-danger">✗ DB Erreur: ' + xhr.status + ' - ' + xhr.responseJSON?.message || xhr.statusText + '</span>');
             });
-    });
-    
-    // Soumission du formulaire - VERSION SIMPLIFIEE
-    $('#rechercheForm').on('submit', function(e) {
-        e.preventDefault();
-        debugLog("=== DEBUT SOUMISSION FORMULAIRE ===");
-        
-        const code = $('#codeRecherche').val().trim();
-        debugLog("Code saisi:", code);
-        
-        if (!code) {
-            debugLog("Code vide - affichage erreur");
-            showError('Veuillez entrer un code de recherche');
-            return;
+        } else {
+            ctx.canvas.style.display = 'none';
+            emptyDiv.style.display = 'block';
         }
+    } catch (error) {
+        console.error('Erreur loadStatusChart:', error);
+        document.getElementById('statusChart').style.display = 'none';
+        document.getElementById('statusChartEmpty').style.display = 'block';
+    }
+}
+
+async function loadManufacturerChart() {
+    try {
+        const response = await fetch('/api/balises/manufacturers');
+        const data = await response.json();
         
-        // Reset affichage
-        $('#resultats').hide();
-        $('#erreur').hide();
-        $('#loading').show();
-        $('#baliseInfo').empty();
+        const ctx = document.getElementById('manufacturerChart').getContext('2d');
+        const emptyDiv = document.getElementById('manufacturerChartEmpty');
         
-        debugLog("Préparation requête AJAX...");
-        
-        // REQUETE AJAX SIMPLIFIEE
-        $.ajax({
-            url: '/api/recherche-balise',
-            type: 'POST',
-            contentType: 'application/json',
-            data: JSON.stringify({ code: code }),
-            dataType: 'json',
-            timeout: 10000,
-            beforeSend: function() {
-                debugLog("Envoi requête AJAX...");
-            }
-        })
-        .done(function(data, textStatus, xhr) {
-            debugLog("Réponse AJAX reçue:", data);
-            $('#loading').hide();
+        if (data.success && data.manufacturers && data.manufacturers.length > 0) {
+            ctx.canvas.style.display = 'block';
+            emptyDiv.style.display = 'none';
             
-            if (data.error) {
-                debugLog("Erreur dans réponse:", data.error);
-                showError(data.error);
-            } else {
-                debugLog("Données trouvées - affichage");
-                displayBaliseInfo(data);
+            const labels = data.manufacturers.map(m => m.name);
+            const counts = data.manufacturers.map(m => m.count);
+            
+            if (manufacturerChart) {
+                manufacturerChart.destroy();
             }
-        })
-        .fail(function(xhr, textStatus, errorThrown) {
-            debugLog("Erreur AJAX:", {
-                status: xhr.status,
-                statusText: xhr.statusText,
-                textStatus: textStatus,
-                error: errorThrown,
-                responseText: xhr.responseText
+            
+            manufacturerChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Nombre de balises',
+                        data: counts,
+                        backgroundColor: 'rgba(13, 110, 253, 0.7)',
+                        borderColor: '#0d6efd',
+                        borderWidth: 1,
+                        borderRadius: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `Balises: ${context.raw}`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: { display: true, text: 'Nombre de balises' },
+                            ticks: { stepSize: 1 }
+                        },
+                        x: {
+                            title: { display: true, text: 'Fabricant' },
+                            ticks: { autoSkip: true, maxRotation: 45, minRotation: 45 }
+                        }
+                    }
+                }
             });
+        } else {
+            ctx.canvas.style.display = 'none';
+            emptyDiv.style.display = 'block';
+        }
+    } catch (error) {
+        console.error('Erreur loadManufacturerChart:', error);
+        document.getElementById('manufacturerChart').style.display = 'none';
+        document.getElementById('manufacturerChartEmpty').style.display = 'block';
+    }
+}
+
+
+// ============================================================================
+// CHARGEMENT DES DONNÉES
+// ============================================================================
+async function loadStats() {
+    try {
+        const response = await fetch('/api/balises/stats');
+        const data = await response.json();
+        if (data.success) {
+            document.getElementById('totalBalises').textContent = data.stats.total || 0;
+            document.getElementById('balisesActives').textContent = data.stats.actives || 0;
+            document.getElementById('balisesExpirees').textContent = data.stats.expired || 0;
+            document.getElementById('balisesMaintenance').textContent = data.stats.maintenance || 0;
+            document.getElementById('totalCount').textContent = (data.stats.total || 0).toLocaleString();
+        }
+    } catch (error) {
+        console.error('Erreur stats:', error);
+    }
+}
+
+async function loadList() {
+    if (isLoading) return;
+    isLoading = true;
+    
+    showLoader();
+    
+    try {
+        const url = `/api/balises?page=${currentPage}&per_page=${currentPerPage}&search=${encodeURIComponent(currentSearch)}&status=${currentStatus}`;
+        const response = await fetch(url);
+        const data = await response.json();
+        
+        if (data.success) {
+            totalPages = data.pagination.pages;
+            totalItems = data.pagination.total;
             
-            $('#loading').hide();
+            updatePaginationUI();
+            displayList(data.data);
+            document.getElementById('resultsCount').textContent = `${totalItems.toLocaleString()} balises`;
+        } else {
+            showToast(data.error || 'Erreur de chargement', 'error');
+        }
+    } catch (error) {
+        console.error('Erreur:', error);
+        showToast('Erreur de connexion', 'error');
+    } finally {
+        isLoading = false;
+        hideLoader();
+    }
+}
+
+function displayList(balises) {
+    const container = document.getElementById('balisesListContainer');
+    if (!container) return;
+    
+    container.innerHTML = '';
+    
+    if (!balises || balises.length === 0) {
+        container.innerHTML = '<div class="text-center py-5 text-muted"><i class="fas fa-inbox fa-3x mb-3"></i><p>Aucune balise trouvée</p></div>';
+        return;
+    }
+    
+    balises.forEach(b => {
+        container.appendChild(createBaliseRow(b));
+    });
+}
+
+function createBaliseRow(b) {
+    const statusClass = getStatusClass(b.beacon_status);
+    const statusIcon = getStatusIcon(b.beacon_status);
+    
+    const div = document.createElement('div');
+    div.className = 'balise-row';
+    div.onclick = () => showDetails(b.id);
+    div.innerHTML = `
+        <div class="row align-items-center">
+            <div class="col-md-3">
+                <div class="fw-bold">${escapeHtml(b.registration_number || '-')}</div>
+                <small class="text-muted">${escapeHtml(b.unit_name || '-')}</small>
+            </div>
+            <div class="col-md-2">
+                <code>${escapeHtml(b.mmsi || '-')}</code>
+            </div>
+            <div class="col-md-2">
+                <code>${escapeHtml(b.uin || '-')}</code>
+            </div>
+            <div class="col-md-2">
+                <span class="badge-status ${statusClass}">
+                    <i class="fas ${statusIcon} me-1"></i>${escapeHtml(b.beacon_status || 'N/A')}
+                </span>
+            </div>
+            <div class="col-md-2">
+                ${escapeHtml(b.owner || '-')}
+            </div>
+            <div class="col-md-1 text-end">
+                <button class="btn btn-sm btn-outline-primary" onclick="event.stopPropagation(); editBalise(${b.id})">
+                    <i class="fas fa-edit"></i>
+                </button>
+            </div>
+        </div>
+    `;
+    return div;
+}
+
+function updatePaginationUI() {
+    document.getElementById('paginationInfo').textContent = `Page ${currentPage} / ${totalPages || 1}`;
+    document.getElementById('prevPage').disabled = currentPage <= 1;
+    document.getElementById('nextPage').disabled = currentPage >= totalPages;
+}
+
+function refreshList() {
+    currentPage = 1;
+    loadList();
+    loadStats();
+}
+
+// ============================================================================
+// AFFICHAGE DES DÉTAILS
+// ============================================================================
+async function showDetails(id) {
+    const modal = new bootstrap.Modal(document.getElementById('detailModal'));
+    const body = document.getElementById('detailModalBody');
+    
+    body.innerHTML = '<div class="text-center py-4"><div class="spinner-border text-primary"></div><p class="mt-2">Chargement...</p></div>';
+    modal.show();
+    
+    try {
+        const response = await fetch(`/api/balises/${id}`);
+        const data = await response.json();
+        
+        if (data.success) {
+            body.innerHTML = createDetailView(data.data);
+        } else {
+            body.innerHTML = `<div class="alert alert-danger">${escapeHtml(data.error)}</div>`;
+        }
+    } catch (error) {
+        body.innerHTML = '<div class="alert alert-danger">Erreur de chargement</div>';
+    }
+}
+
+function createDetailView(b) {
+    return `
+        <div class="row">
+            <div class="col-md-6">
+                <h6 class="border-bottom pb-2"><i class="fas fa-info-circle text-primary me-2"></i>Informations Générales</h6>
+                <table class="table table-sm">
+                    <tr><th>ID:</th><td>${b.id}</td></tr>
+                    <tr><th>N° Enregistrement:</th><td><strong>${escapeHtml(b.registration_number || '-')}</strong></td></tr>
+                    <tr><th>Nom unité:</th><td>${escapeHtml(b.unit_name || '-')}</td></tr>
+                    <tr><th>Port:</th><td>${escapeHtml(b.port || '-')}</td></tr>
+                    <tr><th>MMSI:</th><td><code>${escapeHtml(b.mmsi || '-')}</code></td></tr>
+                    <tr><th>UIN:</th><td><code>${escapeHtml(b.uin || '-')}</code></td></tr>
+                </table>
+            </div>
+            <div class="col-md-6">
+                <h6 class="border-bottom pb-2"><i class="fas fa-microchip text-primary me-2"></i>Caractéristiques</h6>
+                <table class="table table-sm">
+                    <tr><th>Type:</th><td>${escapeHtml(b.beacon_type || '-')}</td></tr>
+                    <tr><th>Fabricant:</th><td>${escapeHtml(b.manufacturer || '-')}</td></tr>
+                    <tr><th>Modèle:</th><td>${escapeHtml(b.model || '-')}</td></tr>
+                    <tr><th>N° série fab:</th><td>${escapeHtml(b.serial_number_manufacturer || '-')}</td></tr>
+                    <tr><th>N° série SAR:</th><td>${escapeHtml(b.serial_number_sar || '-')}</td></tr>
+                    <tr><th>Expiration batterie:</th><td>${escapeHtml(b.battery_expiration_date || '-')}</td></tr>
+                </table>
+            </div>
+        </div>
+        <div class="row mt-3">
+            <div class="col-md-12">
+                <h6 class="border-bottom pb-2"><i class="fas fa-user text-primary me-2"></i>Propriétaire</h6>
+                <table class="table table-sm">
+                    <tr><th>Nom:</th><td>${escapeHtml(b.owner || '-')}</td></tr>
+                    <tr><th>Email:</th><td>${escapeHtml(b.email || '-')}</td></tr>
+                    <tr><th>Téléphone:</th><td>${escapeHtml(b.phone_number || '-')}</td></tr>
+                    <tr><th>Adresse:</th><td>${escapeHtml(b.address || '-')}</td></tr>
+                </table>
+            </div>
+        </div>
+        <div class="mt-3 text-end">
+            <button class="btn btn-warning btn-sm" onclick="editBalise(${b.id}); bootstrap.Modal.getInstance(document.getElementById('detailModal')).hide();">
+                <i class="fas fa-edit me-1"></i>Modifier
+            </button>
+            <button class="btn btn-danger btn-sm" onclick="deleteBalise(${b.id}, '${escapeHtml(b.registration_number || b.unit_name || '')}'); bootstrap.Modal.getInstance(document.getElementById('detailModal')).hide();">
+                <i class="fas fa-trash me-1"></i>Supprimer
+            </button>
+        </div>
+    `;
+}
+
+function displayBaliseInfo(data) {
+    const infoContainer = document.getElementById('baliseInfo');
+    if (infoContainer) {
+        infoContainer.innerHTML = createDetailView(data);
+    }
+}
+
+// ============================================================================
+// ACTIONS CRUD
+// ============================================================================
+async function editBalise(id) {
+    try {
+        const response = await fetch(`/api/balises/${id}`);
+        const data = await response.json();
+        
+        if (data.success) {
+            const b = data.data;
+            document.getElementById('edit_id').value = b.id;
+            document.getElementById('edit_registration_number').value = b.registration_number || '';
+            document.getElementById('edit_unit_name').value = b.unit_name || '';
+            document.getElementById('edit_mmsi').value = b.mmsi || '';
+            document.getElementById('edit_uin').value = b.uin || '';
+            document.getElementById('edit_beacon_status').value = b.beacon_status || 'Actif';
+            document.getElementById('edit_owner').value = b.owner || '';
+            document.getElementById('edit_email').value = b.email || '';
+            document.getElementById('edit_phone_number').value = b.phone_number || '';
             
-            let errorMessage = 'Erreur lors de la recherche';
-            if (xhr.status === 404) {
-                errorMessage = 'Aucune balise trouvée avec ce code';
-            } else if (xhr.status === 500) {
-                errorMessage = 'Erreur serveur - veuillez réessayer';
-            } else if (textStatus === 'timeout') {
-                errorMessage = 'Timeout - la requête a pris trop de temps';
-            } else if (textStatus === 'parsererror') {
-                errorMessage = 'Erreur de parsing de la réponse';
-            }
-            
-            showError(errorMessage);
-        })
-        .always(function() {
-            debugLog("Requête AJAX terminée");
+            new bootstrap.Modal(document.getElementById('editBaliseModal')).show();
+        }
+    } catch (error) {
+        showToast('Erreur de chargement', 'error');
+    }
+}
+
+function deleteBalise(id, name) {
+    currentDeleteId = id;
+    document.getElementById('deleteBaliseInfo').innerHTML = `<i class="fas fa-exclamation-triangle me-2"></i>Balise: <strong>${escapeHtml(name)}</strong><br>ID: ${id}`;
+    new bootstrap.Modal(document.getElementById('deleteBaliseModal')).show();
+}
+
+async function exportBalises() {
+    showLoader();
+    try {
+        window.location.href = '/api/balises/export';
+        showToast('Export lancé', 'success');
+    } catch (error) {
+        showToast('Erreur export', 'error');
+    } finally {
+        setTimeout(() => hideLoader(), 1000);
+    }
+}
+
+// ============================================================================
+// GRAPHIQUES
+// ============================================================================
+function initCharts() {
+    const ctx = document.getElementById('statusChart');
+    if (ctx) {
+        statusChart = new Chart(ctx, {
+            type: 'doughnut',
+            data: { labels: ['Actives', 'Inactives', 'Expirées', 'Maintenance'], datasets: [{ data: [0, 0, 0, 0], backgroundColor: ['#198754', '#6c757d', '#dc3545', '#0dcaf0'], borderWidth: 0 }] },
+            options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { position: 'bottom' } } }
         });
+    }
+}
+
+// ============================================================================
+// UTILITAIRES
+// ============================================================================
+function getStatusClass(status) {
+    if (status === 'Actif') return 'actif';
+    if (status === 'Inactif') return 'inactif';
+    if (status === 'Expiré') return 'expire';
+    if (status === 'Maintenance') return 'maintenance';
+    return 'secondary';
+}
+
+function getStatusIcon(status) {
+    if (status === 'Actif') return 'fa-check-circle';
+    if (status === 'Inactif') return 'fa-circle';
+    if (status === 'Expiré') return 'fa-exclamation-triangle';
+    if (status === 'Maintenance') return 'fa-tools';
+    return 'fa-question-circle';
+}
+
+function showLoader() {
+    if (!document.querySelector('.loader-overlay')) {
+        const overlay = document.createElement('div');
+        overlay.className = 'loader-overlay';
+        overlay.innerHTML = '<div class="loader"></div>';
+        document.body.appendChild(overlay);
+    }
+}
+
+function hideLoader() {
+    const overlay = document.querySelector('.loader-overlay');
+    if (overlay) overlay.remove();
+}
+
+function showToast(message, type = 'info') {
+    const bgColor = type === 'success' ? '#198754' : type === 'error' ? '#dc3545' : type === 'warning' ? '#ffc107' : '#0d6efd';
+    const icon = type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-exclamation-triangle' : 'fa-info-circle';
+    
+    const toast = document.createElement('div');
+    toast.className = 'toast-notification bg-white rounded shadow-lg p-3';
+    toast.style.minWidth = '300px';
+    toast.style.borderLeft = `4px solid ${bgColor}`;
+    toast.innerHTML = `
+        <div class="d-flex align-items-center">
+            <div class="me-3" style="color: ${bgColor}"><i class="fas ${icon} fa-lg"></i></div>
+            <div class="flex-grow-1"><p class="mb-0">${escapeHtml(message)}</p></div>
+            <button type="button" class="btn-close btn-sm" onclick="this.parentElement.parentElement.remove()"></button>
+        </div>
+    `;
+    
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 3000);
+}
+
+function escapeHtml(str) {
+    if (!str) return '-';
+    return String(str).replace(/[&<>]/g, function(m) {
+        if (m === '&') return '&amp;';
+        if (m === '<') return '&lt;';
+        if (m === '>') return '&gt;';
+        return m;
     });
-    
-    function displayBaliseInfo(data) {
-        debugLog("Affichage données balise");
-        
-        // Vérifier que les données sont valides
-        if (!data || typeof data !== 'object') {
-            debugLog("Données invalides:", data);
-            showError('Données invalides reçues');
-            return;
-        }
-        
-        const infoHtml = `
-            <div class="row">
-                <div class="col-md-6">
-                    <h6 class="border-bottom pb-2">Informations Générales</h6>
-                    <table class="table table-sm table-striped">
-                        <tr><td><strong>Numéro d'enregistrement:</strong></td><td>${escapeHtml(data.registration_number || 'N/A')}</td></tr>
-                        <tr><td><strong>Nom de l'unité:</strong></td><td>${escapeHtml(data.unit_name || 'N/A')}</td></tr>
-                        <tr><td><strong>Port:</strong></td><td>${escapeHtml(data.port || 'N/A')}</td></tr>
-                        <tr><td><strong>MMSI:</strong></td><td>${escapeHtml(data.mmsi || 'N/A')}</td></tr>
-                        <tr><td><strong>UIN:</strong></td><td>${escapeHtml(data.uin || 'N/A')}</td></tr>
-                    </table>
-                </div>
-                <div class="col-md-6">
-                    <h6 class="border-bottom pb-2">Caractéristiques Techniques</h6>
-                    <table class="table table-sm table-striped">
-                        <tr><td><strong>Type de balise:</strong></td><td>${escapeHtml(data.beacon_type || 'N/A')}</td></tr>
-                        <tr><td><strong>Fabricant:</strong></td><td>${escapeHtml(data.manufacturer || 'N/A')}</td></tr>
-                        <tr><td><strong>Modèle:</strong></td><td>${escapeHtml(data.model || 'N/A')}</td></tr>
-                        <tr><td><strong>Numéro série fabricant:</strong></td><td>${escapeHtml(data.serial_number_manufacturer || 'N/A')}</td></tr>
-                        <tr><td><strong>Numéro série SAR:</strong></td><td>${escapeHtml(data.serial_number_sar || 'N/A')}</td></tr>
-                    </table>
-                </div>
-            </div>
-            
-            <div class="row mt-3">
-                <div class="col-md-6">
-                    <h6 class="border-bottom pb-2">Dates Importantes</h6>
-                    <table class="table table-sm table-striped">
-                        <tr><td><strong>Date d'enregistrement:</strong></td><td>${escapeHtml(data.registration_date || 'N/A')}</td></tr>
-                        <tr><td><strong>Expiration batterie:</strong></td><td>${escapeHtml(data.battery_expiration_date || 'N/A')}</td></tr>
-                    </table>
-                </div>
-                <div class="col-md-6">
-                    <h6 class="border-bottom pb-2">Statut</h6>
-                    <table class="table table-sm table-striped">
-                        <tr><td><strong>Statut:</strong></td><td>${getStatusBadge(data.beacon_status)}</td></tr>
-                        <tr><td><strong>Type d'activité:</strong></td><td>${escapeHtml(data.activity_type || 'N/A')}</td></tr>
-                        <tr><td><strong>TAC:</strong></td><td>${escapeHtml(data.tac || 'N/A')}</td></tr>
-                    </table>
-                </div>
-            </div>
-            
-            <div class="row mt-3">
-                <div class="col-12">
-                    <h6 class="border-bottom pb-2">Informations Propriétaire</h6>
-                    <table class="table table-sm table-striped">
-                        <tr><td><strong>Propriétaire:</strong></td><td>${escapeHtml(data.owner || 'N/A')}</td></tr>
-                        <tr><td><strong>Email:</strong></td><td>${escapeHtml(data.email || 'N/A')}</td></tr>
-                        <tr><td><strong>Téléphone:</strong></td><td>${escapeHtml(data.phone_number || 'N/A')}</td></tr>
-                        <tr><td><strong>Adresse:</strong></td><td>${escapeHtml(data.address || 'N/A')}</td></tr>
-                    </table>
-                </div>
-            </div>
-        `;
-        
-        $('#baliseInfo').html(infoHtml);
-        $('#resultats').show();
-        debugLog("Affichage terminé");
-    }
-    
-    function getStatusBadge(status) {
-        if (!status) return '<span class="badge bg-secondary">N/A</span>';
-        
-        const statusLower = status.toLowerCase();
-        let badgeClass = 'secondary';
-        
-        if (statusLower.includes('actif') || statusLower.includes('active')) {
-            badgeClass = 'success';
-        } else if (statusLower.includes('inactif') || statusLower.includes('inactive')) {
-            badgeClass = 'warning';
-        } else if (statusLower.includes('expir') || statusLower.includes('expired')) {
-            badgeClass = 'danger';
-        }
-        
-        return `<span class="badge bg-${badgeClass}">${escapeHtml(status)}</span>`;
-    }
-    
-    function showError(message) {
-        debugLog("Affichage erreur:", message);
-        $('#messageErreur').text(message);
-        $('#erreur').show();
-    }
-    
-    function escapeHtml(unsafe) {
-        if (unsafe === null || unsafe === undefined) return 'N/A';
-        return unsafe.toString()
-            .replace(/&/g, "&amp;")
-            .replace(/</g, "&lt;")
-            .replace(/>/g, "&gt;")
-            .replace(/"/g, "&quot;")
-            .replace(/'/g, "&#039;");
-    }
-});
+}
 </script>
-
-
 {% endblock %}

@@ -379,6 +379,266 @@
   color: rgba(255, 255, 255, 0.9) !important;
  
 }
+
+
+
+/* Styles pour les notifications dynamiques */
+.notification-wrapper {
+    position: relative;
+}
+
+.notification-icon {
+    position: relative;
+    background: transparent;
+    border: none;
+    font-size: 1.3rem;
+    color: white;
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 50%;
+    transition: background-color 0.3s;
+}
+
+.notification-icon:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.notification-badge {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background-color: #dc3545;
+    color: white;
+    border-radius: 50%;
+    width: 18px;
+    height: 18px;
+    font-size: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+}
+
+.notification-dropdown {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    width: 380px;
+    max-height: 500px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+    display: none;
+    z-index: 1000;
+    overflow: hidden;
+    flex-direction: column;
+}
+
+.notification-dropdown.show {
+    display: flex;
+}
+
+.notification-header {
+    padding: 12px 15px;
+    background: linear-gradient(135deg, #005baa, #003366);
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.notification-header h5 {
+    margin: 0;
+    font-size: 16px;
+}
+
+.mark-all-read {
+    background: rgba(255,255,255,0.2);
+    border: none;
+    color: white;
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 11px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.mark-all-read:hover {
+    background: rgba(255,255,255,0.3);
+}
+
+.notification-content {
+    flex: 1;
+    overflow-y: auto;
+    max-height: 400px;
+}
+
+.notification-item {
+    padding: 12px 15px;
+    border-bottom: 1px solid #e9ecef;
+    display: flex;
+    gap: 12px;
+    transition: background 0.2s;
+    cursor: pointer;
+}
+
+.notification-item:hover {
+    background-color: #f8f9fa;
+}
+
+.notification-item.notification-critical {
+    border-left: 3px solid #dc3545;
+    background-color: #fff5f5;
+}
+
+.notification-item.notification-urgent {
+    border-left: 3px solid #ffc107;
+    background-color: #fffbf0;
+}
+
+.notification-item.notification-normal {
+    border-left: 3px solid #0d6efd;
+}
+
+.notification-icon-mini {
+    flex-shrink: 0;
+}
+
+.notification-icon-mini i {
+    font-size: 20px;
+}
+
+.notification-critical .notification-icon-mini i {
+    color: #dc3545;
+}
+
+.notification-urgent .notification-icon-mini i {
+    color: #ffc107;
+}
+
+.notification-normal .notification-icon-mini i {
+    color: #0d6efd;
+}
+
+.notification-content-item {
+    flex: 1;
+}
+
+.notification-title {
+    font-weight: 600;
+    font-size: 14px;
+    margin-bottom: 4px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.notification-time {
+    font-size: 10px;
+    color: #6c757d;
+    font-weight: normal;
+}
+
+.notification-text {
+    font-size: 12px;
+    color: #6c757d;
+    margin-bottom: 6px;
+    line-height: 1.4;
+}
+
+.notification-meta {
+    display: flex;
+    gap: 5px;
+    margin-bottom: 8px;
+    flex-wrap: wrap;
+}
+
+.notification-meta .badge {
+    font-size: 10px;
+    padding: 2px 6px;
+}
+
+.notification-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.btn-mark-read, .btn-view-details {
+    background: none;
+    border: none;
+    font-size: 11px;
+    padding: 2px 6px;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-mark-read {
+    color: #28a745;
+}
+
+.btn-mark-read:hover {
+    background-color: #d4edda;
+}
+
+.btn-view-details {
+    color: #005baa;
+}
+
+.btn-view-details:hover {
+    background-color: #e3f2fd;
+}
+
+.notification-footer {
+    padding: 10px 15px;
+    border-top: 1px solid #e9ecef;
+    background-color: #f8f9fa;
+}
+
+.view-all-link {
+    display: block;
+    text-align: center;
+    color: #005baa;
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.view-all-link:hover {
+    text-decoration: underline;
+}
+
+/* Animation pour les nouvelles notifications */
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.notification-item {
+    animation: slideIn 0.3s ease;
+}
+
+/* Responsive */
+@media (max-width: 576px) {
+    .notification-dropdown {
+        width: 320px;
+        right: -50px;
+    }
+}
+
+
+
+
+
+
 </style>
 <style>
   .language-selector {
@@ -435,6 +695,254 @@
       margin: 10px 0;
     }
   }
+
+  /* Dropdown navigation */
+.navmenu ul li.dropdown ul {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background: var(--primary-color);
+    min-width: 200px;
+    border-top: 2px solid var(--accent-color);
+    border-radius: 0 0 8px 8px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    z-index: 999;
+    padding: 8px 0;
+}
+
+.navmenu ul li.dropdown {
+    position: relative;
+}
+
+.navmenu ul li.dropdown:hover ul {
+    display: block;
+}
+
+.navmenu ul li.dropdown ul li a {
+    padding: 8px 16px;
+    display: block;
+    color: rgba(255,255,255,0.9) !important;
+    border-bottom: none;
+    font-size: 0.9rem;
+    white-space: nowrap;
+}
+
+.navmenu ul li.dropdown ul li a:hover {
+    color: var(--gold-light) !important;
+    background: rgba(255,255,255,0.05);
+}
+
+/* Mobile : dropdown dans le menu vertical */
+@media (max-width: 768px) {
+    .navmenu ul li.dropdown ul {
+        position: static;
+        display: none;
+        background: rgba(255,255,255,0.05);
+        border-top: 1px solid rgba(255,215,0,0.2);
+        box-shadow: none;
+        padding-left: 15px;
+    }
+
+    .navmenu ul li.dropdown.active ul {
+        display: block;
+    }
+}
+
+/* ──────────────────────────────────────────
+   MENU NAVIGATION IAMSAR - STYLES CORRIGÉS
+   ────────────────────────────────────────── */
+
+/* Réduction de la taille de police des noms de modules */
+.navmenu ul li > a {
+    font-size: 0.85rem !important;  /* Taille réduite */
+    font-weight: 500;
+    padding: 8px 12px;
+}
+
+/* Icônes dans le menu principal - ajustées */
+.navmenu ul li a i {
+    font-size: 1rem;
+    margin-right: 6px;
+    vertical-align: middle;
+}
+
+/* Style des dropdowns */
+.navmenu ul li.dropdown {
+    position: relative;
+}
+
+.navmenu ul li.dropdown > a {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.navmenu ul li.dropdown > a i.bi-chevron-down {
+    font-size: 0.65rem;
+    transition: transform 0.2s ease;
+}
+
+.navmenu ul li.dropdown:hover > a i.bi-chevron-down {
+    transform: rotate(180deg);
+}
+
+/* Sous-menu - Texte aligné à GAUCHE */
+.navmenu ul li.dropdown ul {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    min-width: 250px;
+    border-top: 3px solid var(--accent-color);
+    border-radius: 0 0 12px 12px;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
+    z-index: 999;
+    padding: 10px 0;
+}
+
+.navmenu ul li.dropdown ul li {
+    display: block;
+    text-align: left !important;  /* Alignement à gauche */
+}
+
+.navmenu ul li.dropdown ul li a {
+    padding: 8px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;  /* Alignement à gauche */
+    text-align: left;              /* Texte aligné à gauche */
+    color: rgba(255, 255, 255, 0.9) !important;
+    border-bottom: none;
+    font-size: 0.8rem;            /* Taille réduite pour sous-menus */
+    font-weight: 400;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.navmenu ul li.dropdown ul li a i {
+    width: 28px;
+    font-size: 0.9rem;
+    color: var(--gold-light);
+    text-align: center;
+    margin-right: 8px;
+}
+
+.navmenu ul li.dropdown ul li a:hover {
+    color: var(--gold-light) !important;
+    background: rgba(255, 215, 0, 0.1);
+    padding-left: 24px;
+}
+
+/* Premier niveau - active */
+.navmenu ul li a.active {
+    color: var(--gold-light) !important;
+    border-bottom: 2px solid var(--gold-light);
+}
+
+/* Responsive mobile - dropdown empilés */
+@media (max-width: 1199px) {
+    /* Taille des modules en mobile */
+    .navmenu ul li > a {
+        font-size: 0.9rem !important;
+        padding: 12px 15px;
+    }
+    
+    .navmenu ul li.dropdown ul {
+        position: static;
+        display: none;
+        background: rgba(255, 255, 255, 0.05);
+        border-top: 1px solid rgba(201, 169, 74, 0.3);
+        border-radius: 0;
+        box-shadow: none;
+        padding: 5px 0 5px 20px;
+        width: 100%;
+    }
+
+    .navmenu ul li.dropdown ul li a {
+        padding: 8px 15px;
+        font-size: 0.85rem;
+        white-space: normal;  /* Permet le retour à la ligne sur mobile */
+    }
+    
+    .navmenu ul li.dropdown ul li a i {
+        width: 25px;
+        font-size: 0.85rem;
+    }
+
+    .navmenu ul li.dropdown.active ul {
+        display: block;
+    }
+    
+    .navmenu ul li.dropdown > a i.bi-chevron-down {
+        margin-left: auto;
+    }
+}
+
+/* Animation hover pour les éléments du menu */
+.navmenu ul li > a {
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+.navmenu ul li > a::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 50%;
+    width: 0;
+    height: 2px;
+    background: var(--gold-light);
+    transition: all 0.3s ease;
+    transform: translateX(-50%);
+}
+
+.navmenu ul li > a:hover::after,
+.navmenu ul li > a.active::after {
+    width: 60%;
+}
+
+/* Séparateur visuel dans les menus */
+.navmenu ul li.dropdown ul li.divider {
+    height: 1px;
+    background: rgba(255, 255, 255, 0.1);
+    margin: 8px 0;
+}
+
+/* Badge pour les notifications dans le menu */
+.navmenu .menu-badge {
+    background: #e63946;
+    color: white;
+    border-radius: 20px;
+    padding: 2px 8px;
+    font-size: 0.6rem;
+    font-weight: 600;
+    margin-left: 8px;
+}
+
+/* Ajustement global de la navmenu */
+.navmenu ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.navmenu ul li {
+    display: inline-block;
+    position: relative;
+}
+
+@media (max-width: 1199px) {
+    .navmenu ul li {
+        display: block;
+        width: 100%;
+    }
+}
+
+
+
+
 </style>
     {% block extra_css %}{% endblock %}
 
@@ -451,21 +959,68 @@
             <h1>MRCC</h1>
         </a>
 
-        <nav id="navmenu" class="navmenu">
-            <ul>
-                <li><a href="{{ url_for('index') }}" class="{% if request.path == url_for('index') %}active{% endif %}">Accueil</a></li>
-                <li><a href="http://geoai-solutions.ddns.net:8888/MRCC/" class="{% if request.path == '/geoportail' %}active{% endif %}">Géoportail</a></li>
-                <li><a href="{{ url_for('meteo') }}" class="{% if request.path == url_for('meteo') %}active{% endif %}">Météo</a></li>
-                <li><a href="{{ url_for('marine') }}" class="{% if request.path == url_for('marine') %}active{% endif %}">Flotte maritime</a></li>
-                <li><a href="{{ url_for('moyens') }}" class="{% if request.path == url_for('moyens') %}active{% endif %}">Moyens de secours</a></li>
-                <li><a href="{{ url_for('simulate_derive') }}" class="{% if request.path == url_for('simulate_derive') %}active{% endif %}">Dérives</a></li>
-                <li><a href="{{ url_for('alerte') }}" class="{% if request.path == url_for('alerte') %}active{% endif %}">Alertes</a></li>
-                <!-- Nouvel élément Événements -->
-                <li><a href="{{ url_for('rescue_events') }}" class="{% if request.path == url_for('rescue_events') %}active{% endif %}">
-                    <i class="fas fa-life-ring me-1"></i>Événements
-                </a></li>
-            </ul>
-        </nav>
+        <!-- Menu de navigation au centre -->
+      <nav id="navmenu" class="navmenu">
+        <ul>
+          <li><a href="{{ url_for('index') }}" class="{% if request.path == url_for('index') %}active{% endif %}">
+              <i class="bi bi-house-door"></i>Accueil
+          </a></li>
+
+          <li class="dropdown">
+              <a href="#"><i class="bi bi-map"></i>Planification <i class="bi bi-chevron-down ms-1"></i></a>
+              <ul>
+                  <li><a href="http://geoai-solutions.ddns.net:8888/MRCC/"><i class="bi bi-geo-alt"></i>Géoportail SAR</a></li>
+                  <li><a href="{{ url_for('simulate_derive') }}"><i class="bi bi-compass"></i>Modélisation dérive</a></li>
+                  <li><a href="#"><i class="bi bi-layers"></i>Zones de recherche</a></li>
+              </ul>
+          </li>
+
+          <li class="dropdown">
+              <a href="#"><i class="bi bi-boat"></i>Ressources <i class="bi bi-chevron-down ms-1"></i></a>
+              <ul>
+                  <li><a href="{{ url_for('moyens') }}"><i class="bi bi-helicopter"></i>Moyens MRCC</a></li>
+                  <li><a href="#"><i class="bi bi-people"></i>Équipes d'intervention</a></li>
+                  <li><a href="#"><i class="bi bi-hospital"></i>Ressources médicales</a></li>
+              </ul>
+          </li>
+
+          <li class="dropdown">
+              <a href="#"><i class="bi bi-broadcast"></i>Alertes <i class="bi bi-chevron-down ms-1"></i></a>
+              <ul>
+                  <li><a href="{{ url_for('alerte') }}"><i class="bi bi-exclamation-triangle"></i>Alertes détresses</a></li>
+                  <li><a href="{{ url_for('rescue_events') }}"><i class="bi bi-life-ring"></i>Événements SAR</a></li>
+                  <li><a href="#"><i class="bi bi-megaphone"></i>Diffusion urgente</a></li>
+              </ul>
+          </li>
+
+          <li class="dropdown">
+              <a href="#"><i class="bi bi-cloud-sun"></i>Environnement <i class="bi bi-chevron-down ms-1"></i></a>
+              <ul>
+                  <li><a href="{{ url_for('meteo') }}"><i class="bi bi-cloud-wind"></i>Météo marine</a></li>
+                  <li><a href="#"><i class="bi bi-water"></i>Courants et marées</a></li>
+                  <li><a href="#"><i class="bi bi-map"></i>Cartes marines</a></li>
+              </ul>
+          </li>
+
+          <li class="dropdown">
+              <a href="#"><i class="bi bi-bar-chart-steps"></i>Trafic <i class="bi bi-chevron-down ms-1"></i></a>
+              <ul>
+                  <li><a href="{{ url_for('recherche_balises') }}"><i class="bi bi-search"></i>Recherche balise</a></li>
+                  <li><a href="{{ url_for('plb_management') }}"><i class="bi bi-database"></i>Gestion PLB</a></li>
+                  <li><a href="{{ url_for('marine') }}"><i class="bi bi-ship"></i>Flotte SAR</a></li>
+              </ul>
+          </li>
+
+          <li class="dropdown">
+              <a href="#"><i class="bi bi-file-text"></i>Admin <i class="bi bi-chevron-down ms-1"></i></a>
+              <ul>
+                  <li><a href="#"><i class="bi bi-journal-bookmark-fill"></i>Rapports SAR</a></li>
+                  <li><a href="#"><i class="bi bi-gear"></i>Paramètres</a></li>
+                  <li><a href="#"><i class="bi bi-graph-up"></i>Statistiques</a></li>
+              </ul>
+          </li>
+        </ul>
+      </nav>
 
         <div class="user-menu ms-auto">
             {% if current_user.is_authenticated %}
@@ -491,29 +1046,30 @@
         </div>
         
         <div class="notification-wrapper ms-3">
-            <button id="notification-icon" class="notification-icon" aria-label="Notifications">
-                <i class="bi bi-bell"></i>
-                <span id="notification-count" class="notification-badge">3</span>
-            </button>
-            <div id="notification-list" class="notification-dropdown">
-                <div class="notification-header">
-                    <h5>Alertes récentes</h5>
-                    <button class="mark-all-read">Tout marquer comme lu</button>
-                </div>
-                <div class="notification-content">
-                    <div class="notification-item">
-                        <div class="notification-title">Alerte détresse</div>
-                        <div class="notification-text">Signal de détresse reçu à 12:34 - Position: 33.5°N, 7.6°W</div>
-                        <button class="mark-as-read" data-id="1">Marquer comme lu</button>
-                    </div>
-                    <div class="notification-item">
-                        <div class="notification-title">Météo</div>
-                        <div class="notification-text">Avertissement de tempête pour la zone Atlantique Nord</div>
-                        <button class="mark-as-read" data-id="2">Marquer comme lu</button>
-                    </div>
-                </div>
-            </div>
-        </div>
+          <button id="notification-icon" class="notification-icon" aria-label="Notifications">
+              <i class="bi bi-bell"></i>
+              <span id="notification-count" class="notification-badge">0</span>
+          </button>
+          <div id="notification-list" class="notification-dropdown">
+              <div class="notification-header">
+                  <h5>Alertes récentes</h5>
+                  <button class="mark-all-read" id="mark-all-read-btn">Tout marquer comme lu</button>
+              </div>
+              <div class="notification-content" id="notification-content">
+                  <div class="text-center py-3">
+                      <div class="spinner-border spinner-border-sm text-primary" role="status">
+                          <span class="visually-hidden">Chargement...</span>
+                      </div>
+                      <p class="mt-2 mb-0 text-muted small">Chargement des notifications...</p>
+                  </div>
+              </div>
+              <div class="notification-footer">
+                  <a href="{{ url_for('alerte') }}" class="view-all-link">
+                      Voir toutes les alertes <i class="bi bi-arrow-right"></i>
+                  </a>
+              </div>
+          </div>
+      </div>
     </div>
 
     <button class="mobile-nav-toggle d-xl-none">
@@ -1244,6 +1800,283 @@
           });
         });
       });
+
+      // Gestion dropdown mobile
+document.querySelectorAll('.navmenu ul li.dropdown > a').forEach(link => {
+    link.addEventListener('click', function(e) {
+        // Seulement sur mobile
+        if (window.innerWidth <= 768) {
+            e.preventDefault();
+            this.closest('li').classList.toggle('active');
+        }
+    });
+});
+
+
+
+
+
+
+
+
+// Gestion des notifications
+class NotificationManager {
+    constructor() {
+        this.notifications = [];
+        this.unreadCount = 0;
+        this.pollingInterval = null;
+        this.init();
+    }
+    
+    init() {
+        this.loadNotifications();
+        this.startPolling();
+        this.attachEventListeners();
+    }
+    
+    startPolling() {
+        // Rafraîchir les notifications toutes les 30 secondes
+        this.pollingInterval = setInterval(() => {
+            this.loadNotifications();
+        }, 30000);
+    }
+    
+    async loadNotifications() {
+        try {
+            const response = await fetch('/api/notifications');
+            if (!response.ok) throw new Error('Erreur réseau');
+            const data = await response.json();
+            this.notifications = data.notifications;
+            this.unreadCount = data.unread_count;
+            this.updateUI();
+        } catch (error) {
+            console.error('Erreur chargement notifications:', error);
+            this.showError();
+        }
+    }
+    
+    updateUI() {
+        // Mettre à jour le compteur
+        const countBadge = document.getElementById('notification-count');
+        if (countBadge) {
+            countBadge.textContent = this.unreadCount;
+            countBadge.style.display = this.unreadCount > 0 ? 'flex' : 'none';
+        }
+        
+        // Mettre à jour la liste
+        this.renderNotificationList();
+    }
+    
+    renderNotificationList() {
+        const container = document.getElementById('notification-content');
+        if (!container) return;
+        
+        if (this.notifications.length === 0) {
+            container.innerHTML = `
+                <div class="text-center py-4">
+                    <i class="bi bi-bell-slash" style="font-size: 2rem; color: #ccc;"></i>
+                    <p class="mt-2 mb-0 text-muted">Aucune nouvelle alerte</p>
+                </div>
+            `;
+            return;
+        }
+        
+        let html = '';
+        this.notifications.forEach(notif => {
+            const urgencyClass = this.getUrgencyClass(notif.niveau_urgence);
+            const urgencyIcon = this.getUrgencyIcon(notif.niveau_urgence);
+            const date = new Date(notif.date_creation);
+            const timeAgo = this.getTimeAgo(date);
+            
+            html += `
+                <div class="notification-item ${urgencyClass}" data-id="${notif.id}">
+                    <div class="notification-icon-mini">
+                        <i class="${urgencyIcon}"></i>
+                    </div>
+                    <div class="notification-content-item">
+                        <div class="notification-title">
+                            ${this.escapeHtml(notif.titre)}
+                            <span class="notification-time">${timeAgo}</span>
+                        </div>
+                        <div class="notification-text">
+                            ${this.escapeHtml(notif.description?.substring(0, 100) || '')}${notif.description?.length > 100 ? '...' : ''}
+                        </div>
+                        <div class="notification-meta">
+                            <span class="badge bg-${this.getTypeColor(notif.type_incident)}">
+                                ${this.escapeHtml(notif.type_incident || 'Non spécifié')}
+                            </span>
+                            ${notif.latitude && notif.longitude ? `
+                                <span class="badge bg-info">
+                                    <i class="bi bi-geo-alt"></i> ${parseFloat(notif.latitude).toFixed(2)}°, ${parseFloat(notif.longitude).toFixed(2)}°
+                                </span>
+                            ` : ''}
+                        </div>
+                        <div class="notification-actions">
+                            <button class="btn-mark-read" data-id="${notif.id}">
+                                <i class="bi bi-check-circle"></i> Marquer comme lu
+                            </button>
+                            <button class="btn-view-details" data-id="${notif.id}">
+                                <i class="bi bi-eye"></i> Voir détails
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+        
+        container.innerHTML = html;
+        
+        // Attacher les événements
+        this.attachItemEvents();
+    }
+    
+    getUrgencyClass(niveau) {
+        switch(niveau) {
+            case 'critique': return 'notification-critical';
+            case 'urgent': return 'notification-urgent';
+            default: return 'notification-normal';
+        }
+    }
+    
+    getUrgencyIcon(niveau) {
+        switch(niveau) {
+            case 'critique': return 'bi bi-exclamation-octagon-fill';
+            case 'urgent': return 'bi bi-exclamation-triangle-fill';
+            default: return 'bi bi-info-circle-fill';
+        }
+    }
+    
+    getTypeColor(type) {
+        const colors = {
+            'Sauvetage': 'danger',
+            'Médical': 'warning',
+            'Incendie': 'danger',
+            'Pollution': 'success',
+            'Sécurité': 'info'
+        };
+        return colors[type] || 'secondary';
+    }
+    
+    getTimeAgo(date) {
+        const now = new Date();
+        const diff = now - date;
+        const minutes = Math.floor(diff / 60000);
+        const hours = Math.floor(diff / 3600000);
+        const days = Math.floor(diff / 86400000);
+        
+        if (minutes < 1) return 'à l\'instant';
+        if (minutes < 60) return `il y a ${minutes} min`;
+        if (hours < 24) return `il y a ${hours} h`;
+        if (days < 7) return `il y a ${days} j`;
+        return date.toLocaleDateString('fr-FR');
+    }
+    
+    async markAsRead(alerteId) {
+        try {
+            const response = await fetch('/api/notifications/mark_read', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ alerte_id: alerteId })
+            });
+            
+            if (response.ok) {
+                await this.loadNotifications();
+            }
+        } catch (error) {
+            console.error('Erreur:', error);
+        }
+    }
+    
+    async markAllAsRead() {
+        try {
+            const response = await fetch('/api/notifications/mark_all_read', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' }
+            });
+            
+            if (response.ok) {
+                await this.loadNotifications();
+            }
+        } catch (error) {
+            console.error('Erreur:', error);
+        }
+    }
+    
+    attachEventListeners() {
+        // Icône des notifications
+        const icon = document.getElementById('notification-icon');
+        const dropdown = document.getElementById('notification-list');
+        
+        if (icon && dropdown) {
+            icon.addEventListener('click', (e) => {
+                e.stopPropagation();
+                dropdown.classList.toggle('show');
+            });
+            
+            // Fermer le dropdown en cliquant ailleurs
+            document.addEventListener('click', (e) => {
+                if (!icon.contains(e.target) && !dropdown.contains(e.target)) {
+                    dropdown.classList.remove('show');
+                }
+            });
+        }
+        
+        // Bouton "Tout marquer comme lu"
+        const markAllBtn = document.getElementById('mark-all-read-btn');
+        if (markAllBtn) {
+            markAllBtn.addEventListener('click', () => this.markAllAsRead());
+        }
+    }
+    
+    attachItemEvents() {
+        // Boutons "Marquer comme lu"
+        document.querySelectorAll('.btn-mark-read').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const id = btn.getAttribute('data-id');
+                this.markAsRead(id);
+            });
+        });
+        
+        // Boutons "Voir détails"
+        document.querySelectorAll('.btn-view-details').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const id = btn.getAttribute('data-id');
+                window.location.href = `/details_alerte/${id}`;
+            });
+        });
+    }
+    
+    showError() {
+        const container = document.getElementById('notification-content');
+        if (container) {
+            container.innerHTML = `
+                <div class="text-center py-4 text-danger">
+                    <i class="bi bi-exclamation-triangle" style="font-size: 2rem;"></i>
+                    <p class="mt-2 mb-0">Erreur de chargement</p>
+                    <button class="btn btn-sm btn-link" onclick="location.reload()">Réessayer</button>
+                </div>
+            `;
+        }
+    }
+    
+    escapeHtml(text) {
+        if (!text) return '';
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+}
+
+// Initialiser les notifications au chargement de la page
+document.addEventListener('DOMContentLoaded', () => {
+    window.notificationManager = new NotificationManager();
+});
+
+
+
+
     </script>
   {% block extra_js %}{% endblock %}
 </body>

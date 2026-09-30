@@ -140,6 +140,19 @@
         border-radius: 20px;
         font-size: 0.7rem;
     }
+    
+    .form-section {
+        background: #f8f9fa;
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+    }
+    
+    .form-section h6 {
+        margin-bottom: 15px;
+        color: #001F4D;
+        font-weight: 600;
+    }
 </style>
 {% endblock %}
 
@@ -201,12 +214,7 @@
                 <label class="form-label">Type d'incident</label>
                 <select id="typeFilter" class="form-select">
                     <option value="">Tous</option>
-                    <option value="man_overboard">Homme à la mer</option>
-                    <option value="vessel_sinking">Navire qui coule</option>
-                    <option value="medical">Urgence médicale</option>
-                    <option value="fire">Incendie</option>
-                    <option value="collision">Collision</option>
-                    <option value="distress">Détresse</option>
+                    <!-- Rempli dynamiquement depuis VueTypeCategorieSectEvent -->
                 </select>
             </div>
             <div class="col-md-3">
@@ -261,101 +269,183 @@
             </div>
             <form id="createEventForm">
                 <div class="modal-body">
-                    <div class="row g-3">
-                        <div class="col-md-6">
-                            <label class="form-label">Type d'incident *</label>
-                            <select class="form-select" name="event_type" required>
-                                <option value="">Sélectionner...</option>
-                                <option value="man_overboard">Homme à la mer</option>
-                                <option value="vessel_sinking">Navire qui coule</option>
-                                <option value="medical">Urgence médicale</option>
-                                <option value="fire">Incendie à bord</option>
-                                <option value="collision">Collision</option>
-                                <option value="distress">Signal de détresse</option>
-                            </select>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Priorité</label>
-                            <select class="form-select" name="priority">
-                                <option value="normal">Normale</option>
-                                <option value="high">Élevée</option>
-                                <option value="critical">Critique</option>
-                                <option value="low">Faible</option>
-                            </select>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Latitude *</label>
-                            <input type="number" class="form-control" name="latitude" step="0.0001" required>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Longitude *</label>
-                            <input type="number" class="form-control" name="longitude" step="0.0001" required>
-                        </div>
-                        <div class="col-md-12">
-                            <label class="form-label">Lieu / Description</label>
-                            <input type="text" class="form-control" name="location_name">
-                        </div>
-                        <div class="col-md-12">
-                            <label class="form-label">Description de l'incident</label>
-                            <textarea class="form-control" name="description" rows="3"></textarea>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Nombre de personnes impliquées</label>
-                            <input type="number" class="form-control" name="persons_involved" value="1" min="1">
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Heure de l'incident</label>
-                            <input type="datetime-local" class="form-control" name="incident_time">
-                        </div>
-                        <div class="col-md-12">
-                            <h5 class="mt-3">Informations navire (si applicable)</h5>
-                            <div class="row g-3">
-                                <div class="col-md-6">
-                                    <label class="form-label">Nom du navire</label>
-                                    <input type="text" class="form-control" name="vessel_name">
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label">Type de navire</label>
-                                    <input type="text" class="form-control" name="vessel_type">
-                                </div>
+                    <!-- Section: Informations générales -->
+                        <div class="form-section">
+                            <h6><i class="fas fa-info-circle me-2"></i>Informations générales</h6>
+                            <div class="row g-2">
                                 <div class="col-md-4">
-                                    <label class="form-label">Pavillon</label>
-                                    <input type="text" class="form-control" name="vessel_flag">
+                                    <label class="form-label">Type d'incident *</label>
+                                    <select class="form-select" name="event_type" id="eventTypeSelect" required>
+                                        <option value="">Sélectionner...</option>
+                                        <!-- Rempli dynamiquement depuis VueTypeCategorieSectEvent -->
+                                    </select>
                                 </div>
+                                
                                 <div class="col-md-4">
-                                    <label class="form-label">IMO</label>
-                                    <input type="text" class="form-control" name="vessel_imo">
-                                </div>
-                                <div class="col-md-4">
-                                    <label class="form-label">MMSI</label>
-                                    <input type="text" class="form-control" name="vessel_mmsi">
+                                    <label class="form-label">Priorité</label>
+                                    <select class="form-select" name="priority">
+                                        <option value="normal">Normale</option>
+                                        <option value="high">Élevée</option>
+                                        <option value="critical">Critique</option>
+                                        <option value="low">Faible</option>
+                                    </select>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-12">
-                            <h5 class="mt-3">Conditions environnementales</h5>
-                            <div class="row g-3">
-                                <div class="col-md-3">
-                                    <label class="form-label">Vent (nœuds)</label>
-                                    <input type="number" class="form-control" name="wind_speed" step="0.1">
-                                </div>
-                                <div class="col-md-3">
-                                    <label class="form-label">Direction vent (°)</label>
-                                    <input type="number" class="form-control" name="wind_direction">
-                                </div>
-                                <div class="col-md-3">
-                                    <label class="form-label">État de mer (1-9)</label>
-                                    <input type="number" class="form-control" name="sea_state" min="1" max="9">
-                                </div>
-                                <div class="col-md-3">
-                                    <label class="form-label">Visibilité (km)</label>
-                                    <input type="number" class="form-control" name="visibility_km" step="0.1">
-                                </div>
+                    
+                    <!-- Section: Localisation (avec création du point géométrique) -->
+                    <div class="form-section">
+                        <h6><i class="fas fa-map-marker-alt me-2"></i>Localisation (Point géographique)</h6>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Latitude *</label>
+                                <input type="number" class="form-control" name="latitude" id="latitude" step="0.000000000000000001" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Longitude *</label>
+                                <input type="number" class="form-control" name="longitude" id="longitude" step="0.000000000000000001" required>
+                            </div>
+                            <div class="col-md-12">
+                                <label class="form-label">Lieu / Description</label>
+                                <input type="text" class="form-control" name="location_name" id="location_name">
+                            </div>
+                            <div class="col-md-12">
+                                <label class="form-label">Distance de la côte (km)</label>
+                                <input type="number" class="form-control" name="distance_coast_km" step="0.1">
+                            </div>
+                            <div class="col-md-12">
+                                <button type="button" class="btn btn-sm btn-secondary" onclick="getCurrentLocation()">
+                                    <i class="fas fa-location-dot me-1"></i>Utiliser ma position
+                                </button>
+                                <button type="button" class="btn btn-sm btn-info" onclick="showLocationPicker()">
+                                    <i class="fas fa-map me-1"></i>Sélectionner sur la carte
+                                </button>
                             </div>
                         </div>
-                        <div class="col-md-12">
-                            <label class="form-label">Notes supplémentaires</label>
-                            <textarea class="form-control" name="notes" rows="2"></textarea>
+                    </div>
+                    
+                    <!-- Section: Description de l'incident -->
+                    <div class="form-section">
+                        <h6><i class="fas fa-file-alt me-2"></i>Description de l'incident</h6>
+                        <div class="row g-3">
+                            <div class="col-md-12">
+                                <label class="form-label">Description</label>
+                                <textarea class="form-control" name="description" rows="3"></textarea>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Signalé par</label>
+                                <input type="text" class="form-control" name="reported_by">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Section: Date et heure de l'incident (séparés) -->
+                    <div class="form-section">
+                        <h6><i class="fas fa-calendar-alt me-2"></i>Date et heure de l'incident</h6>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Date de l'incident</label>
+                                <input type="date" class="form-control" id="incident_date" name="incident_date">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Heure de l'incident</label>
+                                <input type="time" class="form-control" id="incident_time" name="incident_time">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Section: Personnes impliquées -->
+                    <div class="form-section">
+                        <h6><i class="fas fa-users me-2"></i>Personnes impliquées</h6>
+                        <div class="row g-3">
+                            <div class="col-md-3">
+                                <label class="form-label">Impliquées</label>
+                                <input type="number" class="form-control" name="persons_involved" value="1" min="0">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">Sauvées</label>
+                                <input type="number" class="form-control" name="persons_rescued" value="0" min="0">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">Décédées</label>
+                                <input type="number" class="form-control" name="persons_deceased" value="0" min="0">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">Disparues</label>
+                                <input type="number" class="form-control" name="persons_missing" value="0" min="0">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Section: Informations navire -->
+                    <div class="form-section">
+                        <h6><i class="fas fa-ship me-2"></i>Informations navire (si applicable)</h6>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Nom du navire</label>
+                                <input type="text" class="form-control" name="vessel_name">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Type de navire</label>
+                                <input type="text" class="form-control" name="vessel_type">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Pavillon</label>
+                                <input type="text" class="form-control" name="vessel_flag">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">IMO</label>
+                                <input type="text" class="form-control" name="vessel_imo">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">MMSI</label>
+                                <input type="text" class="form-control" name="vessel_mmsi">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Section: Conditions environnementales -->
+                    <div class="form-section">
+                        <h6><i class="fas fa-cloud-sun me-2"></i>Conditions environnementales</h6>
+                        <div class="row g-3">
+                            <div class="col-md-3">
+                                <label class="form-label">Vent (nœuds)</label>
+                                <input type="number" class="form-control" name="wind_speed" step="0.1">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">Direction vent (°)</label>
+                                <input type="number" class="form-control" name="wind_direction" min="0" max="359">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">État de mer (1-9)</label>
+                                <input type="number" class="form-control" name="sea_state" min="1" max="9">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">Visibilité (km)</label>
+                                <input type="number" class="form-control" name="visibility_km" step="0.1">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">Température eau (°C)</label>
+                                <input type="number" class="form-control" name="water_temperature" step="0.1">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">Courant (nœuds)</label>
+                                <input type="number" class="form-control" name="current_speed" step="0.1">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">Direction courant (°)</label>
+                                <input type="number" class="form-control" name="current_direction" min="0" max="359">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Section: Notes -->
+                    <div class="form-section">
+                        <h6><i class="fas fa-sticky-note me-2"></i>Notes supplémentaires</h6>
+                        <div class="row g-3">
+                            <div class="col-md-12">
+                                <textarea class="form-control" name="notes" rows="2"></textarea>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -392,30 +482,171 @@
     </div>
 </div>
 
+<!-- Modal sélection sur carte -->
+<div class="modal fade" id="locationPickerModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Sélectionner un point sur la carte</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div id="pickerMap" style="height: 400px;"></div>
+                <div class="mt-3">
+                    <p>Coordonnées sélectionnées : <strong id="selectedCoords">-</strong></p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <button type="button" class="btn btn-primary" onclick="confirmLocation()">Valider</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 
 <script>
 let map;
+let pickerMap;
 let markers = [];
 let currentEvents = [];
 let currentEventId = null;
+let selectedLat = null;
+let selectedLng = null;
+let eventTypesList = [];
 
 // Initialisation
 document.addEventListener('DOMContentLoaded', () => {
     initMap();
     loadEvents();
+    loadEventTypes();
     initForm();
 });
 
 function initMap() {
-    map = L.map('eventsMap').setView([31.7917, -7.0926], 6);
-    
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; CartoDB',
-        subdomains: 'abcd',
-        maxZoom: 19
-    }).addTo(map);
+    map = L.map('eventsMap', {
+        center: [31.7917, -7.0926],
+        zoom: 6,
+        scrollWheelZoom: false  // Molette désactivée par défaut
+    });
+
+L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', {
+    attribution: 'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ, TomTom, Intermap, iPC, USGS, FAO, NPS, NRCAN, GeoBase, Kadaster NL, Ordnance Survey, Esri Japan, METI, Esri China (Hong Kong), Esri Korea, Esri (Thailand), GEBCO, NGS',
+    maxZoom: 19
+}).addTo(map);
+
+    // Désactive complètement le zoom molette au départ
+    map.scrollWheelZoom.disable();
+
+    let isCtrlPressed = false;
+
+    document.addEventListener('keydown', function(e) {
+        if (e.ctrlKey) {
+            isCtrlPressed = true;
+            map.scrollWheelZoom.enable(); // active le zoom avec la molette
+        }
+    });
+
+    document.addEventListener('keyup', function(e) {
+        // Teste n’importe quelle touche, si CTRL n’est pas enfoncé
+        if (!e.ctrlKey) {
+            isCtrlPressed = false;
+            map.scrollWheelZoom.disable(); // desactive la molette
+        }
+    });
+}
+function showLocationPicker() {
+    initPickerMap();
+    new bootstrap.Modal(document.getElementById('locationPickerModal')).show();
+}
+
+function confirmLocation() {
+    if (selectedLat && selectedLng) {
+        document.getElementById('latitude').value = selectedLat;
+        document.getElementById('longitude').value = selectedLng;
+        
+        // Optionnel: faire une requête reverse geocoding pour obtenir le nom du lieu
+        reverseGeocode(selectedLat, selectedLng);
+    }
+    bootstrap.Modal.getInstance(document.getElementById('locationPickerModal')).hide();
+}
+
+function reverseGeocode(lat, lng) {
+    fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.display_name) {
+                document.getElementById('location_name').value = data.display_name.substring(0, 200);
+            }
+        })
+        .catch(error => console.error('Erreur reverse geocoding:', error));
+}
+
+function getCurrentLocation() {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function(position) {
+            document.getElementById('latitude').value = position.coords.latitude;
+            document.getElementById('longitude').value = position.coords.longitude;
+            reverseGeocode(position.coords.latitude, position.coords.longitude);
+            showToast('Position obtenue avec succès', 'success');
+        }, function(error) {
+            showToast('Erreur de géolocalisation: ' + error.message, 'error');
+        });
+    } else {
+        showToast('Géolocalisation non supportée', 'error');
+    }
+}
+
+function loadEventTypes() {
+    // Charger les types d'événements depuis VueTypeCategorieSectEvent
+    fetch('/api/event-types')
+        .then(response => response.json())
+        .then(data => {
+            eventTypesList = data;
+            
+            // Remplir le select des types dans les filtres
+            const typeFilter = document.getElementById('typeFilter');
+            const eventTypeSelect = document.getElementById('eventTypeSelect');
+            
+            // Nettoyer les options existantes (garder l'option "Tous" / "Sélectionner")
+            while (typeFilter.options.length > 1) typeFilter.remove(1);
+            while (eventTypeSelect.options.length > 1) eventTypeSelect.remove(1);
+            
+            // Ajouter les types uniques
+            const uniqueTypes = [...new Map(data.map(item => [item.id_type, item])).values()];
+            
+            uniqueTypes.forEach(type => {
+                const option1 = document.createElement('option');
+                option1.value = type.type || type.id_type;
+                option1.textContent = type.type || type.categorie || `Type ${type.id_type}`;
+                typeFilter.appendChild(option1);
+                
+                const option2 = document.createElement('option');
+                option2.value = type.type || type.id_type;
+                option2.textContent = type.type || type.categorie || `Type ${type.id_type}`;
+                eventTypeSelect.appendChild(option2);
+            });
+        })
+        .catch(error => {
+            console.error('Erreur chargement types:', error);
+            // Fallback: types par défaut
+            const defaultTypes = [
+                'man_overboard', 'vessel_sinking', 'medical', 'fire', 'collision', 'distress'
+            ];
+            defaultTypes.forEach(type => {
+                const option1 = document.createElement('option');
+                option1.value = type;
+                option1.textContent = type.replace('_', ' ').toUpperCase();
+                document.getElementById('typeFilter').appendChild(option1);
+                
+                const option2 = document.createElement('option');
+                option2.value = type;
+                option2.textContent = type.replace('_', ' ').toUpperCase();
+                document.getElementById('eventTypeSelect').appendChild(option2);
+            });
+        });
 }
 
 function loadEvents() {
@@ -463,32 +694,48 @@ function updateMap() {
         
         const color = priorityColors[event.priority] || '#007bff';
         
-        const marker = L.marker([event.latitude, event.longitude], {
-            icon: L.divIcon({
-                html: `
-                    <div style="background: ${color}; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.3);">
-                        <i class="fas ${getEventIcon(event.event_type)}" style="color: white; font-size: 14px;"></i>
-                    </div>
-                `,
-                className: 'event-marker',
-                iconSize: [30, 30],
-                iconAnchor: [15, 15]
-            })
-        }).bindPopup(`
+        const popupHtml = `
             <div style="min-width: 200px;">
                 <b>${event.event_number}</b><br>
                 <span class="badge ${event.status === 'active' ? 'bg-warning' : 'bg-success'}">${getStatusText(event.status)}</span><br>
                 <small>${event.event_type_display || event.event_type}</small><br>
                 <small>${event.location_name || ''}</small><br>
                 <small>👥 ${event.persons_involved} personnes</small><br>
+                <small>🟢 Point géométrique: ${event.geom && event.geom.type === 'Point' ? `${event.geom.coordinates[1].toFixed(4)}, ${event.geom.coordinates[0].toFixed(4)}` : `${event.latitude.toFixed(4)}, ${event.longitude.toFixed(4)}`}</small><br>
                 <button class="btn btn-sm btn-primary mt-2" onclick="showEventDetails(${event.event_id})">
                     Voir détails
                 </button>
             </div>
-        `);
-        
-        markers.push(marker);
-        marker.addTo(map);
+        `;
+
+        const icon = L.divIcon({
+            html: `
+                <div style="background: ${color}; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.3);">
+                    <i class="fas ${getEventIcon(event.event_type)}" style="color: white; font-size: 14px;"></i>
+                </div>
+            `,
+            className: 'event-marker',
+            iconSize: [30, 30],
+            iconAnchor: [15, 15]
+        });
+
+        let eventLayer;
+        if (event.geom && event.geom.type) {
+            eventLayer = L.geoJSON(event.geom, {
+                pointToLayer: (feature, latlng) => L.marker(latlng, { icon }),
+                style: {
+                    color: color,
+                    weight: 3,
+                    opacity: 0.7
+                },
+                onEachFeature: (feature, layer) => layer.bindPopup(popupHtml)
+            });
+        } else {
+            eventLayer = L.marker([event.latitude, event.longitude], { icon }).bindPopup(popupHtml);
+        }
+
+        markers.push(eventLayer);
+        eventLayer.addTo(map);
     });
     
     if (markers.length > 0) {
@@ -539,7 +786,10 @@ function updateEventList() {
                             ${event.location_name ? ` - ${event.location_name}` : ''}
                         </p>
                         <p class="text-muted small mb-2">${event.description || 'Aucune description'}</p>
-                        <div class="d-flex gap-3">
+                        <div class="d-flex gap-3 flex-wrap">
+                            <span class="stat-badge">
+                                <i class="fas fa-map-marker-alt"></i> ${event.latitude.toFixed(4)}, ${event.longitude.toFixed(4)}
+                            </span>
                             <span class="stat-badge">
                                 <i class="fas fa-users"></i> ${event.persons_involved} personnes
                             </span>
@@ -586,7 +836,9 @@ function showEventDetails(eventId) {
                             <tr><th>Priorité</th><td><span class="badge ${getPriorityClass(event.priority)}">${getPriorityText(event.priority)}</span></td></tr>
                             <tr><th>Statut</th><td><span class="badge ${event.status === 'active' ? 'bg-warning' : 'bg-success'}">${getStatusText(event.status)}</span></td></tr>
                             <tr><th>Date/Heure incident</th><td>${formatDateTime(event.incident_time || event.created_at)}</td></tr>
-                            <tr><th>Lieu</th><td>${event.location_name || `${event.latitude}, ${event.longitude}`}</td></tr>
+                            <tr><th>Point géométrique</th><td>${event.geom && event.geom.type === 'Point' ? `${event.geom.coordinates[1].toFixed(6)}, ${event.geom.coordinates[0].toFixed(6)}` : `${event.latitude}, ${event.longitude}`}</td></tr>
+                            <tr><th>Lieu</th><td>${event.location_name || '-'}</td></tr>
+                            <tr><th>Distance côte</th><td>${event.distance_coast_km ? event.distance_coast_km + ' km' : '-'}</td></tr>
                         </table>
                     </div>
                     <div class="col-md-6">
@@ -596,7 +848,7 @@ function showEventDetails(eventId) {
                             <tr><th>Sauvées</th><td class="text-success">${event.persons_rescued}</td></tr>
                             <tr><th>Décédées</th><td class="text-danger">${event.persons_deceased || 0}</td></tr>
                             <tr><th>Disparues</th><td class="text-warning">${event.persons_missing || 0}</td></tr>
-                         </table>
+                          </table>
                     </div>
                 </div>
                 
@@ -682,7 +934,6 @@ function updateEventStatus(eventId) {
 }
 
 function editCurrentEvent() {
-    // Redirection vers la page d'édition
     window.location.href = `/rescue-events/${currentEventId}/edit`;
 }
 
@@ -703,40 +954,133 @@ function closeCurrentEvent() {
 }
 
 function initForm() {
-    document.getElementById('createEventForm').addEventListener('submit', function(e) {
+    const form = document.getElementById('createEventForm');
+    const modal = document.getElementById('createEventModal');
+    
+    // Supprimer les anciens écouteurs pour éviter les doublons
+    form.removeEventListener('submit', form.handleSubmit);
+    
+    // Créer le gestionnaire d'événement
+    form.handleSubmit = async function(e) {
         e.preventDefault();
         
-        const formData = new FormData(this);
-        const data = {};
-        formData.forEach((value, key) => {
-            if (value) data[key] = value;
-        });
+        // Désactiver le bouton de soumission pour éviter les double-clics
+        const submitBtn = form.querySelector('button[type="submit"]');
+        const originalText = submitBtn.innerHTML;
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Création...';
         
-        // Convertir les nombres
-        const numberFields = ['latitude', 'longitude', 'persons_involved', 'wind_speed', 
-                             'wind_direction', 'sea_state', 'visibility_km'];
-        numberFields.forEach(field => {
-            if (data[field]) data[field] = parseFloat(data[field]);
-        });
-        
-        fetch('/api/rescue-events', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data)
-        })
-        .then(response => response.json())
-        .then(() => {
-            bootstrap.Modal.getInstance(document.getElementById('createEventModal')).hide();
-            loadEvents();
-            this.reset();
-            showToast('Événement créé avec succès', 'success');
-        })
-        .catch(error => {
+        try {
+            const formData = new FormData(form);
+            const data = {};
+            formData.forEach((value, key) => {
+                if (value && value.trim() !== '') data[key] = value;
+            });
+            
+            // Convertir les nombres
+            const numberFields = ['latitude', 'longitude', 'persons_involved', 'persons_rescued', 
+                                 'persons_deceased', 'persons_missing', 'distance_coast_km',
+                                 'wind_speed', 'wind_direction', 'current_speed', 'current_direction',
+                                 'sea_state', 'visibility_km', 'water_temperature'];
+            numberFields.forEach(field => {
+                if (data[field]) data[field] = parseFloat(data[field]);
+            });
+            
+            // Combiner date et heure de l'incident
+            if (data.incident_date || data.incident_time) {
+                const incidentDate = data.incident_date || new Date().toISOString().split('T')[0];
+                const incidentTime = data.incident_time || '00:00';
+                data.incident_time = `${incidentDate}T${incidentTime}:00`;
+                delete data.incident_date;
+            }
+            
+            const response = await fetch('/api/rescue-events', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            
+            const result = await response.json();
+            
+            if (result.success) {
+                // Fermer le modal correctement
+                const modalInstance = bootstrap.Modal.getInstance(modal);
+                if (modalInstance) {
+                    modalInstance.hide();
+                }
+                
+                // Attendre que le modal soit fermé avant de rafraîchir
+                setTimeout(() => {
+                    // Réinitialiser le formulaire
+                    form.reset();
+                    // Recharger les événements
+                    loadEvents();
+                    // Afficher le message de succès
+                    showToast('Événement créé avec succès', 'success');
+                }, 300);
+            } else {
+                showToast(result.error || 'Erreur de création', 'error');
+            }
+        } catch (error) {
             console.error('Erreur:', error);
             showToast('Erreur de création', 'error');
-        });
+        } finally {
+            // Réactiver le bouton
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = originalText;
+        }
+    };
+    
+    form.addEventListener('submit', form.handleSubmit);
+    
+    // Nettoyer le modal quand il est fermé
+    modal.addEventListener('hidden.bs.modal', function() {
+        // Supprimer le backdrop manuellement au cas où
+        const backdrop = document.querySelector('.modal-backdrop');
+        if (backdrop) {
+            backdrop.remove();
+        }
+        // Restaurer le scroll du body
+        document.body.classList.remove('modal-open');
+        document.body.style.overflow = '';
+        document.body.style.paddingRight = '';
     });
 }
+
+
+function forceCloseModal() {
+    const modal = document.getElementById('createEventModal');
+    const modalInstance = bootstrap.Modal.getInstance(modal);
+    if (modalInstance) {
+        modalInstance.hide();
+    }
+    // Supprimer manuellement le backdrop
+    const backdrops = document.querySelectorAll('.modal-backdrop');
+    backdrops.forEach(backdrop => backdrop.remove());
+    // Restaurer le body
+    document.body.classList.remove('modal-open');
+    document.body.style.overflow = '';
+    document.body.style.paddingRight = '';
+}
+
+// Ajouter cette fonction au début de votre code JavaScript
+function setupGlobalErrorHandling() {
+    // Intercepter les erreurs non gérées
+    window.addEventListener('unhandledrejection', function(event) {
+        console.error('Erreur non gérée:', event.reason);
+        forceCloseModal();
+        showToast('Une erreur inattendue est survenue', 'error');
+    });
+}
+
+// Appeler cette fonction dans DOMContentLoaded
+document.addEventListener('DOMContentLoaded', () => {
+    setupGlobalErrorHandling();
+    initMap();
+    loadEvents();
+    loadEventTypes();
+    initForm();
+});
 
 function exportEvents() {
     fetch('/api/rescue-events/export')
@@ -818,11 +1162,16 @@ function escapeHtml(str) {
 }
 
 function showToast(message, type) {
-    // Implémenter une notification toast
     const toast = document.createElement('div');
     toast.className = `alert alert-${type === 'success' ? 'success' : 'danger'} position-fixed bottom-0 end-0 m-3`;
     toast.style.zIndex = '9999';
-    toast.innerHTML = message;
+    toast.style.backgroundColor = type === 'success' ? '#d4edda' : '#f8d7da';
+    toast.style.color = type === 'success' ? '#155724' : '#721c24';
+    toast.style.border = type === 'success' ? '1px solid #c3e6cb' : '1px solid #f5c6cb';
+    toast.style.padding = '12px 20px';
+    toast.style.borderRadius = '8px';
+    toast.style.boxShadow = '0 2px 10px rgba(0,0,0,0.1)';
+    toast.innerHTML = `<i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'} me-2"></i>${message}`;
     document.body.appendChild(toast);
     setTimeout(() => toast.remove(), 3000);
 }

@@ -1,0 +1,695 @@
+{% extends "base.html" %}
+
+{% block title %}MRCC - Détails de l'alerte {{ alerte.id }}{% endblock %}
+
+{% block extra_css %}
+<style>
+  .status-badge {
+    display: inline-block;
+    padding: 0.35em 0.65em;
+    font-size: 0.75em;
+    font-weight: 700;
+    border-radius: 50rem;
+  }
+  
+  .status-nouvelle { background-color: #17a2b8; color: white; }
+  .status-en_cours { background-color: #ffc107; color: #000; }
+  .status-terminee { background-color: #28a745; color: white; }
+  .status-annulee { background-color: #dc3545; color: white; }
+  
+  .urgence-normal { background-color: #28a745; color: white; }
+  .urgence-urgent { background-color: #ffc107; color: #000; }
+  .urgence-critique { background-color: #dc3545; color: white; }
+  
+  .timeline {
+    position: relative;
+    padding-left: 2rem;
+  }
+  
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 7px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background-color: #dee2e6;
+  }
+  
+  .timeline-item {
+    position: relative;
+    padding-bottom: 1.5rem;
+  }
+  
+  .timeline-item::before {
+    content: '';
+    position: absolute;
+    left: -1.5rem;
+    top: 0.25rem;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background-color: var(--primary-color);
+    border: 2px solid white;
+  }
+  
+  .info-card {
+    background: linear-gradient(135deg, #005baa 0%, #003366 100%);
+    color: white;
+  }
+  
+  .info-card hr {
+    border-color: rgba(255,255,255,0.3);
+  }
+  
+  #map-detail {
+    height: 350px;
+    border-radius: 8px;
+    width: 100%;
+  }
+  
+  .file-link {
+    text-decoration: none;
+  }
+  
+  .file-link:hover {
+    text-decoration: underline;
+  }
+  
+  @media (max-width: 768px) {
+    #map-detail {
+      height: 250px;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+    <h1 class="h3 mb-0">
+      <i class="bi bi-exclamation-triangle-fill me-2"></i>
+      Alerte #{{ alerte.id }}
+    </h1>
+    <div>
+      <a href="{{ url_for('modifier_alerte', alerte_id=alerte.id) }}" class="btn btn-warning me-2">
+        <i class="bi bi-pencil me-1"></i> Modifier
+      </a>
+      <a href="{{ url_for('alerte') }}" class="btn btn-outline-primary">
+        <i class="bi bi-arrow-left me-1"></i> Retour
+      </a>
+    </div>
+  </div>
+  
+  <div class="row">
+    <div class="col-md-8">
+      <!-- Carte -->
+      <div class="card mb-4">
+        <div class="card-header bg-light">
+          <h5 class="card-title mb-0"><i class="bi bi-map me-1"></i> Localisation</h5>
+        </div>
+        <div class="card-body">
+          <div id="map-detail"></div>
+          {% if alerte.latitude and alerte.longitude %}
+            <div class="mt-2 text-center">
+              <small class="text-muted">
+                <i class="bi bi-geo-alt"></i> Coordonnées: {{ alerte.latitude|float }}°N, {{ alerte.longitude|float }}°W
+                {% if alerte.precision_position %}
+                  - Précision: {{ alerte.precision_position }}
+                {% endif %}
+              </small>
+            </div>
+          {% else %}
+            <div class="mt-2 text-center text-muted">
+              <i class="bi bi-info-circle"></i> Aucune position définie
+            </div>
+          {% endif %}
+        </div>
+      </div>
+      
+      <!-- Description -->
+      <div class="card mb-4">
+        <div class="card-header bg-light">
+          <h5 class="card-title mb-0"><i class="bi bi-file-text me-1"></i> Description</h5>
+        </div>
+        <div class="card-body">
+          <p class="mb-0">{{ alerte.description or 'Aucune description' }}</p>
+        </div>
+      </div>
+      
+      <!-- Fichier joint -->
+      {% if alerte.fichier_joint %}
+      <div class="card mb-4">
+        <div class="card-header bg-light">
+          <h5 class="card-title mb-0"><i class="bi bi-paperclip me-1"></i> Fichier joint</h5>
+        </div>
+        <div class="card-body">
+          <a href="{{ url_for('static', filename='uploads/alertes/' + alerte.fichier_joint) }}" class="btn btn-sm btn-outline-primary" target="_blank">
+            <i class="bi bi-download me-1"></i> Télécharger {{ alerte.fichier_joint }}
+          </a>
+        </div>
+      </div>
+      {% endif %}
+      
+      <!-- Historique des mises à jour -->
+      <div class="card">
+        <div class="card-header bg-light">
+          <h5 class="card-title mb-0"><i class="bi bi-clock-history me-1"></i> Historique des mises à jour</h5>
+        </div>
+        <div class="card-body">
+          {% if mises_a_jour and mises_a_jour|length > 0 %}
+            <div class="timeline">
+              {% for mise in mises_a_jour %}
+                <div class="timeline-item">
+                  <div class="d-flex justify-content-between flex-wrap">
+                    <strong>
+                      <i class="bi bi-person-circle me-1"></i>
+                      {{ mise.prenom or '' }} {{ mise.nom or 'Utilisateur' }}
+                    </strong>
+                    <small class="text-muted">
+                      <i class="bi bi-calendar3 me-1"></i>
+                      {% if mise.date_mise_a_jour %}
+                        {{ mise.date_mise_a_jour.strftime('%d/%m/%Y %H:%M') if mise.date_mise_a_jour is not string else mise.date_mise_a_jour[:16] }}
+                      {% else %}
+                        Date inconnue
+                      {% endif %}
+                    </small>
+                  </div>
+                  <p class="mb-1 mt-2">{{ mise.contenu }}</p>
+                  {% if mise.statut_precedent and mise.nouveau_statut %}
+                    <small class="text-muted">
+                      <i class="bi bi-arrow-repeat me-1"></i>
+                      Statut: {{ mise.statut_precedent }} → {{ mise.nouveau_statut }}
+                    </small>
+                  {% endif %}
+                </div>
+              {% endfor %}
+            </div>
+          {% else %}
+            <p class="text-muted text-center mb-0">
+              <i class="bi bi-info-circle me-1"></i>
+              Aucune mise à jour pour le moment
+            </p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    
+    <div class="col-md-4">
+      <!-- Informations principales -->
+      <div class="card info-card mb-4">
+        <div class="card-body">
+          <h5 class="card-title"><i class="bi bi-info-circle-fill me-1"></i> Informations clés</h5>
+          <hr>
+          <p><strong>📌 Titre:</strong><br> {{ alerte.titre }}</p>
+          <p><strong>🆔 Statut:</strong><br> 
+            <span class="status-badge status-{{ alerte.statut }}">
+              {% if alerte.statut == 'nouvelle' %}🆕 Nouvelle
+              {% elif alerte.statut == 'en_cours' %}🔄 En cours
+              {% elif alerte.statut == 'terminee' %}✅ Terminée
+              {% elif alerte.statut == 'annulee' %}❌ Annulée
+              {% else %}{{ alerte.statut }}
+              {% endif %}
+            </span>
+          </p>
+          <p><strong>⚠️ Urgence:</strong><br>
+            <span class="status-badge urgence-{{ alerte.niveau_urgence }}">
+              {% if alerte.niveau_urgence == 'normal' %}🟢 Normal
+              {% elif alerte.niveau_urgence == 'urgent' %}🟡 Urgent
+              {% elif alerte.niveau_urgence == 'critique' %}🔴 Critique
+              {% else %}{{ alerte.niveau_urgence }}
+              {% endif %}
+            </span>
+          </p>
+          <p><strong>📅 Créée le:</strong><br> 
+            {% if alerte.date_creation %}
+              {{ alerte.date_creation.strftime('%d/%m/%Y %H:%M') if alerte.date_creation is not string else alerte.date_creation[:16] }}
+            {% else %}
+              Date inconnue
+            {% endif %}
+          </p>
+          <p><strong>👤 Créateur:</strong><br> {{ alerte.prenom or '' }} {{ alerte.nom or 'Inconnu' }}</p>
+          <p><strong>🏢 Organisme:</strong><br> {{ alerte.organisme_nom or 'Non spécifié' }}</p>
+        </div>
+      </div>
+      
+      <!-- Détails de l'incident -->
+      <div class="card mb-4">
+        <div class="card-header bg-light">
+          <h5 class="card-title mb-0"><i class="bi bi-info-circle me-1"></i> Détails de l'incident</h5>
+        </div>
+        <div class="card-body">
+          <p><strong>🚢 Type d'incident:</strong><br> 
+            {% if alerte.type_incident == 'navire_en_detresse' %}🚢 Navire en détresse
+            {% elif alerte.type_incident == 'homme_a_la_mer' %}👨 Homme à la mer
+            {% elif alerte.type_incident == 'avarie' %}⚠️ Avarie
+            {% elif alerte.type_incident == 'incendie' %}🔥 Incendie à bord
+            {% elif alerte.type_incident == 'collision' %}💥 Collision
+            {% elif alerte.type_incident == 'echouement' %}🏝️ Échouement
+            {% elif alerte.type_incident == 'pollution' %}🛢️ Pollution
+            {% else %}{{ alerte.type_incident or 'Non spécifié' }}
+            {% endif %}
+          </p>
+          {% if alerte.nombre_personnes %}
+            <p><strong>👥 Personnes:</strong><br> {{ alerte.nombre_personnes }}</p>
+          {% endif %}
+          {% if alerte.navire_implique %}
+            <p><strong>⚓ Navire:</strong><br> {{ alerte.navire_implique }}</p>
+          {% endif %}
+          {% if alerte.immatriculation_navire %}
+            <p><strong>📝 Immatriculation:</strong><br> {{ alerte.immatriculation_navire }}</p>
+          {% endif %}
+          {% if alerte.moyen_alerte %}
+            <p><strong>📡 Moyen d'alerte:</strong><br> 
+              {% if alerte.moyen_alerte == 'vhf' %}📻 VHF
+              {% elif alerte.moyen_alerte == 'inmarsat' %}🛰️ Inmarsat
+              {% elif alerte.moyen_alerte == 'epirb' %}🆘 Balise EPIRB
+              {% elif alerte.moyen_alerte == 'telephone' %}📞 Téléphone
+              {% elif alerte.moyen_alerte == 'email' %}📧 Email
+              {% else %}{{ alerte.moyen_alerte }}
+              {% endif %}
+            </p>
+          {% endif %}
+          {% if alerte.conditions_meteo %}
+            <p><strong>🌤️ Conditions météo:</strong><br> {{ alerte.conditions_meteo }}</p>
+          {% endif %}
+          {% if alerte.notes_complementaires %}
+            <p><strong>📝 Notes complémentaires:</strong><br> {{ alerte.notes_complementaires }}</p>
+          {% endif %}
+        </div>
+      </div>
+      
+
+
+      <!-- Section des moyens disponibles -->
+<div class="card mb-4">
+    <div class="card-header bg-primary text-white">
+        <h5 class="mb-0">
+            <i class="bi bi-truck me-2"></i> Engager un moyen de secours
+        </h5>
+    </div>
+    <div class="card-body">
+        {% if alerte.statut in ['nouvelle', 'en_cours'] %}
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#engagerMoyenModal">
+            <i class="bi bi-rocket-takeoff me-2"></i> Engager un moyen
+        </button>
+        {% else %}
+        <button type="button" class="btn btn-secondary" disabled>
+            <i class="bi bi-rocket-takeoff me-2"></i> Engagement impossible (alerte {{ alerte.statut }})
+        </button>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Modal d'engagement des moyens -->
+<div class="modal fade" id="engagerMoyenModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">
+                    <i class="bi bi-rocket-takeoff me-2"></i> Engager un moyen de secours
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div id="moyens-loading" class="text-center py-3">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Chargement...</span>
+                    </div>
+                    <p class="mt-2">Chargement des moyens disponibles...</p>
+                </div>
+                <div id="moyens-container" style="display: none;">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Sélectionner un moyen :</label>
+                        <div id="moyens-list" class="border rounded p-2" style="max-height: 300px; overflow-y: auto;">
+                            <!-- Les moyens seront chargés ici -->
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="notes_engagement" class="form-label">Notes (optionnelles) :</label>
+                        <textarea class="form-control" id="notes_engagement" rows="3" 
+                                  placeholder="Instructions supplémentaires pour le moyen engagé..."></textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <button type="button" class="btn btn-primary" id="btn-engager" onclick="engagerMoyen()">
+                    <i class="bi bi-check-circle me-1"></i> Engager
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Section des moyens engagés -->
+<div class="card mb-4">
+    <div class="card-header bg-info text-white">
+        <h5 class="mb-0">
+            <i class="bi bi-truck me-2"></i> Moyens engagés
+        </h5>
+    </div>
+    <div class="card-body">
+        <div id="moyens-engages-container">
+            <div class="text-center py-3">
+                <div class="spinner-border spinner-border-sm text-info" role="status">
+                    <span class="visually-hidden">Chargement...</span>
+                </div>
+                <span class="ms-2">Chargement des moyens engagés...</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+      <!-- Ajouter une mise à jour -->
+      <div class="card">
+        <div class="card-header bg-light">
+          <h5 class="card-title mb-0"><i class="bi bi-plus-circle me-1"></i> Ajouter une mise à jour</h5>
+        </div>
+        <div class="card-body">
+          <form method="POST" action="{{ url_for('mise_a_jour_alerte', alerte_id=alerte.id) }}">
+            <div class="mb-3">
+              <label class="form-label">Commentaire</label>
+              <textarea class="form-control" name="contenu" rows="3" required placeholder="Décrivez l'évolution de la situation..."></textarea>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Changer le statut</label>
+              <select class="form-select" name="statut">
+                <option value="">Ne pas changer</option>
+                <option value="nouvelle" {% if alerte.statut == 'nouvelle' %}selected{% endif %}>🆕 Nouvelle</option>
+                <option value="en_cours" {% if alerte.statut == 'en_cours' %}selected{% endif %}>🔄 En cours</option>
+                <option value="terminee" {% if alerte.statut == 'terminee' %}selected{% endif %}>✅ Terminée</option>
+                <option value="annulee" {% if alerte.statut == 'annulee' %}selected{% endif %}>❌ Annulée</option>
+              </select>
+            </div>
+            <button type="submit" class="btn btn-primary w-100">
+              <i class="bi bi-send me-1"></i> Publier la mise à jour
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Vérifier que Leaflet est chargé
+    if (typeof L === 'undefined') {
+      console.error('Leaflet non chargé');
+      return;
+    }
+    
+    // Récupérer les coordonnées
+    let lat = {{ alerte.latitude|float if alerte.latitude else 31.7917 }};
+    let lon = {{ alerte.longitude|float if alerte.longitude else -7.0926 }};
+    
+    // Initialiser la carte
+    const map = L.map('map-detail').setView([lat, lon], 12);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap contributors',
+      maxZoom: 19
+    }).addTo(map);
+    
+    // Ajouter un marqueur si des coordonnées valides existent
+    if (lat && lon && lat !== 31.7917 && lon !== -7.0926) {
+      // Déterminer la couleur du marqueur selon l'urgence
+      let markerColor = '#0d6efd';
+      const urgence = '{{ alerte.niveau_urgence }}';
+      if (urgence === 'critique') {
+        markerColor = '#dc3545';
+      } else if (urgence === 'urgent') {
+        markerColor = '#ffc107';
+      }
+      
+      // Créer un marqueur personnalisé
+      const marker = L.circleMarker([lat, lon], {
+        radius: 12,
+        fillColor: markerColor,
+        color: '#fff',
+        weight: 3,
+        opacity: 1,
+        fillOpacity: 0.8
+      }).addTo(map);
+      
+      // Popup avec les informations
+      marker.bindPopup(`
+        <div style="min-width: 200px;">
+          <b>⚠️ {{ alerte.titre|escape }}</b><br>
+          <strong>Type:</strong> {{ alerte.type_incident|replace('_', ' ')|title }}<br>
+          <strong>Urgence:</strong> 
+          <span class="badge ${urgence === 'critique' ? 'bg-danger' : (urgence === 'urgent' ? 'bg-warning' : 'bg-primary')}">
+            {{ alerte.niveau_urgence|upper }}
+          </span><br>
+          <strong>Statut:</strong> 
+          <span class="badge ${'{{ alerte.statut }}' === 'nouvelle' ? 'bg-info' : ('{{ alerte.statut }}' === 'en_cours' ? 'bg-warning' : 'bg-success')}">
+            {{ alerte.statut|upper }}
+          </span><br>
+          <hr class="my-1">
+          <small class="text-muted">{{ alerte.date_creation.strftime('%d/%m/%Y %H:%M') if alerte.date_creation else '' }}</small>
+        </div>
+      `).openPopup();
+    } else {
+      // Afficher un message si pas de coordonnées
+      map.bindPopup("Aucune position définie pour cette alerte").openPopup();
+    }
+  });
+
+
+
+let moyensDisponibles = [];
+
+// Charger les moyens disponibles quand le modal s'ouvre
+document.getElementById('engagerMoyenModal').addEventListener('show.bs.modal', function() {
+    chargerMoyensDisponibles();
+});
+
+// Charger les moyens engagés au chargement de la page
+document.addEventListener('DOMContentLoaded', function() {
+    chargerMoyensEngages();
+});
+
+function chargerMoyensDisponibles() {
+    const loadingDiv = document.getElementById('moyens-loading');
+    const containerDiv = document.getElementById('moyens-container');
+    const moyensList = document.getElementById('moyens-list');
+    
+    loadingDiv.style.display = 'block';
+    containerDiv.style.display = 'none';
+    
+    fetch('/api/moyens_disponibles')
+        .then(response => response.json())
+        .then(data => {
+            moyensDisponibles = data;
+            moyensList.innerHTML = '';
+            
+            if (data.length === 0) {
+                moyensList.innerHTML = '<div class="text-center text-muted p-3">Aucun moyen disponible pour le moment</div>';
+                document.getElementById('btn-engager').disabled = true;
+            } else {
+                data.forEach(moyen => {
+                    // Déterminer l'icône en fonction de la catégorie
+                    let iconClass = 'bi-truck';
+                    if (moyen.category === 'helicoptere') iconClass = 'bi-helicopter';
+                    else if (moyen.category === 'vedette') iconClass = 'bi-ship';
+                    else if (moyen.category === 'patrouilleur') iconClass = 'bi-binoculars';
+                    
+                    const radioDiv = document.createElement('div');
+                    radioDiv.className = 'form-check mb-3 p-2 border rounded';
+                    radioDiv.innerHTML = `
+                        <input class="form-check-input" type="radio" name="moyen" id="moyen_${moyen.resource_id}" value="${moyen.resource_id}">
+                        <label class="form-check-label w-100" for="moyen_${moyen.resource_id}">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <i class="bi ${iconClass} me-2"></i>
+                                    <strong>${escapeHtml(moyen.resource_name)}</strong>
+                                    <span class="badge bg-success ms-2">Disponible</span>
+                                </div>
+                                <div>
+                                    <span class="badge bg-secondary">Code: ${escapeHtml(moyen.identifier_code)}</span>
+                                </div>
+                            </div>
+                            <div class="mt-2 small text-muted">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <i class="bi bi-tag me-1"></i>Type: ${escapeHtml(moyen.type_name)}
+                                    </div>
+                                    <div class="col-md-6">
+                                        <i class="bi bi-geo-alt me-1"></i>Base: ${escapeHtml(moyen.base_name)}
+                                    </div>
+                                    ${moyen.speed ? `<div class="col-md-6 mt-1"><i class="bi bi-speedometer2 me-1"></i>Vitesse: ${moyen.speed} nœuds</div>` : ''}
+                                    ${moyen.max_capacity ? `<div class="col-md-6 mt-1"><i class="bi bi-people me-1"></i>Capacité: ${moyen.max_capacity} personnes</div>` : ''}
+                                    ${moyen.operational_range ? `<div class="col-md-6 mt-1"><i class="bi bi-rulers me-1"></i>Rayon: ${moyen.operational_range} km</div>` : ''}
+                                </div>
+                            </div>
+                        </label>
+                    `;
+                    moyensList.appendChild(radioDiv);
+                });
+                document.getElementById('btn-engager').disabled = false;
+            }
+            
+            loadingDiv.style.display = 'none';
+            containerDiv.style.display = 'block';
+        })
+        .catch(error => {
+            console.error('Erreur:', error);
+            moyensList.innerHTML = '<div class="text-center text-danger p-3">Erreur lors du chargement des moyens</div>';
+            loadingDiv.style.display = 'none';
+            containerDiv.style.display = 'block';
+            document.getElementById('btn-engager').disabled = true;
+        });
+}
+
+function engagerMoyen() {
+    const selectedMoyen = document.querySelector('input[name="moyen"]:checked');
+    if (!selectedMoyen) {
+        alert('Veuillez sélectionner un moyen à engager');
+        return;
+    }
+    
+    const moyenId = selectedMoyen.value;
+    const notes = document.getElementById('notes_engagement').value;
+    
+    const btnEngager = document.getElementById('btn-engager');
+    btnEngager.disabled = true;
+    btnEngager.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Engagement...';
+    
+    fetch(`/api/engager_moyen/{{ alerte.id }}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            moyen_id: parseInt(moyenId),
+            notes: notes
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Fermer le modal
+            bootstrap.Modal.getInstance(document.getElementById('engagerMoyenModal')).hide();
+            
+            // Afficher le succès
+            alert(data.message);
+            
+            // Recharger les moyens engagés
+            chargerMoyensEngages();
+            
+            // Rafraîchir la page pour mettre à jour le statut
+            setTimeout(() => {
+                location.reload();
+            }, 1000);
+        } else {
+            alert('Erreur: ' + data.error);
+            btnEngager.disabled = false;
+            btnEngager.innerHTML = '<i class="bi bi-check-circle me-1"></i> Engager';
+        }
+    })
+    .catch(error => {
+        console.error('Erreur:', error);
+        alert('Erreur lors de l\'engagement du moyen');
+        btnEngager.disabled = false;
+        btnEngager.innerHTML = '<i class="bi bi-check-circle me-1"></i> Engager';
+    });
+}
+
+function chargerMoyensEngages() {
+    const container = document.getElementById('moyens-engages-container');
+    
+    fetch(`/api/alertes/{{ alerte.id }}/moyens_engages`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.length === 0) {
+                container.innerHTML = `
+                    <div class="alert alert-info mb-0">
+                        <i class="bi bi-info-circle me-2"></i>
+                        Aucun moyen engagé pour le moment.
+                    </div>
+                `;
+            } else {
+                let html = '<div class="list-group">';
+                data.forEach(moyen => {
+                    const dateEngagement = new Date(moyen.date_engagement).toLocaleString('fr-FR');
+                    
+                    // Déterminer l'icône
+                    let iconClass = 'bi-truck';
+                    if (moyen.category === 'helicoptere') iconClass = 'bi-helicopter';
+                    else if (moyen.category === 'vedette') iconClass = 'bi-ship';
+                    else if (moyen.category === 'patrouilleur') iconClass = 'bi-binoculars';
+                    
+                    // Badge de statut
+                    let statusBadge = '';
+                    if (moyen.operational_status === 'on_mission') {
+                        statusBadge = '<span class="badge bg-warning ms-2">En mission</span>';
+                    } else if (moyen.operational_status === 'available') {
+                        statusBadge = '<span class="badge bg-success ms-2">Disponible</span>';
+                    } else {
+                        statusBadge = '<span class="badge bg-secondary ms-2">Indisponible</span>';
+                    }
+                    
+                    html += `
+                        <div class="list-group-item">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div class="flex-grow-1">
+                                    <h6 class="mb-1">
+                                        <i class="bi ${iconClass} me-2"></i>
+                                        ${escapeHtml(moyen.resource_name)}
+                                        ${statusBadge}
+                                    </h6>
+                                    <p class="mb-1 small text-muted">
+                                        <strong>Type:</strong> ${escapeHtml(moyen.type_name || 'Non spécifié')}<br>
+                                        <strong>Base:</strong> ${escapeHtml(moyen.base_name || 'Non spécifiée')}<br>
+                                        <strong>Code:</strong> ${escapeHtml(moyen.identifier_code || 'N/A')}
+                                    </p>
+                                    ${moyen.notes ? `<p class="mb-1 small"><strong>Notes:</strong> ${escapeHtml(moyen.notes)}</p>` : ''}
+                                    <small class="text-muted">
+                                        <i class="bi bi-calendar-event me-1"></i>Engagé le ${dateEngagement}
+                                        ${moyen.engage_par_nom ? `par ${moyen.engage_par_prenom} ${moyen.engage_par_nom}` : ''}
+                                    </small>
+                                </div>
+                                ${moyen.speed ? `
+                                <div class="text-end">
+                                    <span class="badge bg-info">
+                                        <i class="bi bi-speedometer2"></i> ${moyen.speed} nœuds
+                                    </span>
+                                </div>
+                                ` : ''}
+                            </div>
+                        </div>
+                    `;
+                });
+                html += '</div>';
+                container.innerHTML = html;
+            }
+        })
+        .catch(error => {
+            console.error('Erreur:', error);
+            container.innerHTML = `
+                <div class="alert alert-danger mb-0">
+                    <i class="bi bi-exclamation-triangle me-2"></i>
+                    Erreur lors du chargement des moyens engagés
+                </div>
+            `;
+        });
+}
+
+function escapeHtml(text) {
+    if (!text) return '';
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+</script>
+{% endblock %}

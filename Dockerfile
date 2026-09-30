@@ -24,7 +24,7 @@ RUN pip install --no-cache-dir --upgrade pip \
 
 COPY . .
 
-RUN mkdir -p uploads
+RUN mkdir -p uploads uploads/alertes
 
 EXPOSE 5052
 

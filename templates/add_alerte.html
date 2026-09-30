@@ -1,829 +1,312 @@
-<!DOCTYPE html>
-<html lang="fr">
+{% extends "base.html" %}
 
-<head>
-  <meta charset="utf-8">
-  <meta content="width=device-width, initial-scale=1.0" name="viewport">
-  <title>MRCC - Gestion des Alertes de Sauvetage</title>
+{% block title %}MRCC - Nouvelle Alerte de Sauvetage{% endblock %}
 
-  <meta name="description" content="Plateforme nationale de gestion des sauvetages et des données maritimes pour le MRCC Maroc">
-  <meta name="keywords" content="MRCC, sauvetage maritime, Maroc, données maritimes, secours en mer">
-
-  <!-- Fonts -->
-  <link href="https://fonts.googleapis.com" rel="preconnect">
-  <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+{% block extra_css %}
+<style>
+  .alert-card {
+    border-left: 4px solid var(--primary-blue);
+    transition: all 0.2s;
+  }
   
-  <!-- Font Awesome -->
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
-
-  <!-- Vendor CSS Files -->
-  <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet">
-  <link href="{{ url_for('static', filename='vendor/bootstrap-icons/bootstrap-icons.css') }}" rel="stylesheet">
-  <link href="{{ url_for('static', filename='vendor/aos/aos.css') }}" rel="stylesheet">
-  <link href="{{ url_for('static', filename='vendor/glightbox/css/glightbox.min.css') }}" rel="stylesheet">
-  <link href="{{ url_for('static', filename='vendor/swiper/swiper-bundle.min.css') }}" rel="stylesheet">
-
-  <!-- Main CSS File -->
-  <link href="{{ url_for('static', filename='css/main.css') }}" rel="stylesheet">
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
-  <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
-  <style>
-    :root {
-      --primary-color: #4361ee;
-      --secondary-color: #3f37c9;
-      --accent-color: #4cc9f0;
-      --light-color: #f8f9fa;
-      --dark-color: #212529;
-      --success-color: #4bb543;
-      --warning-color: #f0ad4e;
-      --danger-color: #d9534f;
-    }
-    
-    body {
-      background-color: #f5f7fb;
-      font-family: 'Inter', sans-serif;
-      color: var(--dark-color);
-      padding-top: 70px;
-    }
-    
-    /* Header Styles - Identique aux autres pages */
-    .header {
-      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-      box-shadow: 0 2px 20px rgba(67, 97, 238, 0.2);
-      height: 70px;
-    }
-    
-    .header .logo h1 {
-      color: white;
-      font-weight: 700;
-      font-size: 1.5rem;
-    }
-    
-    .header .navmenu ul li a {
-      color: rgba(255, 255, 255, 0.8);
-      font-weight: 500;
-      transition: all 0.3s;
-    }
-    
-    .header .navmenu ul li a:hover,
-    .header .navmenu ul li a.active {
-      color: white;
-    }
-    
-    .user-menu {
-      display: flex;
-      align-items: center;
-      gap: 15px;
-    }
-    
-    .username {
-      color: white;
-      font-weight: 500;
-      margin-right: 10px;
-    }
-    
-    .btn-custom {
-      padding: 8px 16px;
-      border-radius: 20px;
-      font-weight: 500;
-      transition: 0.3s ease-in-out;
-    }
-    
-    .btn-primary-custom {
-      background: white;
-      color: var(--primary-color);
-      border: none;
-    }
-    
-    .btn-primary-custom:hover {
-      background: rgba(255, 255, 255, 0.9);
-    }
-    
-    .btn-secondary-custom {
-      background: rgba(255, 255, 255, 0.1);
-      border: 1px solid white;
-      color: white;
-    }
-    
-    .btn-secondary-custom:hover {
-      background: rgba(255, 255, 255, 0.2);
-    }
-    
-    
-/* Notifications */
-.notification-wrapper {
-  position: relative;
-  margin-left: 10px;
-}
-
-.notification-icon {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #f0f2f5;
-  color: #4a4a6a;
-  border: none;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  position: relative;
-}
-
-.notification-icon:hover {
-  background: #e4e6eb;
-  color: var(--primary-color);
-}
-
-.notification-badge {
-  position: absolute;
-  top: -5px;
-  right: -5px;
-  background: #f94144;
-  color: white;
-  border-radius: 50%;
-  width: 20px;
-  height: 20px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.7rem;
-  font-weight: 600;
-}
-
-.notification-dropdown {
-  position: absolute;
-  top: 50px;
-  right: 0;
-  width: 350px;
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 5px 25px rgba(0, 0, 0, 0.1);
-  opacity: 0;
-  visibility: hidden;
-  transform: translateY(10px);
-  transition: all 0.3s ease;
-  z-index: 1000;
-}
-
-.notification-wrapper:hover .notification-dropdown {
-  opacity: 1;
-  visibility: visible;
-  transform: translateY(0);
-}
-
-.notification-header {
-  padding: 15px;
-  border-bottom: 1px solid #eee;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.notification-header h5 {
-  margin: 0;
-  font-size: 1rem;
-  color: #2b2d42;
-}
-
-.mark-all-read {
-  background: none;
-  border: none;
-  color: var(--primary-color);
-  font-size: 0.8rem;
-  cursor: pointer;
-}
-
-.notification-content {
-  max-height: 400px;
-  overflow-y: auto;
-  padding: 10px;
-}
-
-.empty-notifications {
-  padding: 20px;
-  text-align: center;
-  color: #888;
-}
-.notification-item {
-    padding: 10px;
-    border-bottom: 1px solid #eee;
-    transition: background 0.2s;
-}
-
-.notification-item:hover {
-    background: #f9f9f9;
-}
-
-.notification-title {
-    font-weight: 600;
-    color: #2b2d42;
-    margin-bottom: 5px;
-}
-
-.notification-text {
-    color: #4a4a6a;
-    font-size: 0.9rem;
-    margin-bottom: 8px;
-}
-
-.mark-as-read {
-    background: none;
-    border: none;
-    color: var(--primary-color);
+  .alert-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  }
+  
+  .alert-card.critique {
+    border-left-color: var(--danger-red);
+  }
+  
+  .alert-card.urgent {
+    border-left-color: var(--warning-yellow);
+  }
+  
+  .map-container {
+    height: 400px;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  
+  .status-badge {
     font-size: 0.8rem;
-    cursor: pointer;
-    padding: 0;
-}
-
-.mark-as-read:hover {
-    text-decoration: underline;
-}
-    /* Mobile Navigation */
-    .mobile-nav-toggle {
-      color: white;
-      font-size: 1.5rem;
-      cursor: pointer;
-      display: none;
-    }
-    
-    /* Responsive */
-    @media (max-width: 768px) {
-      .header .logo h1 {
-        font-size: 1.3rem;
-      }
-      
-      .mobile-nav-toggle {
-        display: block;
-      }
-      
-      .navmenu {
-        position: fixed;
-        top: 70px;
-        right: -100%;
-        width: 80%;
-        height: calc(100vh - 70px);
-        background: white;
-        transition: 0.3s;
-        z-index: 999;
-      }
-      
-      .navmenu ul {
-        flex-direction: column;
-        padding: 1rem;
-      }
-      
-      .navmenu ul li a {
-        color: var(--dark-color) !important;
-        padding: 1rem 0;
-        border-bottom: 1px solid #eee;
-      }
-      
-      .navmenu.active {
-        right: 0;
-      }
-    }
-    :root {
-      --primary-color: #005baa; /* Bleu marine */
-      --secondary-color: #003366; /* Bleu foncé */
-      --accent-color: #00a1e0; /* Bleu clair */
-      --light-color: #f8f9fa;
-      --dark-color: #212529;
-      --success-color: #28a745;
-      --warning-color: #ffc107;
-      --danger-color: #dc3545;
-    }
-    
-    .hero {
-      background: linear-gradient(rgba(0, 91, 170, 0.8), rgba(0, 51, 102, 0.8)), url('img/hero-bg-rescue.jpg');
-      background-size: cover;
-      background-position: center;
-      color: white;
-    }
-    
-    .feature-card {
-      border-left: 4px solid var(--accent-color);
-      transition: transform 0.3s;
-    }
-    
-    .feature-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-    }
-    
-    .real-time-map {
-      height: 400px;
-      background: #f0f0f0;
-      border-radius: 8px;
-      overflow: hidden;
-    }
-    
-    .emergency-btn {
-      background-color: var(--danger-color);
-      color: white;
-      font-weight: bold;
-      padding: 12px 24px;
-      border-radius: 30px;
-      transition: all 0.3s;
-    }
-    
-    .emergency-btn:hover {
-      background-color: #c82333;
-      transform: scale(1.05);
-    }
-    
-    .status-badge {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      padding: 5px 10px;
-      border-radius: 20px;
-      font-size: 0.8rem;
-      font-weight: bold;
-    }
-    
-    .status-active {
-      background-color: var(--success-color);
-      color: white;
-    }
-    
-    .status-warning {
-      background-color: var(--warning-color);
-      color: var(--dark-color);
-    }
-    #map-container {
-  width: 100%;
-  height: 400px; /* ou la hauteur souhaitée */
-}
-
-  </style>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
-    <link href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" rel="stylesheet">
-    <style>
-    
-      
-      .alert-card {
-        border-left: 4px solid var(--primary-blue);
-        transition: all 0.2s;
-      }
-      
-      .alert-card:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-      }
-      
-      .alert-card.critique {
-        border-left-color: var(--danger-red);
-      }
-      
-      .alert-card.urgent {
-        border-left-color: var(--warning-yellow);
-      }
-      
-      .map-container {
-        height: 400px;
-        border-radius: 8px;
-        overflow: hidden;
-      }
-      
-      .status-badge {
-        font-size: 0.8rem;
-        padding: 0.35em 0.65em;
-      }
-      
-      .timeline {
-        position: relative;
-        padding-left: 1.5rem;
-      }
-      
-      .timeline::before {
-        content: '';
-        position: absolute;
-        left: 7px;
-        top: 0;
-        bottom: 0;
-        width: 2px;
-        background-color: #e9ecef;
-      }
-      
-      .timeline-item {
-        position: relative;
-        padding-bottom: 1.5rem;
-      }
-      
-      .timeline-item::before {
-        content: '';
-        position: absolute;
-        left: -1.5rem;
-        top: 0.25rem;
-        width: 12px;
-        height: 12px;
-        border-radius: 50%;
-        background-color: var(--primary-blue);
-        border: 2px solid white;
-      }
-      
-      .file-preview {
-        max-width: 100px;
-        max-height: 100px;
-        margin-right: 10px;
-        border: 1px solid #dee2e6;
-        border-radius: 4px;
-      }
-      
-      @media (max-width: 768px) {
-        .map-container {
-          height: 300px;
-        }
-      }
-    </style>
-</head>
-
-<body class="index-page">
-
-  <header id="header" class="header d-flex align-items-center fixed-top">
-    <div class="container-fluid container-xl position-relative d-flex align-items-center">
-      <a href="index.html" class="logo d-flex align-items-center me-auto">
-        <img src="{{ url_for('static', filename='img/mrcc-logo.png') }}" alt=""> 
-        <h1>MRCC</h1>
-      </a>
-
-      <nav id="navmenu" class="navmenu">
-        <ul>
-          <li><a href="{{ url_for('index') }}">Accueil</a></li>
-          <li><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
-          <li><a href="http://geoai-solutions.ddns.net:8888/MRCC/">Géoportail</a></li>
-          <li><a href="{{ url_for('marine') }}">Flotte maritime</a></li>
-          <li><a href="{{ url_for('moyens') }}">Moyens de secours</a></li>
-          <li><a href="{{ url_for('alerte') }}">Alertes</a></li>
-          <li><a href="{{ url_for('api') }}">API</a></li>
-        </ul>
-      </nav>
-
-      <div class="user-menu ms-auto">
-        {% if current_user.is_authenticated %}
-          <span class="username">{{ current_user.username }}</span>
-          <a href="{{ url_for('logout') }}" class="btn btn-sm btn-primary-custom">Déconnexion</a>
-        {% else %}
-          <a href="{{ url_for('login') }}" class="btn btn-sm btn-primary-custom">Connexion</a>
-          <a href="{{ url_for('register') }}" class="btn btn-sm btn-secondary-custom">Inscription</a>
-        {% endif %}
-     
-      </div>
-      
-      <div class="notification-wrapper ms-3">
-        <button id="notification-icon" class="notification-icon" aria-label="Notifications">
-          <i class="bi bi-bell"></i>
-          <span id="notification-count" class="notification-badge">3</span>
-        </button>
-        <div id="notification-list" class="notification-dropdown">
-          <div class="notification-header">
-            <h5>Alertes récentes</h5>
-            <button class="mark-all-read">Tout marquer comme lu</button>
-          </div>
-          <div class="notification-content">
-            <div class="notification-item">
-              <div class="notification-title">Alerte détresse</div>
-              <div class="notification-text">Signal de détresse reçu à 12:34 - Position: 33.5°N, 7.6°W</div>
-              <button class="mark-as-read" data-id="1">Marquer comme lu</button>
-            </div>
-            <div class="notification-item">
-              <div class="notification-title">Météo</div>
-              <div class="notification-text">Avertissement de tempête pour la zone Atlantique Nord</div>
-              <button class="mark-as-read" data-id="2">Marquer comme lu</button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <button class="mobile-nav-toggle d-xl-none">
-      <i class="bi bi-list"></i>
-    </button>
-  </header>
-
-  <main class="main">
+    padding: 0.35em 0.65em;
+  }
   
+  .timeline {
+    position: relative;
+    padding-left: 1.5rem;
+  }
+  
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 7px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background-color: #e9ecef;
+  }
+  
+  .timeline-item {
+    position: relative;
+    padding-bottom: 1.5rem;
+  }
+  
+  .timeline-item::before {
+    content: '';
+    position: absolute;
+    left: -1.5rem;
+    top: 0.25rem;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background-color: var(--primary-blue);
+    border: 2px solid white;
+  }
+  
+  .file-preview {
+    max-width: 100px;
+    max-height: 100px;
+    margin-right: 10px;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+  }
+  
+  @media (max-width: 768px) {
+    .map-container {
+      height: 300px;
+    }
+  }
+  
+  .required-field::after {
+    content: " *";
+    color: red;
+  }
+</style>
+{% endblock %}
 
-  <div class="container py-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-      <h1 class="h3 mb-0">Nouvelle Alerte de Sauvetage</h1>
-      <a href="/alertes" class="btn btn-outline-primary">
-        <i class="bi bi-arrow-left me-1"></i> Retour aux alertes
-      </a>
-    </div>
+{% block content %}
+<div class="container py-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3 mb-0">
+      <i class="bi bi-plus-circle me-2"></i>Nouvelle Alerte de Sauvetage
+    </h1>
+    <a href="{{ url_for('mes_alertes') }}" class="btn btn-outline-primary">
+      <i class="bi bi-arrow-left me-1"></i> Retour aux alertes
+    </a>
+  </div>
 
-    <div class="card mb-4">
-      <div class="card-body">
-        <form id="alerteForm">
-          <div class="row">
-            <div class="col-md-6">
-              <div class="mb-3">
-                <label for="titre" class="form-label">Titre de l'alerte *</label>
-                <input type="text" class="form-control" id="titre" required>
-              </div>
-              
-              <div class="mb-3">
-                <label for="type_incident" class="form-label">Type d'incident *</label>
-                <select class="form-select" id="type_incident" required>
-                  <option value="">Sélectionnez un type</option>
-                  <option value="navire_en_detresse">Navire en détresse</option>
-                  <option value="homme_a_la_mer">Homme à la mer</option>
-                  <option value="avarie">Avarie</option>
-                  <option value="incendie">Incendie à bord</option>
-                  <option value="collision">Collision</option>
-                  <option value="echouement">Échouement</option>
-                  <option value="pollution">Pollution</option>
-                  <option value="autre">Autre</option>
-                </select>
-              </div>
-              
-              <div class="mb-3">
-                <label for="niveau_urgence" class="form-label">Niveau d'urgence *</label>
-                <select class="form-select" id="niveau_urgence" required>
-                  <option value="normal">Normal</option>
-                  <option value="urgent">Urgent</option>
-                  <option value="critique">Critique</option>
-                </select>
-              </div>
-              
-              <div class="mb-3">
-                <label for="nombre_personnes" class="form-label">Nombre de personnes concernées</label>
-                <input type="number" class="form-control" id="nombre_personnes" min="1">
-              </div>
-              
-              <div class="mb-3">
-                <label for="moyen_alerte" class="form-label">Moyen d'alerte</label>
-                <select class="form-select" id="moyen_alerte">
-                  <option value="">Sélectionnez un moyen</option>
-                  <option value="vhf">VHF</option>
-                  <option value="inmarsat">Inmarsat</option>
-                  <option value="epirb">Balise EPIRB</option>
-                  <option value="telephone">Téléphone</option>
-                  <option value="autre">Autre</option>
-                </select>
-              </div>
+  <div class="card mb-4">
+    <div class="card-body">
+      <!-- Formulaire avec méthode POST et enctype pour les fichiers -->
+      <form id="alerteForm" method="POST" action="{{ url_for('add_alerte') }}" enctype="multipart/form-data">
+        <div class="row">
+          <div class="col-md-6">
+            <div class="mb-3">
+              <label for="titre" class="form-label required-field">Titre de l'alerte</label>
+              <input type="text" class="form-control" id="titre" name="titre" required>
             </div>
             
-            <div class="col-md-6">
-              <div class="mb-3">
-                <label for="navire_implique" class="form-label">Navire impliqué</label>
-                <input type="text" class="form-control" id="navire_implique">
-              </div>
-              
-              <div class="mb-3">
-                <label for="immatriculation_navire" class="form-label">Immatriculation/Nom du navire</label>
-                <input type="text" class="form-control" id="immatriculation_navire">
-              </div>
-              
-              <div class="mb-3">
-                <label for="conditions_meteo" class="form-label">Conditions météorologiques</label>
-                <textarea class="form-control" id="conditions_meteo" rows="2"></textarea>
-              </div>
-              
-              <div class="mb-3">
-                <label for="notes_complementaires" class="form-label">Notes complémentaires</label>
-                <textarea class="form-control" id="notes_complementaires" rows="2"></textarea>
-              </div>
-              
-              <div class="mb-3">
-                <label for="fichier_joint" class="form-label">Fichier joint</label>
-                <input type="file" class="form-control" id="fichier_joint">
-                <div class="form-text">Formats acceptés: PDF, JPG, PNG (max 5MB)</div>
-              </div>
+            <div class="mb-3">
+              <label for="type_incident" class="form-label required-field">Type d'incident</label>
+              <select class="form-select" id="type_incident" name="type_incident" required>
+                <option value="">Sélectionnez un type</option>
+                <option value="navire_en_detresse">🚢 Navire en détresse</option>
+                <option value="homme_a_la_mer">👨 Homme à la mer</option>
+                <option value="avarie">⚠️ Avarie</option>
+                <option value="incendie">🔥 Incendie à bord</option>
+                <option value="collision">💥 Collision</option>
+                <option value="echouement">🏝️ Échouement</option>
+                <option value="pollution">🛢️ Pollution</option>
+                <option value="autre">❓ Autre</option>
+              </select>
+            </div>
+            
+            <div class="mb-3">
+              <label for="niveau_urgence" class="form-label required-field">Niveau d'urgence</label>
+              <select class="form-select" id="niveau_urgence" name="niveau_urgence" required>
+                <option value="normal">🟢 Normal</option>
+                <option value="urgent">🟡 Urgent</option>
+                <option value="critique">🔴 Critique</option>
+              </select>
+            </div>
+            
+            <div class="mb-3">
+              <label for="nombre_personnes" class="form-label">Nombre de personnes concernées</label>
+              <input type="number" class="form-control" id="nombre_personnes" name="nombre_personnes" min="1">
+            </div>
+            
+            <div class="mb-3">
+              <label for="moyen_alerte" class="form-label">Moyen d'alerte</label>
+              <select class="form-select" id="moyen_alerte" name="moyen_alerte">
+                <option value="">Sélectionnez un moyen</option>
+                <option value="vhf">📻 VHF</option>
+                <option value="inmarsat">🛰️ Inmarsat</option>
+                <option value="epirb">🆘 Balise EPIRB</option>
+                <option value="telephone">📞 Téléphone</option>
+                <option value="autre">❓ Autre</option>
+              </select>
             </div>
           </div>
           
-          <div class="row">
-            <div class="col-12">
-              <div class="mb-3">
-                <label for="description" class="form-label">Description détaillée *</label>
-                <textarea class="form-control" id="description" rows="4" required></textarea>
-              </div>
+          <div class="col-md-6">
+            <div class="mb-3">
+              <label for="navire_implique" class="form-label">Navire impliqué</label>
+              <input type="text" class="form-control" id="navire_implique" name="navire_implique">
+            </div>
+            
+            <div class="mb-3">
+              <label for="immatriculation_navire" class="form-label">Immatriculation/Nom du navire</label>
+              <input type="text" class="form-control" id="immatriculation_navire" name="immatriculation_navire">
+            </div>
+            
+            <div class="mb-3">
+              <label for="conditions_meteo" class="form-label">Conditions météorologiques</label>
+              <textarea class="form-control" id="conditions_meteo" name="conditions_meteo" rows="2"></textarea>
+            </div>
+            
+            <div class="mb-3">
+              <label for="notes_complementaires" class="form-label">Notes complémentaires</label>
+              <textarea class="form-control" id="notes_complementaires" name="notes_complementaires" rows="2"></textarea>
+            </div>
+            
+            <div class="mb-3">
+              <label for="fichier_joint" class="form-label">Fichier joint</label>
+              <input type="file" class="form-control" id="fichier_joint" name="fichier_joint" accept=".pdf,.jpg,.jpeg,.png">
+              <div class="form-text">Formats acceptés: PDF, JPG, PNG (max 5MB)</div>
             </div>
           </div>
-          
-          <div class="row mb-4">
-            <div class="col-md-6">
-              <div class="card">
-                <div class="card-header bg-light">
-                  <h5 class="card-title mb-0">Position</h5>
-                </div>
-                <div class="card-body">
-                  <div class="row">
-                    <div class="col-md-6 mb-3">
-                      <label for="latitude" class="form-label">Latitude</label>
-                      <input type="text" class="form-control" id="latitude" placeholder="ex: 31.7917">
-                    </div>
-                    <div class="col-md-6 mb-3">
-                      <label for="longitude" class="form-label">Longitude</label>
-                      <input type="text" class="form-control" id="longitude" placeholder="ex: -7.0926">
-                    </div>
+        </div>
+        
+        <div class="row">
+          <div class="col-12">
+            <div class="mb-3">
+              <label for="description" class="form-label required-field">Description détaillée</label>
+              <textarea class="form-control" id="description" name="description" rows="4" required></textarea>
+            </div>
+          </div>
+        </div>
+        
+        <div class="row mb-4">
+          <div class="col-md-6">
+            <div class="card">
+              <div class="card-header bg-light">
+                <h5 class="card-title mb-0">Position</h5>
+              </div>
+              <div class="card-body">
+                <div class="row">
+                  <div class="col-md-6 mb-3">
+                    <label for="latitude" class="form-label">Latitude</label>
+                    <input type="text" class="form-control" id="latitude" name="latitude" placeholder="ex: 31.7917">
                   </div>
-                  <button type="button" class="btn btn-outline-primary btn-sm" id="localiserBtn">
-                    <i class="bi bi-geo-alt me-1"></i> Localiser sur la carte
-                  </button>
+                  <div class="col-md-6 mb-3">
+                    <label for="longitude" class="form-label">Longitude</label>
+                    <input type="text" class="form-control" id="longitude" name="longitude" placeholder="ex: -7.0926">
+                  </div>
                 </div>
-              </div>
-            </div>
-            <div class="col-md-6">
-              <div class="card h-100">
-                <div class="card-header bg-light">
-                  <h5 class="card-title mb-0">Carte</h5>
-                </div>
-                <div class="card-body p-0">
-                  <div id="map" class="map-container"></div>
-                </div>
+                <button type="button" class="btn btn-outline-primary btn-sm" id="localiserBtn">
+                  <i class="bi bi-geo-alt me-1"></i> Localiser sur la carte
+                </button>
               </div>
             </div>
           </div>
-          
-          <div class="d-flex justify-content-end">
-            <button type="button" class="btn btn-outline-secondary me-2">
-              <i class="bi bi-x-circle me-1"></i> Annuler
-            </button>
-            <button type="submit" class="btn btn-primary">
-              <i class="bi bi-save me-1"></i> Enregistrer l'alerte
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-  </div>
-
-  <!-- Notifications Modal -->
-  <div class="modal fade" id="notificationsModal" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">Notifications</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-        </div>
-        <div class="modal-body" id="notificationsList">
-          <div class="text-center py-3">
-            <div class="spinner-border text-primary" role="status">
-              <span class="visually-hidden">Chargement...</span>
+          <div class="col-md-6">
+            <div class="card h-100">
+              <div class="card-header bg-light">
+                <h5 class="card-title mb-0">Carte interactive</h5>
+              </div>
+              <div class="card-body p-0">
+                <div id="map" class="map-container"></div>
+              </div>
+              <div class="card-footer bg-light">
+                <small class="text-muted">
+                  <i class="bi bi-info-circle"></i> Cliquez sur la carte pour définir la position
+                </small>
+              </div>
             </div>
           </div>
         </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+        
+        <div class="d-flex justify-content-end gap-2">
+          <button type="button" class="btn btn-outline-secondary" onclick="window.history.back()">
+            <i class="bi bi-x-circle me-1"></i> Annuler
+          </button>
+          <button type="submit" class="btn btn-primary">
+            <i class="bi bi-save me-1"></i> Enregistrer l'alerte
+          </button>
         </div>
-      </div>
+      </form>
     </div>
   </div>
-</main>
+</div>
+{% endblock %}
 
-<footer id="footer" class="footer">
-  <div class="container footer-top">
-    <div class="row gy-4">
-      <div class="col-lg-4 col-md-6 footer-about">
-        <a href="index.html" class="logo d-flex align-items-center">
-          <img src="{{ url_for('static', filename='img/mrcc-logo.png') }}" alt=""> 
-          <span class="ms-2">MRCC Maroc</span>
-        </a>
-        <p>Centre de Coordination des Sauvetages Maritimes du Royaume du Maroc. Service public de recherche et sauvetage en mer.</p>
-        <div class="social-links d-flex mt-4">
-          <a href="#"><i class="bi bi-twitter"></i></a>
-          <a href="#"><i class="bi bi-facebook"></i></a>
-          <a href="#"><i class="bi bi-linkedin"></i></a>
-        </div>
-      </div>
-
-      <div class="col-lg-2 col-md-3 footer-links">
-        <h4>Liens utiles</h4>
-        <ul>
-          <li><a href="#">Marine Royale</a></li>
-          <li><a href="#">Direction de la Météorologie</a></li>
-          <li><a href="#">Ports Nationaux</a></li>
-          <li><a href="#">Gendarmerie Royale</a></li>
-          <li><a href="#">Protection Civile</a></li>
-        </ul>
-      </div>
-
-      <div class="col-lg-2 col-md-3 footer-links">
-        <h4>Nos services</h4>
-        <ul>
-          <li><a href="#">Coordination SAR</a></li>
-          <li><a href="#">Surveillance maritime</a></li>
-          <li><a href="#">Prévention des pollutions</a></li>
-          <li><a href="#">Formation maritime</a></li>
-          <li><a href="#">Coopération internationale</a></li>
-        </ul>
-      </div>
-
-      <div class="col-lg-4 col-md-12 footer-newsletter">
-        <h4>Bulletin d'information</h4>
-        <p>Abonnez-vous à notre newsletter pour recevoir les dernières actualités et alertes.</p>
-        <form action="#" method="post">
-          <input type="email" name="email" placeholder="Votre email">
-          <input type="submit" value="S'abonner">
-        </form>
-      </div>
-    </div>
-  </div>
-
-  <div class="container copyright text-center mt-4">
-    <p>&copy; <span id="year"></span> <strong>MRCC Maroc</strong>. Tous droits réservés.</p>
-    <div class="credits">
-      Développé par <a href="#">Centre Royal de Télédétection Spatiale</a>
-    </div>
-  </div>
-</footer>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
-  <script>
-    // Initialisation de la carte
-    let map = L.map('map').setView([31.7917, -7.0926], 6);
-    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', {
-      attribution: 'Tiles © Esri — Source: Esri, Garmin, USGS, NGA, and others'
-    }).addTo(map);
+{% block extra_js %}
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+  // Initialisation de la carte
+  let map = L.map('map').setView([31.7917, -7.0926], 6);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© OpenStreetMap contributors'
+  }).addTo(map);
+  
+  let marker = null;
+  
+  // Gestion du clic sur la carte
+  map.on('click', function(e) {
+    if (marker) {
+      map.removeLayer(marker);
+    }
+    marker = L.marker(e.latlng).addTo(map);
+    document.getElementById('latitude').value = e.latlng.lat.toFixed(6);
+    document.getElementById('longitude').value = e.latlng.lng.toFixed(6);
+  });
+  
+  // Bouton de localisation
+  document.getElementById('localiserBtn').addEventListener('click', function() {
+    const lat = parseFloat(document.getElementById('latitude').value);
+    const lng = parseFloat(document.getElementById('longitude').value);
     
-    let marker = null;
+    if (isNaN(lat) || isNaN(lng)) {
+      alert('Veuillez entrer des coordonnées valides');
+      return;
+    }
     
-    // Gestion du clic sur la carte
-    map.on('click', function(e) {
-      if (marker) {
-        map.removeLayer(marker);
-      }
-      marker = L.marker(e.latlng).addTo(map);
-      document.getElementById('latitude').value = e.latlng.lat.toFixed(6);
-      document.getElementById('longitude').value = e.latlng.lng.toFixed(6);
-    });
+    const latlng = L.latLng(lat, lng);
+    if (marker) {
+      map.removeLayer(marker);
+    }
+    marker = L.marker(latlng).addTo(map);
+    map.setView(latlng, 12);
+  });
+  
+  // Validation supplémentaire avant soumission
+  document.getElementById('alerteForm').addEventListener('submit', function(e) {
+    const titre = document.getElementById('titre').value.trim();
+    const typeIncident = document.getElementById('type_incident').value;
+    const description = document.getElementById('description').value.trim();
     
-    // Bouton de localisation
-    document.getElementById('localiserBtn').addEventListener('click', function() {
-      const lat = parseFloat(document.getElementById('latitude').value);
-      const lng = parseFloat(document.getElementById('longitude').value);
-      
-      if (isNaN(lat) || isNaN(lng)) {
-        alert('Veuillez entrer des coordonnées valides');
-        return;
-      }
-      
-      const latlng = L.latLng(lat, lng);
-      if (marker) {
-        map.removeLayer(marker);
-      }
-      marker = L.marker(latlng).addTo(map);
-      map.setView(latlng, 12);
-    });
-    
-    // Gestion du formulaire
-    document.getElementById('alerteForm').addEventListener('submit', function(e) {
+    if (!titre) {
       e.preventDefault();
-      
-      // Validation des champs requis
-      if (!document.getElementById('titre').value || 
-          !document.getElementById('type_incident').value || 
-          !document.getElementById('description').value) {
-        alert('Veuillez remplir tous les champs obligatoires');
-        return;
-      }
-      
-      // Ici, vous ajouteriez le code pour envoyer les données au serveur
-      console.log('Formulaire soumis');
-      alert('Alerte enregistrée avec succès!');
-      // window.location.href = '/alertes';
-    });
+      alert('Veuillez saisir un titre');
+      return false;
+    }
     
-    // Gestion des notifications
-    document.getElementById('notificationsBtn').addEventListener('click', function() {
-      const modal = new bootstrap.Modal(document.getElementById('notificationsModal'));
-      modal.show();
-      
-      // Simulation de chargement des notifications
-      setTimeout(() => {
-        document.getElementById('notificationsList').innerHTML = `
-          <div class="list-group">
-            <a href="#" class="list-group-item list-group-item-action">
-              <div class="d-flex justify-content-between">
-                <h6 class="mb-1">Nouvelle alerte</h6>
-                <small class="text-muted">il y a 5 min</small>
-              </div>
-              <p class="mb-1 small">Navire en détresse signalé à 48.123N, 4.456W</p>
-            </a>
-            <a href="#" class="list-group-item list-group-item-action">
-              <div class="d-flex justify-content-between">
-                <h6 class="mb-1">Mise à jour d'alerte</h6>
-                <small class="text-muted">il y a 1h</small>
-              </div>
-              <p class="mb-1 small">Le patrouilleur P1 est en route vers la zone</p>
-            </a>
-            <a href="#" class="list-group-item list-group-item-action">
-              <div class="d-flex justify-content-between">
-                <h6 class="mb-1">Rapport mensuel</h6>
-                <small class="text-muted">il y a 2 jours</small>
-              </div>
-              <p class="mb-1 small">Votre rapport de juin est disponible</p>
-            </a>
-          </div>
-        `;
-      }, 1000);
-    });
-  </script>
-</body>
-</html>
+    if (!typeIncident) {
+      e.preventDefault();
+      alert('Veuillez sélectionner un type d\'incident');
+      return false;
+    }
+    
+    if (!description) {
+      e.preventDefault();
+      alert('Veuillez saisir une description');
+      return false;
+    }
+    
+    // Le formulaire sera soumis normalement
+    return true;
+  });
+</script>
+{% endblock %}
